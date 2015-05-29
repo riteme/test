@@ -1,6 +1,6 @@
-/**
- * Copyright 2015 riteme
- */
+//
+// Copyright 2015 riteme
+// 
 
 #include <iostream>
 using std::cout;
@@ -18,10 +18,10 @@ class A: public Object {
   int i = 100;
   int GetInt() {
     return i;
-  }
-  virtual A GetA() {
+}
+virtual A GetA() {
     return *this;
-  }
+}
 };  // class A:public Object
 
 A Object::GetA() {
