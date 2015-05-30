@@ -16,7 +16,7 @@ TReturn Convert(void *value) {
 }
 
 int main(int argc, char **argv) {
-    int a = 0, b = 1, c = 2;
+    int a = 0/*, b = 1, c = 2*/;
     string s = "Hello, world!";
     void *ps = &s;
     string new_s = Convert<string>(ps);
