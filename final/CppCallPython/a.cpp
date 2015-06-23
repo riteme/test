@@ -4,7 +4,7 @@
 
 #include <python2.7/Python.h>  // Run python
 #include <iostream>
-#include <cstdlib>  // EXIT_sUCCESS, EXiT_FAILURE
+#include <cstdlib>  // EXIT_SUCCESS, EXIT_FAILURE
 #include "./share.h"
 
 using std::cout;
@@ -81,5 +81,7 @@ int main(int argc, char **argv) {
     cout << "a: " << get() << endl;
 
     Py_Finalize();
+
+    return EXIT_SUCCESS;
 }
 
