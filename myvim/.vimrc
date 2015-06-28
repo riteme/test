@@ -1,4 +1,16 @@
 set nocompatible
+"filetype off
+
+filetype off
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+Plugin 'gmarik/Vundle.vim'
+
+Plugin 'bling/vim-airline'
+Plugin 'Valloric/YouCompleteMe'
+call vundle#end()            " required
+filetype on
+filetype plugin indent on    " required
 "airline
 "let g:airline_left_sep = ''
 let g:airline_left_sep = ''
@@ -16,7 +28,7 @@ set nowrap
 "Syntax ON
 syntax on
 "Set color scheme
-set t_Co=25?
+set t_Co=256
 let g:molokai_original=1
 let g:rehash256=1
 colo molokai
@@ -97,13 +109,29 @@ nnoremap <leader>gg :YcmCompleter GoToDefinitionElseDeclaration<CR>
 map <F5> :YcmDiags<CR>
 let g:ycm_error_symbol='XX'
 let g:ycm_warning_symbol='??'
+"let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py'
 autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
 autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
 autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
 autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
 autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-autocmd FileType ruby setlocal omnifunc=rubycomplete#Complete
-autocmd FileType haskell setlocal omnifunc=necoghc#omnifunc
+set completeopt=longest,menu
+autocmd InsertLeave * if pumvisible() == 0|pclose|endif
+let g:ycm_auto_trigger = 1
+let g:ycm_confirm_extra_conf=0
+let g:ycm_collect_identifiers_from_tags_files=1
+let g:ycm_min_num_of_chars_for_completion=1
+"let g:ycm_cache_omnifunc=0
+let g:ycm_seed_identifiers_with_syntax=1
+let g:ycm_complete_in_comments = 1
+let g:ycm_complete_in_strings = 1
+inoremap <expr> <CR> pumvisible() ? '<C-y>' : '<CR>'
+inoremap <expr> <Down>     pumvisible() ? '<C-n>' : '<Down>'
+inoremap <expr> <Up>       pumvisible() ? '<C-p>' : '<Up>'
+inoremap <expr> <PageDown> pumvisible() ? '<PageDown><C-p><C-n>' : '<PageDown>'
+inoremap <expr> <PageUp>   pumvisible() ? '<PageUp><C-p><C-n>' : '<PageUp>'
+"let g:ycm_collect_identifiers_from_comments_and_strings =1 
+nnoremap <F6> :YcmForceCompileAndDiagnostics<CR>
 "Clipboard
 ""set clipboard+=unnamed,unnamedplus
 set wildmode=list:longest,full
@@ -124,7 +152,6 @@ map <leader>- <C-w>-
 "jedi
 "autocmd FileType python setlocal completeopt-=preview
 "Pymode
-let g:pymode_python='disable'
 set autowrite
 set hidden
 
@@ -157,13 +184,12 @@ func SetTitle()
     autocmd BufNewFile * normal G
 endfunc
 
-filetype on
+
 filetype plugin on
 filetype indent on
 set iskeyword+=_,$,@,%,#,-
 
 set wildmenu
-set completeopt=longest,menu
 
 ""nmap <leader>f0 :set foldlevel=0<CR>
 ""nmap <leader>f1 :set foldlevel=1<CR>
