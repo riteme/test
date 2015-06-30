@@ -1,7 +1,7 @@
 set nocompatible
 
 "leader is ,
-let mapleader = ","
+let mapleader = ",","\\"
 
 filetype off
 set rtp+=~/.vim/bundle/Vundle.vim
@@ -44,8 +44,12 @@ colo desert
 set background=dark
 hi Pmenu gui=NONE guifg=black guibg=silver
 hi PmenuSel gui=bold guifg=black guibg=grey
-highlight clear SignColumn
-highlight clear LineNr
+hi String guifg=yellow guibg=#333333
+hi Number guifg=pink guibg=#333333
+hi Special guifg=orange guibg=#333333
+()
+hi clear SignColumn
+hi clear LineNr
 "Numbers
 set number
 "Autoindent
@@ -59,7 +63,7 @@ map <Esc> :nohl<CR>
 "Set font
 if has('gui_running')
     " set guifont=Ubuntu\ Mono\ Derivative\ Powerline\ 14
-    set guifont=Monaco\ 10
+    set guifont=Monaco\ 11
 endif
 "Lines & columns
 set lines=34
@@ -226,10 +230,10 @@ vnoremap > >gv
 " cmap cd. lcd %:p:h
 " layout
 
-map <leader><Right> <C-w>l
-map <leader><Left> <C-w>h
-map <leader><Up> <C-w>k
-map <leader><Down> <C-w>j
+map <C-Right> <C-w>l
+map <C-Left> <C-w>h
+map <C-Up> <C-w>k
+map <C-Down> <C-w>j
 
 nnoremap > >>
 nnoremap < <<
