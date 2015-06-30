@@ -1,5 +1,7 @@
 set nocompatible
-"filetype off
+
+"leader is ,
+let mapleader = ","
 
 filetype off
 set rtp+=~/.vim/bundle/Vundle.vim
@@ -7,7 +9,11 @@ call vundle#begin()
 Plugin 'gmarik/Vundle.vim'
 
 Plugin 'bling/vim-airline'
-Plugin 'Valloric/YouCompleteMe'
+Plugin 'scrooloose/syntastic'
+Plugin 'easymotion/vim-easymotion'
+Plugin 'terryma/vim-multiple-cursors'
+Plugin 'tpope/vim-commentary'
+Plugin 'terryma/vim-expand-region'
 call vundle#end()            " required
 filetype on
 filetype plugin indent on    " required
@@ -22,17 +28,22 @@ set guitablabel=%M\ %t
 set encoding=utf8
 "set guioptions+=e
 scriptencoding utf-8
-set spell
+"set spell
 "set foldenable
 set nowrap
 "Syntax ON
 syntax on
 "Set color scheme
 set t_Co=256
-let g:molokai_original=1
-let g:rehash256=1
-colo molokai
+"let g:molokai_original=1
+"let g:rehash256=1
+"autocmd InsertLeave * se nocul
+"autocmd InsertEnter * se cul
+set cul
+colo desert
 set background=dark
+hi Pmenu gui=NONE guifg=black guibg=silver
+hi PmenuSel gui=bold guifg=black guibg=grey
 highlight clear SignColumn
 highlight clear LineNr
 "Numbers
@@ -47,7 +58,8 @@ set ignorecase
 map <Esc> :nohl<CR>
 "Set font
 if has('gui_running')
-    set guifont=ubuntu\ mono\ derivative\ powerline\ 13
+    " set guifont=Ubuntu\ Mono\ Derivative\ Powerline\ 14
+    set guifont=Monaco\ 10
 endif
 "Lines & columns
 set lines=34
@@ -64,7 +76,7 @@ set whichwrap+=<,>,h,l
 "Perfomance
 set lazyredraw
 "Brackets
-set showmatch
+"set showmatch
 "No sound
 set noerrorbells
 set novisualbell
@@ -89,8 +101,8 @@ set laststatus=2
 let g:airline#extensions#tabline#enabled=1
 let g:airline_powerline_fonts=1
 "Tab
-map <S-Left> :tabp<CR>
-map <S-Right> :tabn<CR>
+map <S-Left> :bp<CR>
+map <S-Right> :bn<CR>
 map <S-Up> :tabnew<CR>
 map <S-Down> :bd<CR>
 
@@ -107,15 +119,16 @@ nnoremap <leader>gl :YcmCompleter GoToDeclaration<CR>
 nnoremap <leader>gf :YcmCompleter GoToDefinition<CR>
 nnoremap <leader>gg :YcmCompleter GoToDefinitionElseDeclaration<CR>
 map <F5> :YcmDiags<CR>
-let g:ycm_error_symbol='XX'
-let g:ycm_warning_symbol='??'
-"let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py'
+"let g:ycm_error_symbol=''
+"let g:ycm_warning_symbol=''
+let g:ycm_enable_diagnostic_signs = 0
+let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py'
 autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
 autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
 autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
 autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
 autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-set completeopt=longest,menu
+set completeopt=longest,menu,menuone
 autocmd InsertLeave * if pumvisible() == 0|pclose|endif
 let g:ycm_auto_trigger = 1
 let g:ycm_confirm_extra_conf=0
@@ -125,15 +138,17 @@ let g:ycm_min_num_of_chars_for_completion=1
 let g:ycm_seed_identifiers_with_syntax=1
 let g:ycm_complete_in_comments = 1
 let g:ycm_complete_in_strings = 1
-inoremap <expr> <CR> pumvisible() ? '<C-y>' : '<CR>'
+"inoremap <expr> <CR> pumvisible() ? '<C-y>' : '<CR>'
 inoremap <expr> <Down>     pumvisible() ? '<C-n>' : '<Down>'
 inoremap <expr> <Up>       pumvisible() ? '<C-p>' : '<Up>'
 inoremap <expr> <PageDown> pumvisible() ? '<PageDown><C-p><C-n>' : '<PageDown>'
 inoremap <expr> <PageUp>   pumvisible() ? '<PageUp><C-p><C-n>' : '<PageUp>'
 "let g:ycm_collect_identifiers_from_comments_and_strings =1 
 nnoremap <F6> :YcmForceCompileAndDiagnostics<CR>
+"syntastic
+let g:syntastic_enable_signs=0
 "Clipboard
-""set clipboard+=unnamed,unnamedplus
+" set clipboard+=unnamed,unnamedplus
 set wildmode=list:longest,full
 map <leader>d "+d
 map <leader>y "+y
@@ -158,15 +173,13 @@ set hidden
 noremap j gj
 noremap k gk
 "auro brackets
-""inoremap ( ()<ESC>i
-""inoremap [ []<ESC>i
-""inoremap { {}<ESC>i
-""inoremap < <><ESC>i
-""inoremap " ""<ESC>i
-""inoremap ' ''<ESC>i
+" inoremap ( ()<ESC>i
+" inoremap [ []<ESC>i
+" inoremap { {}<ESC>i
+" inoremap < <><ESC>i
+" inoremap " ""<ESC>i
+" inoremap ' ''<ESC>i
 
-autocmd InsertLeave * se nocul
-autocmd InsertEnter * se cul
 
 autocmd BufNewFile *.cpp,*.c,*.h,*.hpp,*.py exec ":call SetTitle()"
 func SetTitle()
@@ -191,16 +204,16 @@ set iskeyword+=_,$,@,%,#,-
 
 set wildmenu
 
-""nmap <leader>f0 :set foldlevel=0<CR>
-""nmap <leader>f1 :set foldlevel=1<CR>
-""nmap <leader>f2 :set foldlevel=2<CR>
-""nmap <leader>f3 :set foldlevel=3<CR>
-""nmap <leader>f4 :set foldlevel=4<CR>
-""nmap <leader>f5 :set foldlevel=5<CR>
-""nmap <leader>f6 :set foldlevel=6<CR>
-""nmap <leader>f7 :set foldlevel=7<CR>
-""nmap <leader>f8 :set foldlevel=8<CR>
-""nmap <leader>f9 :set foldlevel=9<CR>
+" nmap <leader>f0 :set foldlevel=0<CR>
+" nmap <leader>f1 :set foldlevel=1<CR>
+" nmap <leader>f2 :set foldlevel=2<CR>
+" nmap <leader>f3 :set foldlevel=3<CR>
+" nmap <leader>f4 :set foldlevel=4<CR>
+" nmap <leader>f5 :set foldlevel=5<CR>
+" nmap <leader>f6 :set foldlevel=6<CR>
+" nmap <leader>f7 :set foldlevel=7<CR>
+" nmap <leader>f8 :set foldlevel=8<CR>
+" nmap <leader>f9 :set foldlevel=9<CR>
 
 nnoremap H ^
 vnoremap H ^
@@ -209,9 +222,9 @@ vnoremap L g_
 vnoremap < <gv
 vnoremap > >gv
 
-""cmap cwd lcd %:p:h
-""cmap cd. lcd %:p:h
-""layout
+" cmap cwd lcd %:p:h
+" cmap cd. lcd %:p:h
+" layout
 
 map <leader><Right> <C-w>l
 map <leader><Left> <C-w>h
@@ -221,3 +234,31 @@ map <leader><Down> <C-w>j
 nnoremap > >>
 nnoremap < <<
 
+"syntastic
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+
+"easymotion
+map <Leader> <Plug>(easymotion-prefix)
+map <Leader>l <Plug>(easymotion-lineforward)
+map <Leader>j <Plug>(easymotion-j)
+map <Leader>k <Plug>(easymotion-k)
+map <Leader>h <Plug>(easymotion-linebackward)
+
+nmap ; :
+
+"multiselection
+let g:multi_cursor_next_key='<C-n>'
+let g:multi_cursor_prev_key='<C-p>'
+let g:multi_cursor_skip_key='<C-k>'
+let g:multi_cursor_quit_key='<Esc>'
+
+"commentary
+nmap <BS> gcc
+vmap <BS> gc
+
+" expand-region
+map K <Plug>(expand_region_expand)
+map J <Plug>(expand_region_shrink)
