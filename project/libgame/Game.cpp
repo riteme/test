@@ -43,7 +43,7 @@ extern "C" {
             SetStatus(Status::Error);
             return GAME_FAILURE;
         }
-        
+
         // 加载渲染器
         renderer = SDL_CreateRenderer(window,
                                       REN_DRIVER, REN_FLAGS);
