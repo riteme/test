@@ -6,8 +6,10 @@
 #define PROJECT_LIBRENDER_RENDER_H_
 
 #include <SDL2/SDL.h>
+#include <string>
+#include <unordered_map>
 
-// NOTICE: 这里只有渲染函数
+// NOTICE: 这里只有渲染函数以及一个材质管理器
 //         不包括载入和退出
 
 /** 表示一种颜色（RGBA）
@@ -120,12 +122,14 @@ typedef SDL_Renderer* Renderer;
 typedef SDL_Window* Window;
 
 // 内部使用
-static Rectangle axis = {0, 0, 0, 0};
-static Renderer renderer = nullptr;
-static Window window = nullptr;
+extern Rectangle axis;
+extern Renderer renderer;
+extern Window window;
+extern std::unordered_map<std::string, Texture> textureMap;
 
-/** 绑定渲染器
+/** 绑定渲染器和窗口
  * @param ren: 渲染器，即SDL_Renderer的指针
+ * @param wnd: 窗口，即SDL_Window的指针
  */
 void BindSdlInstances(Renderer ren, Window wnd);
 
@@ -154,25 +158,39 @@ void MoveAxisToOrigin(void);
 void MoveAxisToCenter(void);
 
 /** 加载材质
+ * @param newName: 新材质的名称
  * @param filePath: 材质文件路径
+ * @ret: 一个整型，指示操作是否成功
  * @remark: 使用SDL_IMG来加载
+ *          如果存在同名的材质，**则会将之前的材质删除**
+ *          由于创建材质需要渲染器，所以在调用此函数前**先绑定渲染器**
  */
-Texture LoadTexture(const char *filePath);
+int LoadTexture(std::string &newName, std::string &filePath);
+
+/** 通过名称获取材质
+ * @param name: 材质名称
+ * @ret: 返回对应的材质
+ */
+Texture GetTexture(std::string &name);
+
+/** 销毁所有的材质
+ * @ret: 一个整型，指示操作是否成功
+ */
+int DestroyTextures(void);
 
 /** 清除画面
- * @remark: 实际未清除缓存
  */
 void ClearDisplay(Color backColor);
 
 /** 展示画面
- * @remark: SDL2采用了双缓冲技术，实际上为Flip操作
  */
 void PresentDisplay(void);
 
 /** 设置当前绘制颜色
  * @param c: 颜色
+ * @remark: 用户不应使用该函数
  */
-void SetDrawColor(Color c);
+void _SetDrawColor(Color c);
 
 /** 绘制一条直线
  * @params x1, y1: 第一个点的横纵坐标

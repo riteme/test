@@ -3,21 +3,33 @@
 //
 
 #include "./Game.h"
+#include "../librender/Render.h"  // 渲染模块
 
 #include <SDL2/SDL.h>
 #include <cstdlib>
 #include <iostream>
+#include <fstream>
 
 using std::cout;
 using std::cerr;
 using std::endl;
+using std::string;
+using std::ifstream;
 
-extern "C" {
+SDL_Renderer *renderer = nullptr;
+SDL_Window *window = nullptr;
 
-    int GameInit(const char *wndTitle,
+Chess board[BOARD_WIDTH][BOARD_HEIGHT];
+Chess chessMode = Chess::Unknown;
+Status status = Status::NotInit;
+
+extern "C" {  // C语言借口声明
+
+    int GameInit(string wndTitle,
                  int wndWidth,
                  int wndHeight,
-                 int wndFlags
+                 int wndFlags,
+                 string textureConfig
                 ) {
         if (SDL_Init(SDL_INIT_VIDEO) != GAME_SUCCESS) {
             cerr << "Cannot initialize SDL2!"
@@ -30,7 +42,7 @@ extern "C" {
         }
 
         // 加载窗口
-        window = SDL_CreateWindow(wndTitle,
+        window = SDL_CreateWindow(wndTitle.c_str(),
                                   WND_X, WND_Y,
                                   wndWidth, wndHeight,
                                   wndFlags);
@@ -57,7 +69,17 @@ extern "C" {
             return GAME_FAILURE;
         }
 
-        // TODO(riteme): Textures
+        // 绑定到渲染模块
+        BindSdlInstances(renderer, window);
+
+        // 加载材质
+        ifstream config(textureConfig);
+
+        if (config) {
+            /* for (auto line : config) { */
+            // TODO(riteme):
+            /* } */
+        }
 
         // ... 确认数组中每个值均为CHESS_UNKNOWN
         for (auto &x : board) {

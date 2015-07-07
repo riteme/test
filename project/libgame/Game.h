@@ -6,49 +6,33 @@
 #define PROJECT_LIBGAME_GAME_H_
 
 #include <SDL2/SDL.h>
+#include <string>
 
-// NOTICE:
-// 在C++11中，使用constexpr代替宏
-
-// #define GAME_SUCCESS 0
-// #define GAME_FAILURE -1
-constexpr int GAME_SUCCESS = 0;
-constexpr int GAME_FAILURE = -1;
+#define GAME_SUCCESS 0
+#define GAME_FAILURE -1
 
 // 窗口默认值
-// #define WND_TITLE "Chess"
-// #define WND_WIDTH 800
-// #define WND_HEIGHT 600
-// #define WND_X SDL_WINDOWPOS_CENTERED
-// #define WND_Y SDL_WINDOWPOS_CENTERED
-// #define WND_FLAGS SDL_WINDOW_SHOWN
-constexpr char WND_TITLE[] = "Chess";
-constexpr int WND_WIDTH = 800;
-constexpr int WND_HEIGHT = 600;
-constexpr int WND_X = SDL_WINDOWPOS_CENTERED;
-constexpr int WND_Y = SDL_WINDOWPOS_CENTERED;
-constexpr int WND_FLAGS = SDL_WINDOW_SHOWN;
+#define WND_TITLE "Chess"
+#define WND_WIDTH 800
+#define WND_HEIGHT 600
+#define WND_X SDL_WINDOWPOS_CENTERED
+#define WND_Y SDL_WINDOWPOS_CENTERED
+#define WND_FLAGS SDL_WINDOW_SHOWN
 
 // 渲染器默认值
-// #define REN_DRIVER -1
-// #define REN_FLAGS SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
-constexpr int REN_DRIVER = -1;
-constexpr int REN_FLAGS = SDL_RENDERER_ACCELERATED |
-                          SDL_RENDERER_PRESENTVSYNC;
+#define REN_DRIVER -1
+#define REN_FLAGS SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
+
+// 材质配置文件默认值
+#define TEX_CONFIG_FILE ""
 
 // 18x18 = 391
-// #define BOARD_WIDTH 18
-// #define BOARD_HEIGHT 18
-constexpr int BOARD_WIDTH = 18;
-constexpr int BOARD_HEIGHT = 18;
+#define BOARD_WIDTH 18
+#define BOARD_HEIGHT 18
 
-// 状态宏定义
-// #define STATUS_NOT_INIT -1
-// #define STATUS_ERROR -2
-// #define STATUS_UNKNOWN -3
-// #define STATUS_NORMAL 0
-// #define STATUS_BLACK_WON 1
-// #define STATUS_WHITE_WON 2
+#define CHESS_WIDTH 50
+#define CHESS_HEIGHT 50
+#define CHESS_MARGIN 6
 
 /** 状态枚举
  * @enum NotInit: 表示还未载入
@@ -68,11 +52,6 @@ enum class Status {
     WhiteNow = 2
 };
 
-// chess
-// #define CHESS_UNKNOWN 0
-// #define CHESS_BLACK 1
-// #define CHESS_WHITE 2
-
 /** 表示棋子颜色
  * @enum Unknown: 未知
  * @enum Black: 黑子
@@ -84,20 +63,14 @@ enum class Chess {
     White   = 2
 };
 
-// #define CHESS_WIDTH 50
-// #define CHESS_HEIGHT 50
-constexpr int CHESS_WIDTH = 50;
-constexpr int CHESS_HEIGHT = 50;
-constexpr int CHESS_MARGIN = 6;
-
 // 渲染器和窗口声明
-SDL_Renderer *renderer = nullptr;
-SDL_Window *window = nullptr;
+extern SDL_Renderer *renderer;
+extern SDL_Window *window;
 
 // 游戏数据
-static Chess board[BOARD_WIDTH][BOARD_HEIGHT];
-static Chess chessMode = Chess::Unknown;
-static Status status = Status::NotInit;
+extern Chess board[BOARD_WIDTH][BOARD_HEIGHT];
+extern Chess chessMode;
+extern Status status;
 
 extern "C" {
     /** 载入游戏
@@ -108,10 +81,11 @@ extern "C" {
      * @param wndFlags: 窗口参数
      * @ret: 返回一个整型，指示执行状态
      */
-    int GameInit(const char *wndTitle  = WND_TITLE,
-                 int         wndWidth  = WND_WIDTH,
-                 int         wndHeight = WND_HEIGHT,
-                 int         wndFlags  = WND_FLAGS);
+    int GameInit(std::string wndTitle      = WND_TITLE,
+                 int         wndWidth      = WND_WIDTH,
+                 int         wndHeight     = WND_HEIGHT,
+                 int         wndFlags      = WND_FLAGS,
+                 std::string textureConfig = TEX_CONFIG_FILE);
 
     /* 退出游戏 */
     void GameExit(void);

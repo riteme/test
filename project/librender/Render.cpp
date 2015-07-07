@@ -3,8 +3,20 @@
 //
 
 #include "./Render.h"
-#include <SDL2/SDL.h>
+
 #include <SDL2/SDL_image.h>
+
+// NOTICE: 和libgame/Game.h中的定义一致
+#define GAME_SUCCESS 0
+#define GAME_FAILURE -1
+
+using std::string;
+using std::unordered_map;
+
+Rectangle axis = {0, 0, 0, 0};
+Renderer renderer = nullptr;
+Window window = nullptr;
+std::unordered_map<std::string, Texture> textureMap;
 
 void BindSdlInstances(Renderer ren, Window wnd) {
     renderer = ren;
@@ -41,27 +53,69 @@ void MoveToAxisOrigin() {
 }
 
 void MoveToAxisCenter() {
+    // ? : 转换是否必要？
     axis.X = reinterpret_cast<int>(axis.Width / 2);
     axis.Y = reinterpret_cast<int>(axis.Height / 2);
 }
 
-Texture LoadTexture(const char *filePath) {
+int LoadTexture(string &newName, string &filePath) {
+    int status = GAME_SUCCESS;
+
     SDL_Surface *tmpSurface = nullptr;
-    tmpSurface = IMG_Load(filePath);
-
-    if (tmpSurface == nullptr) {
-        return nullptr;
-    }
-
-    if (renderer == nullptr) {
-        return nullptr;
-    }
-
     SDL_Texture *tmpTexture = nullptr;
-    tmpTexture = SDL_CreateTextureFromSurface(renderer, tmpSurface);
-    SDL_FreeSurface(tmpSurface);
 
-    return tmpTexture;
+    tmpSurface = IMG_Load(filePath.c_str());
+
+    if (tmpSurface == nullptr || renderer == nullptr) {
+        status = GAME_FAILURE;
+    } else {
+        tmpTexture = SDL_CreateTextureFromSurface(renderer, tmpSurface);
+
+        if (tmpTexture == nullptr) {
+            status = GAME_FAILURE;
+        }
+
+        SDL_FreeSurface(tmpSurface);
+    }
+
+    if (status != GAME_FAILURE) {
+        auto iter = textureMap.find(newName);
+        
+        // 如果名称已存在，则检查材质是否被创建
+        // 若创建，则先销毁之前的材质，
+        // 改为新的材质
+        if (iter != textureMap.end()) {
+            if (iter->second != nullptr) {
+                SDL_DestroyTexture(iter->second);
+            }
+
+            iter->second = tmpTexture;
+        } else {
+            textureMap.insert(std::make_pair(newName, tmpTexture));
+        }
+    }
+
+    return status;
+}
+
+Texture GetTexture(string &name) {
+    auto iter = textureMap.find(name);
+
+    if (iter != textureMap.end()) {
+        return iter->second;
+    } else {
+        return nullptr;
+    }
+}
+
+int DestroyTextures() {
+    for (auto &e : textureMap) {
+        SDL_DestroyTexture(e.second);
+    }
+
+    textureMap.clear();
+
+    return GAME_SUCCESS;
 }
 
 void ClearDisplay(Color backColor) {
@@ -80,7 +134,7 @@ void PresentDisplay() {
     SDL_RenderPresent(renderer);
 }
 
-void SetDrawColor(Color c) {
+void _SetDrawColor(Color c) {
 #ifndef NDEBUG
     if (renderer == nullptr) return;
 #endif
@@ -93,8 +147,12 @@ void DrawLine(int x1, int y1, int x2, int y2, Color c) {
     if (renderer == nullptr) return;
 #endif
 
-    SetDrawColor(c);
-    SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+    _SetDrawColor(c);
+    SDL_RenderDrawLine(renderer,
+                       x1 + axis.X,
+                       y1 + axis.Y,
+                       x2 + axis.X,
+                       y2);
 }
 
 void DrawLine(Point point1, Point point2, Color c) {
@@ -106,7 +164,7 @@ void DrawRectangle(int x, int y, int width, int height, Color c) {
     if (renderer == nullptr) return;
 #endif
 
-    SetDrawColor(c);
+    _SetDrawColor(c);
 
     SDL_Rect rect;
     rect.x = x;
@@ -129,7 +187,7 @@ void DrawTexture(Texture texture, int x, int y, Color c) {
     if (renderer == nullptr) return;
 #endif
 
-    SetDrawColor(c);
+    _SetDrawColor(c);
 
     int w, h;
     SDL_QueryTexture(texture, nullptr, nullptr, &w, &h);

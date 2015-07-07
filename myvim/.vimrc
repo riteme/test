@@ -27,15 +27,23 @@ filetype plugin indent on
 " color scheme
 syntax on
 set t_Co=256
-colorscheme evening
-set background=dark
+" colorscheme evening
+colorscheme default
+" set background=dark
+set background=light
+hi Normal guibg=#EAEAEA
 hi Pmenu gui=NONE guifg=black guibg=silver
 hi PmenuSel gui=bold guifg=black guibg=grey
-hi Constant guibg=#333333
-hi Special guifg=orange guibg=#333333
-hi Cursor guifg=white guibg=red
+" hi Constant guibg=#333333
+" hi Special guifg=orange guibg=#333333
+" hi Cursor guifg=white guibg=red
 hi clear SignColumn
 hi clear LineNr
+
+" UI settings
+set number
+set lazyredraw " for perfomance
+set cul " highligh current line.
 
 " gvim setting
 if has('gui_running')
@@ -52,11 +60,6 @@ if has('gui_running')
     set mouse=a
 endif
 
-" UI settings
-set number
-set lazyredraw " for perfomance
-set cul " highligh current line.
-
 " highlight search
 set hlsearch
 set incsearch
@@ -71,7 +74,7 @@ set noswapfile
 set autowrite
 set hidden
 set iskeyword+=_,$,@,%,#,-
-set wrapmargin=0
+" set wrapmargin=0
 set history=512
 set wildmenu
 set autoread
@@ -85,7 +88,7 @@ scriptencoding utf-8
 
 " text setting
 set nowrap " do not wrap words.
-set whichwrap+=<,>,h,l
+" set whichwrap+=<,>,h,l
 set backspace=eol,start,indent " better backspace.
 
 " tabs & indents
@@ -125,8 +128,8 @@ map <leader>- <C-w>-
 
 noremap j gj
 noremap k gk
-noremap H ^
-noremap L g_
+noremap H 0
+noremap L $
 
 vnoremap < <gv
 vnoremap > >gv
@@ -134,7 +137,7 @@ nnoremap < <<
 nnoremap > >>
 
 map <C-Right> <C-w>l
-map <C-Left> <C-w>k
+map <C-Left> <C-w>h
 map <C-Up> <C-w>k
 map <C-Down> <C-w>j
 
@@ -174,11 +177,11 @@ let g:ycm_seed_identifiers_with_syntax = 1
 let g:ycm_complete_in_comments = 1
 let g:ycm_complete_in_strings = 1
 
-autocmd FileType css setlocal omnifunc = csscomplete#CompleteCSS
-autocmd FileType html,markdown setlocal omnifunc = htmlcomplete#CompleteTags
-autocmd FileType javascript setlocal omnifunc = javascriptcomplete#CompleteJS
-autocmd FileType python setlocal omnifunc = pythoncomplete#Complete
-autocmd FileType xml setlocal omnifunc = xmlcomplete#CompleteTags
+autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 autocmd InsertLeave * if pumvisible() == 0|pclose | endif
 
 nnoremap <leader>gl :YcmCompleter GoToDeclaration<CR>
