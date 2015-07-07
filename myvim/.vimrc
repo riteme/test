@@ -15,6 +15,8 @@ Plugin 'easymotion/vim-easymotion'
 Plugin 'terryma/vim-multiple-cursors'
 Plugin 'tpope/vim-commentary'
 Plugin 'terryma/vim-expand-region'
+Plugin 'rhysd/vim-clang-format'
+Plugin 'kana/vim-operator-user'
 Plugin 'Valloric/YouCompleteMe'
 call vundle#end()
 
@@ -51,10 +53,11 @@ if has('gui_running')
     set guifont=Monaco\ 12,Ubuntu\ Mono\ 14
 
     " layout
-    set lines=48
-    set columns=160
+    set lines=38
+    " set columns=160
+    set columns=80
     set linespace=0
-    vsplit
+    " vsplit
 
     " manage mouse
     set mouse=a
@@ -103,7 +106,33 @@ set smartindent
 set cindent
 
 " key bindings
-map ; :
+map <C-r> :!xmodmap ~/.exchangeESCandCAPSLOCK<CR>
+
+noremap ; :
+
+" make vim more like an IDE.
+imap (<Tab> ()<Esc>i
+imap "<Tab> ""<Esc>i
+imap '<Tab> ''<Esc>i
+imap [<Tab> []<Esc>i
+imap <<Tab> <><Esc>i
+imap {<Tab> {}<Esc>i
+
+imap [<CR> [<CR><CR>]<Esc>kcc
+imap {<CR> {<CR><CR>}<Esc>kcc
+
+vmap " xi""<Esc>P
+vmap ' xi''<Esc>P
+vmap ( xi()<Esc>P
+vmap [ xi[]<Esc>P
+vmap { xi{}<Esc>P
+vmap < xi<><Esc>P
+
+imap <C-CR> <Esc>$a;<Esc>o
+imap ` <C-Space>
+
+map u :undo<CR>
+map U :redo<CR>
 
 nmap <ESC> :nohl<CR>
 
@@ -111,20 +140,29 @@ map <S-Left> :bp<CR>
 map <S-Right> :bn<CR>
 map <S-Up> :tabnew<CR>
 map <S-Down> :bd<CR>
+imap <S-Left> :bp<CR>
+imap <S-Right> :bn<CR>
+imap <S-Up> :tabnew<CR>
+imap <S-Down> :bd<CR>
 
 map <leader>x "+x
+map <leader>d "+d
 map <leader>y "+y
 map <leader>p "+p
 map <leader>P "+P
 
 nmap <F2> :!
-nmap <F3> :!cpplint
-nmap <F4> :!python
+nmap <F3> :!cppcheck --enable=all -j 4 
+nmap <F4> :!python 
 
 map <leader>s :split<CR>
 map <leader>vs :vsplit<CR>
 map <leader>= <C-w>+
 map <leader>- <C-w>-
+imap <leader>s :split<CR>
+imap <leader>vs :vsplit<CR>
+imap <leader>= <C-w>+
+imap <leader>- <C-w>-
 
 noremap j gj
 noremap k gk
@@ -136,10 +174,17 @@ vnoremap > >gv
 nnoremap < <<
 nnoremap > >>
 
-map <C-Right> <C-w>l
-map <C-Left> <C-w>h
-map <C-Up> <C-w>k
-map <C-Down> <C-w>j
+noremap <C-Right> <C-w>l
+noremap <C-Left> <C-w>h
+noremap <C-Up> <C-w>k
+noremap <C-Down> <C-w>j
+inoremap <C-Right> <C-w>l
+inoremap <C-Left> <C-w>h
+inoremap <C-Up> <C-w>k
+inoremap <C-Down> <C-w>j
+
+map <C-d> 10j
+map <C-u> 10k
 
 " when new buffer.
 autocmd BufNewFile *.cpp,*.c,*.h,*.hpp,*.py exec ":call SetTitle()"
@@ -184,9 +229,9 @@ autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
 autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 autocmd InsertLeave * if pumvisible() == 0|pclose | endif
 
-nnoremap <leader>gl :YcmCompleter GoToDeclaration<CR>
-nnoremap <leader>gf :YcmCompleter GoToDefinition<CR>
-nnoremap <leader>gg :YcmCompleter GoToDefinitionElseDeclaration<CR>
+nmap <leader>gl :YcmCompleter GoToDeclaration<CR>
+nmap <leader>gf :YcmCompleter GoToDefinition<CR>
+nmap <leader>gg :YcmCompleter GoToDefinitionElseDeclaration<CR>
 inoremap <expr> <Down>     pumvisible() ? '<C-n>' : '<Down>'
 inoremap <expr> <Up>       pumvisible() ? '<C-p>' : '<Up>'
 inoremap <expr> <PageDown> pumvisible() ? '<PageDown><C-p><C-n>' : '<PageDown>'
@@ -215,9 +260,20 @@ let g:multi_cursor_skip_key = '<C-k>'
 let g:multi_cursor_quit_key = '<Esc>'
 
 " commentary
-nmap <BS> gcc
-vmap <BS> gc
+nnoremap <BS> gcc
+vnoremap <BS> gc
 
 " expand-region
 map K <Plug>(expand_region_expand)
 map J <Plug>(expand_region_shrink)
+
+" clang-format
+let g:clang_format#code_style = "llvm"
+let g:clang_format#style_options = {
+            \ "IndentWidth" : 4,
+            \ "SpacesBeforeTrailingComments" : 2,
+            \ "IndentCaseLabels" : "true",
+            \ "AllowShortIfStatementsOnASingleLine" : "true",
+            \ "AllowShortCaseLabelsOnASingleLine" : "true"}
+let g:clang_format#auto_format = 1
+map <C-f> <Plug>(operator-clang-format)
