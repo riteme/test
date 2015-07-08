@@ -1,0 +1,21 @@
+#include <iostream>
+#include <vector>
+#include <list>
+
+using namespace std;
+
+template <typename Iter, typename T, typename C>
+Iter Find(const T &value, const C &container) {
+    for (auto beg = container.begin(); beg != container.end(); ++beg) {
+        if (*beg == value) {
+            return beg;
+        }
+    }
+    return container.end();
+}
+
+int main(int argc, char **argv) {
+    vector<string> vec = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"};
+    cout << *Find<vector<string>::iterator, string, vector<string>>("1", vec)
+         << endl;
+}
