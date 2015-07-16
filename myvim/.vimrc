@@ -29,16 +29,13 @@ filetype plugin indent on
 " color scheme
 syntax on
 set t_Co=256
-" colorscheme evening
-colorscheme default
-" set background=dark
-set background=light
-hi Normal guibg=#EAEAEA
-hi Pmenu gui=NONE guifg=black guibg=silver
-hi PmenuSel gui=bold guifg=black guibg=grey
-" hi Constant guibg=#333333
-" hi Special guifg=orange guibg=#333333
-" hi Cursor guifg=white guibg=red
+set background=dark
+colorscheme molokai
+let g:molokai_original=1
+let g:rehash256=1
+" set background=light
+" hi Pmenu gui=NONE guifg=black guibg=silver
+" hi PmenuSel gui=bold guifg=black guibg=grey
 hi clear SignColumn
 hi clear LineNr
 
@@ -50,13 +47,13 @@ set cul " highligh current line.
 " gvim setting
 if has('gui_running')
     set guioptions=
-    set guifont=Monaco\ 12,Ubuntu\ Mono\ 14
+    set guifont=Source\ Code\ Pro\ 13,Monaco\ 12,Ubuntu\ Mono\ 14
 
     " layout
     set lines=38
     " set columns=160
     set columns=80
-    set linespace=0
+    set linespace=-2
     " vsplit
 
     " manage mouse
@@ -111,12 +108,12 @@ map <C-r> :!xmodmap ~/.exchangeESCandCAPSLOCK<CR>
 noremap ; :
 
 " make vim more like an IDE.
-imap (<Tab> ()<Esc>i
-imap "<Tab> ""<Esc>i
-imap '<Tab> ''<Esc>i
-imap [<Tab> []<Esc>i
-imap <<Tab> <><Esc>i
-imap {<Tab> {}<Esc>i
+" imap (<Tab> ()<Esc>i
+" imap "<Tab> ""<Esc>i
+" imap '<Tab> ''<Esc>i
+" imap [<Tab> []<Esc>i
+" imap <<Tab> <><Esc>i
+" imap {<Tab> {}<Esc>i
 
 imap [<CR> [<CR><CR>]<Esc>kcc
 imap {<CR> {<CR><CR>}<Esc>kcc
@@ -129,21 +126,18 @@ vmap { xi{}<Esc>P
 vmap < xi<><Esc>P
 
 imap <C-CR> <Esc>$a;<Esc>o
-imap ` <C-Space>
+imap <S-CR> <Esc>o
+" imap ` <C-Space>
 
 map u :undo<CR>
 map U :redo<CR>
 
 nmap <ESC> :nohl<CR>
 
-map <S-Left> :bp<CR>
-map <S-Right> :bn<CR>
+map <S-Left> :tabp<CR>
+map <S-Right> :tabn<CR>
 map <S-Up> :tabnew<CR>
 map <S-Down> :bd<CR>
-imap <S-Left> :bp<CR>
-imap <S-Right> :bn<CR>
-imap <S-Up> :tabnew<CR>
-imap <S-Down> :bd<CR>
 
 map <leader>x "+x
 map <leader>d "+d
@@ -159,10 +153,6 @@ map <leader>s :split<CR>
 map <leader>vs :vsplit<CR>
 map <leader>= <C-w>+
 map <leader>- <C-w>-
-imap <leader>s :split<CR>
-imap <leader>vs :vsplit<CR>
-imap <leader>= <C-w>+
-imap <leader>- <C-w>-
 
 noremap j gj
 noremap k gk
@@ -260,8 +250,8 @@ let g:multi_cursor_skip_key = '<C-k>'
 let g:multi_cursor_quit_key = '<Esc>'
 
 " commentary
-nnoremap <BS> gcc
-vnoremap <BS> gc
+nmap <BS> gcc
+vmap <BS> gc
 
 " expand-region
 map K <Plug>(expand_region_expand)
@@ -274,6 +264,8 @@ let g:clang_format#style_options = {
             \ "SpacesBeforeTrailingComments" : 2,
             \ "IndentCaseLabels" : "true",
             \ "AllowShortIfStatementsOnASingleLine" : "true",
-            \ "AllowShortCaseLabelsOnASingleLine" : "true"}
+            \ "AllowShortCaseLabelsOnASingleLine" : "true",
+            \ "AlwaysBreakTemplateDeclarations" : "true"}
+
 let g:clang_format#auto_format = 1
-map <C-f> <Plug>(operator-clang-format)
+map <C-f> ggVG<Plug>(operator-clang-format)

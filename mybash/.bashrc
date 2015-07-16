@@ -121,3 +121,5 @@ fi
 alias cpp11="clang++ -std=c++11 -stdlib=libc++"
 alias cpp14="clang++ -std=c++14 -stdlib=libc++"
 alias r="./a.out"
+
+alias cppcheck="cppcheck --enable=all"
