@@ -1,61 +1,22 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-/* #include <SDL2/SDL_opengl.h> */
 #include <GL/glew.h>
 #include <cstdio>
 #include <iostream>
 #include <string>
-#include <fstream>
 #include <cstring>
+#include <chrono>
+
+#include "./func.hpp"
+
 using std::string;
-using std::ifstream;
 
-string ReadAllLinesFromFile(const string &filePath) {
-    ifstream f(filePath);
-
-    string data;
-
-    if (!f.is_open()) {
-        printf("Cannot open file! %s\n", filePath.c_str());
-    } else {
-        string buf;
-        while (f) {
-            std::getline(f, buf);
-            data += buf;
-            data += '\n';
-        }
-    }
-
-    return data;
-}
-
-bool CompileShader(GLuint shader) {
-    glCompileShader(shader);
-
-    char logBuf[1024];
-    glGetShaderInfoLog(shader, 1024, NULL, logBuf);
-    printf("%s\n", logBuf);
-
-    GLint status;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
-
-    return status == GL_TRUE ? true : false;
-}
-
-void SetAttr(GLuint prog, const char *name, int len, int step, int offest) {
-    GLint attrPos = glGetAttribLocation(prog, name);
-    glEnableVertexAttribArray(attrPos);
-    glVertexAttribPointer(attrPos, len, GL_FLOAT, GL_FALSE,
-                          step * sizeof(GLfloat),
-                          reinterpret_cast<GLvoid *>(offest * sizeof(GLfloat)));
-}
-
-int main(int argc, char *argv[]) {
+int main() {
     SDL_Init(SDL_INIT_VIDEO);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
                         SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
     SDL_Window *wnd =
         SDL_CreateWindow("OpenGL", SDL_WINDOWPOS_CENTERED,
@@ -97,30 +58,22 @@ int main(int argc, char *argv[]) {
 
     // compile shaders.
     string vertexSource, fragmentSource;
-    vertexSource = ReadAllLinesFromFile("vertex.glsl");
-    fragmentSource = ReadAllLinesFromFile("fragment.glsl");
+    vertexSource = ReadAllLinesFromFile("vertex.vsh");
+    fragmentSource = ReadAllLinesFromFile("fragment.fsh");
 
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
     const GLchar *vertexSource_cstr = vertexSource.c_str();
     glShaderSource(vertexShader, 1, &vertexSource_cstr, NULL);
 
     std::cout << vertexSource << std::endl;
-
-    if (!CompileShader(vertexShader)) {
-        printf("Cannot compile vertex shader.\n");
-        return -1;
-    }
+    CompileShader(vertexShader);
 
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     const GLchar *fragmentSource_cstr = fragmentSource.c_str();
     glShaderSource(fragmentShader, 1, &fragmentSource_cstr, NULL);
 
     std::cout << fragmentSource << std::endl;
-
-    if (!CompileShader(fragmentShader)) {
-        printf("Cannot compile fragment shader.\n");
-        return -1;
-    }
+    CompileShader(fragmentShader);
 
     // make programs.
     GLuint shaderProgram = glCreateProgram();
@@ -140,30 +93,26 @@ int main(int argc, char *argv[]) {
     /* glUniform3f(uniColor, 1.0f, 0.0f, 0.0f); */
 
     // texture
-    GLuint tex;
-    glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
+    GLuint textures[2];
+    LoadTexture("./google.png", textures[0], true, GL_TEXTURE0);
+    auto uniGoogle = glGetUniformLocation(shaderProgram, "texGoogle");
+    glUniform1i(uniGoogle, 0);
+    LoadTexture("./baidu.jpg", textures[1], false, GL_TEXTURE1);
+    auto uniBaidu = glGetUniformLocation(shaderProgram, "texBaidu");
+    glUniform1i(uniBaidu, 1);
 
-    SDL_Surface *surface = nullptr;
-    surface = IMG_Load("./google.png");
-    if (surface == nullptr) {
-        printf("Cannot load texture.\n");
-        return -1;
-    }
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_RGBA,
-                 GL_UNSIGNED_BYTE, surface->pixels);
-    SDL_FreeSurface(surface);
-    surface = nullptr;
+    auto uniTime = glGetUniformLocation(shaderProgram, "time");
+    auto time = 0.0f;
+    auto tStart = std::chrono::high_resolution_clock::now();
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    /* glGenerateMipmap(GL_TEXTURE_2D); */
+    /* constexpr int FUNC_PLUS = 1; */
+    /* constexpr int FUNC_MINUS = 2; */
+    /* auto timeFunc = FUNC_PLUS; */
+    glUniform1f(uniTime, time);
 
     GLenum error = glGetError();
     if (error != GL_NO_ERROR) {
-        printf("Error...   %d\n", error);
+        printf(">> Error...   %d\n", error);
         return -1;
     }
     // ========== END ==========
@@ -189,12 +138,28 @@ int main(int argc, char *argv[]) {
         /* glDrawArrays(GL_TRIANGLES, 0, 3); */
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
+        /* switch (timeFunc) { */
+        /*     case FUNC_PLUS: time += 0.01f; break; */
+        /*     case FUNC_MINUS: time -= 0.01f; break; */
+        /* } */
+        /* if (time <= 0.0f) { */
+        /*     time = 0.0f; */
+        /*     timeFunc = FUNC_PLUS; */
+        /* } else if (time >= 1.0f) { */
+        /*     time = 1.0f; */
+        /*     timeFunc = FUNC_MINUS; */
+        /* } */
+        auto tNow = std::chrono::high_resolution_clock::now();
+        time = std::chrono::duration_cast<std::chrono::duration<float>>(
+                   tNow - tStart).count();
+        glUniform1f(uniTime, time);
+
         SDL_GL_SwapWindow(wnd);
 
         SDL_Delay(1);
     }
 
-    glDeleteTextures(1, &tex);
+    glDeleteTextures(2, textures);
     glDeleteProgram(shaderProgram);
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
