@@ -35,14 +35,10 @@ int main() {
 
     // prepare vertices.
     GLfloat vertices[] = {
-        -0.5f, 0.5f,  1.0f, 1.0f,
-        1.0f,  0.0f,  0.0f,  // vertex 0
-        -0.5f, -0.5f, 1.0f, 1.0f,
-        1.0f,  0.0f,  1.0f,  // vertex 1
-        0.5f,  -0.5f, 1.0f, 1.0f,
-        1.0f,  1.0f,  1.0f,  // vertex 3
-        0.5f,  0.5f,  1.0f, 1.0f,
-        1.0f,  1.0f,  0.0f  // vertex 4
+        -0.5f, 0.5f,  1.0f, 1.0f, 1.0f,  0.0f,  0.0f, // vertex 0
+        -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,  0.0f,  1.0f, // vertex 1
+        0.5f,  -0.5f, 1.0f, 1.0f, 1.0f,  1.0f,  1.0f, // vertex 3
+        0.5f,  0.5f,  1.0f, 1.0f, 1.0f,  1.0f,  0.0f  // vertex 4
     };
     GLuint vbo;
     glGenBuffers(1, &vbo);
@@ -105,9 +101,10 @@ int main() {
     auto time = 0.0f;
     auto tStart = std::chrono::high_resolution_clock::now();
 
-    /* constexpr int FUNC_PLUS = 1; */
-    /* constexpr int FUNC_MINUS = 2; */
-    /* auto timeFunc = FUNC_PLUS; */
+    constexpr float FPS_TIME_SPAN = 5.0f;
+    unsigned fpsCount = 0;
+    float timeSpan = 0.0f;
+
     glUniform1f(uniTime, time);
 
     GLenum error = glGetError();
@@ -138,23 +135,20 @@ int main() {
         /* glDrawArrays(GL_TRIANGLES, 0, 3); */
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-        /* switch (timeFunc) { */
-        /*     case FUNC_PLUS: time += 0.01f; break; */
-        /*     case FUNC_MINUS: time -= 0.01f; break; */
-        /* } */
-        /* if (time <= 0.0f) { */
-        /*     time = 0.0f; */
-        /*     timeFunc = FUNC_PLUS; */
-        /* } else if (time >= 1.0f) { */
-        /*     time = 1.0f; */
-        /*     timeFunc = FUNC_MINUS; */
-        /* } */
         auto tNow = std::chrono::high_resolution_clock::now();
         time = std::chrono::duration_cast<std::chrono::duration<float>>(
                    tNow - tStart).count();
         glUniform1f(uniTime, time);
 
         SDL_GL_SwapWindow(wnd);
+
+        fpsCount += 1;
+        if (time - timeSpan > FPS_TIME_SPAN) {
+            auto fps = fpsCount / FPS_TIME_SPAN;
+            printf(">  FPS = %f\n", fps);
+            fpsCount = 0;
+            timeSpan = time;
+        }
 
         SDL_Delay(1);
     }

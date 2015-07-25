@@ -14,14 +14,14 @@ void main() {
     vec4 colBaidu = texture(texBaidu, Texcoord);
     /* vec4 mixed = mix(colGoogle, colBaidu, sin(time) / 2.0 + 0.5); */
     vec4 mixed;
-    if (Texcoord.y < 0.5) {
+    if (Texcoord.y < sin(time) / 2.0 + 0.5) {
         mixed = colBaidu;
     } else {
         /* mixed = colGoogle; */
         mixed = texture(texBaidu,
                         vec2(Texcoord.x +
                                  sin(Texcoord.y * 30.0 + time * 5.0) / 100.0,
-                             1.0 - Texcoord.y)) *
+                             Texcoord.y)) *
                 vec4(0.8, 0.8, 0.8, 1.0);
     }
     outColor = mixed * vec4(Color, 1.0);
