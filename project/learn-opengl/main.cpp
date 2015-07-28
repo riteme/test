@@ -1,3 +1,7 @@
+//
+// Copyright 2015 riteme
+//
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <GL/glew.h>
@@ -54,8 +58,8 @@ int main() {
 
     // compile shaders.
     string vertexSource, fragmentSource;
-    vertexSource = ReadAllLinesFromFile("vertex.vsh");
-    fragmentSource = ReadAllLinesFromFile("fragment.fsh");
+    vertexSource = ReadAllLinesFromFile("vertex.glsl");
+    fragmentSource = ReadAllLinesFromFile("fragment.glsl");
 
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
     const GLchar *vertexSource_cstr = vertexSource.c_str();
