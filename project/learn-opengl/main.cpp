@@ -5,6 +5,9 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <GL/glew.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <cstdio>
 #include <iostream>
 #include <string>
@@ -58,8 +61,8 @@ int main() {
 
     // compile shaders.
     string vertexSource, fragmentSource;
-    vertexSource = ReadAllLinesFromFile("vertex.glsl");
-    fragmentSource = ReadAllLinesFromFile("fragment.glsl");
+    vertexSource = ReadAllLinesFromFile("vertex.vert");
+    fragmentSource = ReadAllLinesFromFile("fragment.frag");
 
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
     const GLchar *vertexSource_cstr = vertexSource.c_str();
@@ -111,6 +114,12 @@ int main() {
 
     glUniform1f(uniTime, time);
 
+    glm::mat4 trans;
+    trans = glm::rotate(trans, glm::radians(100.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+    auto uniMat = glGetUniformLocation(shaderProgram, "trans");
+    glUniformMatrix4fv(uniMat, 1, GL_FALSE, glm::value_ptr(trans));
+
     GLenum error = glGetError();
     if (error != GL_NO_ERROR) {
         printf(">> Error...   %d\n", error);
@@ -123,12 +132,12 @@ int main() {
     while (flag) {
         if (SDL_PollEvent(&e)) {
             switch (e.type) {
-                case SDL_QUIT: flag = false; continue;
-                case SDL_KEYUP:
-                    switch (e.key.keysym.sym) {
-                        case SDLK_ESCAPE: flag = false; continue;
-                    }
-                    break;
+            case SDL_QUIT: flag = false; continue;
+            case SDL_KEYUP:
+                switch (e.key.keysym.sym) {
+                case SDLK_ESCAPE: flag = false; continue;
+                }
+                break;
             }
         }
 

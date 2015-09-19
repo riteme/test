@@ -7,6 +7,8 @@ in vec2 texcoord;
 out vec3 Color;
 out vec2 Texcoord;
 
+uniform mat4 trans;
+
 void main() {
     Color = color;
     Texcoord = texcoord;
