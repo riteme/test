@@ -1,59 +1,146 @@
 #include <iostream>
-#include <complex>
-#include <cmath>
+#include <algorithm>
+#include <vector>
+#include <cassert>
 
 using namespace std;
 
-// TODO(riteme): 坑爹的浮点数！！！！！！！！！！！
+int GetDigit(const char c){
+    switch (c) {
+    case '0':return 0;
+    case '1':return 1;
+    case '2':return 2;
+    case '3':return 3;
+    case '4':return 4;
+    case '5':return 5;
+    case '6':return 6;
+    case '7':return 7;
+    case '8':return 8;
+    case '9':return 9;
+   }  // switch to c
+}
+char GetChar(int i){
+    switch (i) {
+    case 0:return '0';
+    case 1:return '1';
+    case 2:return '2';
+    case 3:return '3';
+    case 4:return '4';
+    case 5:return '5';
+    case 6:return '6';
+    case 7:return '7';
+    case 8:return '8';
+    case 9:return '9';
+   }  // switch to c
+}
 
-typedef complex<long double> Complex;
+string GetString(const vector<int> &base,const vector<int> &tail){
+    string tmp;
 
-unsigned long GetDigit(const char c);
-Complex GetComplex(const string &data);
+    for (auto i : base) {
+        tmp+=GetChar(i);
+    }  // foreach in vec
+
+    if (tail.size()>0) {
+        tmp+='.';
+        for (auto i : tail) {
+            tmp+=GetChar(i);
+        }  // foreach in tail
+    }
+
+    return tmp;
+}
 
 int main(/*int argc, char *argv[]*/) {
-    // long double base;
-    Complex base;
     string baseData;
+    vector<int> base;
+    vector<int> tail;
 
     while (cin >> baseData) {
-        base = GetComplex(baseData);
+        bool baseOp=true;
+        bool recordingTail=false;
 
-        if (1 <= abs(base) && abs(base) < 10) {
-            cout << base << endl;
+        base.clear();
+        tail.clear();
+
+        for (auto c : baseData) {
+            if (c=='-') {
+                baseOp=false;
+                continue;
+            }else if (c=='.') {
+                recordingTail=true;
+                continue;
+            }
+
+            if (recordingTail) {
+                tail.push_back(GetDigit(c));
+            }else{
+                base.push_back(GetDigit(c));
+            }
+        }  // foreach in baseData
+
+        while (!tail.empty()&&tail.back()==0) {
+            tail.pop_back();
+        } // while
+
+        while (base.size()>1&&base.front()==0) {
+            base.erase(base.begin());
+        } // while
+
+        if (base.size()==1 && base[0]==0 && tail.empty()) {
+            cout<<0<<endl;
             continue;
         }
 
-        if (base == 0.0L) {
-            cout << 0 << endl;
-            continue;
-        }
+        // if (base.size()==2&&base[0]==1&&base[1]==0&&tail.empty()) {
+        //     cout<<GetString(base,tail,baseOp)<<endl;
+        // }
 
         // base * 10 ^ n
-        int n = 0;
-        bool baseOp = base >= 0;
-        bool nOp = !(abs(base) < 1);
-        base = abs(base);
+        unsigned long long n=0;
+        bool nOp=true;
 
-        while (1 > base || base >= 10) {
-            if (base < 1) {
-                base *= 10.0L;
+        if(nOp){
+            for (unsigned i=base.size();
+                 i>1;
+                 i--) {
+                tail.insert(tail.begin(),base.back());
+                base.pop_back();
                 n++;
-            } else {
-                base /= 10.0L;
+            }  // for
+        }else{
+            while (base[0]==0) {
+                base[0]=tail.front();
+                tail.erase(tail.begin());
                 n++;
+            } // while
+        }
+
+        if(!baseOp){
+            cout<<'-';
+        }
+
+        if (!(base.size()==1&&base[0]==1&&std::all_of(tail.begin(),tail.end(),[](int i){return i==0;})&&n!=0)) {
+            cout<<GetString(base,tail);
+            if (n!=0) {
+                cout<<'*';
             }
-        }  // while
+        }
 
-        cout << (baseOp ? "" : "-");
-        if (base != 1.0L) { cout << base << '*'; }
+        // if(tail.empty()){
+        //     cout<<endl;
+        //     continue;
+        // }
 
-        cout << "10";
-        if (n - (nOp ? 1 : 0) != 0) {
-            cout << "^";
-            cout << (nOp ? "" : "(-");
-            cout << n;
-            cout << (nOp ? "" : ")");
+        if (n!=0) {
+            cout << "10";
+
+            if (n - (nOp ? 1 : 0) != 0) {
+                cout << "^";
+                cout << (nOp ? "" : "(-");
+                cout << n;
+                cout << (nOp ? "" : ")");
+            }
         }
 
         cout << endl;
@@ -61,40 +148,3 @@ int main(/*int argc, char *argv[]*/) {
 
     return 0;
 }  // function main
-
-unsigned long GetDigit(const char c) {
-    switch (c) {
-        case '0': return 0UL;
-        case '1': return 1UL;
-        case '2': return 2UL;
-        case '3': return 3UL;
-        case '4': return 4UL;
-        case '5': return 5UL;
-        case '6': return 6UL;
-        case '7': return 7UL;
-        case '8': return 8UL;
-        case '9': return 9UL;
-    }  // switch to c
-}
-
-Complex GetComplex(const string &data) {
-    unsigned long real = 0, imag = 1;
-    bool hasDot = false;
-    int op = 1;
-
-    for (auto c : data) {
-        if (c == '-') {
-            op = -1;
-            continue;
-        }
-        if (c == '.') {
-            hasDot = true;
-            continue;
-        }
-
-        real = real * 10UL + GetDigit(c);
-        imag *= hasDot ? 10UL : 1UL;
-
-        return Complex(real, imag);
-    }  // foreach in data
- }
