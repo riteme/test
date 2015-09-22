@@ -100,6 +100,10 @@ int main(/*int argc, char *argv[]*/) {
         unsigned long long n=0;
         bool nOp=true;
 
+        if (base.size()==1&&base[0]==0&&!tail.empty()) {
+            nOp=false;
+        }
+
         if(nOp){
             for (unsigned i=base.size();
                  i>1;
