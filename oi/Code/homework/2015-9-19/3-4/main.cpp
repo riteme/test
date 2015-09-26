@@ -21,12 +21,25 @@ public:
 	}
 };
 
+void PrintPath(char from,char to){
+	cout<<"Move "<<from<<" to "<<to<<"."<<endl;
+}
+
+void Move(int n,char a,char b,char c){
+	if (n>0)
+	{
+		Move(n-1,a,c,b);
+		PrintPath(a,c);
+		Move(n-1,b,a,c);
+	}
+}
+
 int main(int argc, char **argv) {
 	auto io=StreamRedirect("hanoi.in","hanoi.out");
 
 	int n;
 	while (cin>>n) {
-		// ...
+		Move(n,'a','b','c');
 	} // while
 
 	return 0;
