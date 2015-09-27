@@ -17,9 +17,10 @@ int main(/*int argc, char *argv[]*/) {
     cin >> numberOfSudoku;
 
     int sudoku[SUDOKU_SIZE][SUDOKU_SIZE];
-    bool isFailed = false;
 
     for (int cnt = 1; cnt <= numberOfSudoku; cnt++) {
+        bool isFailed = false;
+
         ReadSudoku(sudoku);
 
         for (int i = 0; i < SUDOKU_SIZE && !isFailed; i++) {
@@ -71,5 +72,5 @@ void ReadSudoku(int dataArea[SUDOKU_SIZE][SUDOKU_SIZE]) {
             cin >> tmp;
             dataArea[i][j] = tmp;
         }  // for
-    }  // for
+    }      // for
 }
