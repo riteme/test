@@ -2,7 +2,6 @@
 #define BINARY_TREE_HPP
 
 #include <stdexcept>
-#include <cassert>
 
 #include "Node.hpp"
 
@@ -26,8 +25,7 @@ class BinaryTree {
     	Clear(m_pRoot);
     	m_pRoot=nullptr;
 
-    	assert(m_nSize==0);
-    	// m_nSize=0;
+    	m_nSize=0;
     }
     // void Remove(const KeyType &key){
     // 	auto target=Get(m_pRoot,key);
@@ -83,7 +81,19 @@ class BinaryTree {
     	return Get(m_pRoot,key)!=nullptr;
     }
 
+    SizeType RealSize(){
+        return RealSize(m_pRoot);
+    }
+
   private:
+    SizeType RealSize(NodeType *node){
+        if (node==nullptr) {
+            return 0;
+        }
+
+        return 1+RealSize(node->Left)+RealSize(node->Right);
+    }
+
   	NodeType *Get(NodeType *node,const KeyType &key) const{
   		if (node==nullptr) {
   		    return nullptr;
