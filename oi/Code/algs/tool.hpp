@@ -9,17 +9,50 @@ void PrintArray(const T &a){
 	cout<<endl;
 }
 
-template <typename T,typename TOp=std::less_equal<typename T::value_type>>
-bool IsSorted(const T &a,const TOp &op=TOp()){
-	for (unsigned i=0;
-	     i!=a.size()-1;
+template <typename T,unsigned N>
+void PrintArray(const T (&a)[N]){
+	for (int i=0;
+	     i<N;
 	     i++) {
-	    if(!op(a[i],a[i+1])) return false;
+	    cout<<a[i]<<' ';
 	}  // for
-	return true;
+	cout<<endl;
 }
 
 template <typename T>
-void Print(const T &msg){
-	cout<<msg<<endl;
-}
+class PtrDeleter {
+  public:
+    PtrDeleter()=default;
+    PtrDeleter(T *target):m_pTarget(target) {}
+    ~PtrDeleter(){
+    	if (m_pTarget!=nullptr) {
+    	    delete m_pTarget;
+    	}
+    }
+
+    void Reset(T *target){
+    	m_pTarget=target;
+    }
+
+  private:
+    T *m_pTarget=nullptr;
+};  // class PtrDeleter
+
+template <typename T>
+class ArrayPtrDeleter {
+  public:
+    ArrayPtrDeleter()=default;
+    ArrayPtrDeleter(T *target):m_pTarget(target) {}
+    ~ArrayPtrDeleter(){
+    	if (m_pTarget!=nullptr) {
+    	    delete [] m_pTarget;
+    	}
+    }
+
+    void Reset(T *target){
+    	m_pTarget=target;
+    }
+
+  private:
+    T *m_pTarget=nullptr;
+};  // class ArrayPtrDeleter
