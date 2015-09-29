@@ -1,6 +1,10 @@
 #ifndef NODE_HPP
 #define NODE_HPP
-    
+
+#include <memory>
+
+using namespace std;
+
 template <typename TKey,typename TValue>
 struct Node {
 	Node(TKey key,TValue value,Node *left,Node *right):Key(key),Value(value),Left(left),Right(right) {}
@@ -22,8 +26,8 @@ struct Node {
 
     TKey Key;
     TValue Value;
-    Node *Left;
-    Node *Right;
+    shared_ptr<Node> Left;
+    shared_ptr<Node> Right;
 };  // struct Node
 
 #endif  // NODE_HPP

@@ -2,10 +2,13 @@
 #define BINARY_TREE_HPP
 
 #include <stdexcept>
+#include <memory>
 
 #include "Node.hpp"
 
 #include "../../tool.hpp"
+
+using namespace std;
 
 template <typename TKey,typename TValue>
 class BinaryTree {
@@ -16,6 +19,7 @@ class BinaryTree {
     }
 
     typedef Node<TKey,TValue> NodeType;
+    typedef shared_ptr<NodeType> NodePtr;
     typedef TKey KeyType;
     typedef TValue ValueType;
     typedef unsigned SizeType;
@@ -66,7 +70,7 @@ class BinaryTree {
     }
     void Put(const KeyType &key,const ValueType &value){
     	if (m_pRoot==nullptr) {
-    	    m_pRoot=new NodeType(key,value,nullptr,nullptr);
+    	    m_pRoot.reset(new NodeType(key,value,nullptr,nullptr));
     	}else{
 	    	Put(m_pRoot,key,value);
 	    }
@@ -86,7 +90,7 @@ class BinaryTree {
     }
 
   private:
-    SizeType RealSize(NodeType *node){
+    SizeType RealSize(NodePtr node){
         if (node==nullptr) {
             return 0;
         }
@@ -94,7 +98,7 @@ class BinaryTree {
         return 1+RealSize(node->Left)+RealSize(node->Right);
     }
 
-  	NodeType *Get(NodeType *node,const KeyType &key) const{
+  	NodePtr Get(NodePtr node,const KeyType &key) const{
   		if (node==nullptr) {
   		    return nullptr;
   		}
@@ -108,19 +112,19 @@ class BinaryTree {
   		}
   	}
 
-  	void Put(NodeType *node,const KeyType &key,const ValueType &value){
+  	void Put(NodePtr node,const KeyType &key,const ValueType &value){
   		if (node->Key<key) {
   		    if (node->Right!=nullptr) {
   		        Put(node->Right,key,value);
   		    }else{
-  		    	node->Right=new NodeType(key,value,nullptr,nullptr);
+  		    	node->Right.reset(new NodeType(key,value,nullptr,nullptr));
   		    	return;
   		    }
   		}else if(key<node->Key){
   			if (node->Left!=nullptr) {
   			    Put(node->Left,key,value);
   			}else{
-  				node->Left=new NodeType(key,value,nullptr,nullptr);
+  				node->Left.reset(new NodeType(key,value,nullptr,nullptr));
   				return;
   			}
   		}else {
@@ -129,7 +133,7 @@ class BinaryTree {
   		}
   	}
 
-  	void Clear(NodeType *current){
+  	void Clear(NodePtr current){
   		if (current==nullptr) {
   		    return;
   		}
@@ -137,11 +141,11 @@ class BinaryTree {
   		Clear(current->Left);
   		Clear(current->Right);
 
-  		delete current;
+  		current.reset();
   		m_nSize--;
   	}
 
-  	NodeType *Remove(NodeType *node,const KeyType &key){
+  	NodePtr Remove(NodePtr node,const KeyType &key){
   		if (node==nullptr) {
   		    return nullptr;
   		}
@@ -152,22 +156,20 @@ class BinaryTree {
   			node->Left=Remove(node->Left,key);
   		}else{
   			if (node->Left==nullptr&&node->Right==nullptr) {
-  			    delete node;
+  			    node.reset();
   			    m_nSize--;
 
   			    return nullptr;
   			}else if(node->Left==nullptr){
-  				auto t=node->Right;
-  				delete node;
+                node=node->Right;
   				m_nSize--;
 
-  				return t;
+  				return node;
   			}else if(node->Right==nullptr){
-  				auto t=node->Left;
-  				delete node;
-  				m_nSize--;
+                node=node->Left;
+                m_nSize--;
 
-  				return t;
+                return node;
   			}else{
   				auto min=GetMin(node->Right);
   				node->Key=min->Key;
@@ -183,7 +185,7 @@ class BinaryTree {
   		return node;
   	}
 
-  	NodeType *GetMin(NodeType *node){
+  	NodePtr GetMin(NodePtr node){
   		if (node->Left==nullptr) {
   		    return node;
   		}
@@ -191,19 +193,17 @@ class BinaryTree {
   		return GetMin(node->Left);
   	}
 
-  	NodeType *DeleteMin(NodeType *node){
+  	NodePtr DeleteMin(NodePtr node){
   		if (node->Left==nullptr) {
-  			auto right=node->Right;
+            node=node->Right;
 
-  			delete node;
-
-  		    return right;
+  		    return node;
   		}
 
   		node->Left=DeleteMin(node->Left);
   	}
 
-    NodeType *m_pRoot=nullptr;
+    NodePtr m_pRoot=nullptr;
     SizeType m_nSize=0;
 };  // class BinaryTree
     

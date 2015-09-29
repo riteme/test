@@ -85,7 +85,7 @@ int main(int argc, char const *argv[])
 	cout<<"Size: "<<bst.Size()<<endl;
 	cout<<"RealSize: "<<bst.RealSize()<<endl;
 	assert(bst.Size()==0);
-	// assert(AllocateCount==0);
+	assert(AllocateCount==0);
 
 	return 0;
 }
