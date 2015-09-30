@@ -31,34 +31,11 @@ class BinaryTree {
 
     	m_nSize=0;
     }
-    // void Remove(const KeyType &key){
-    // 	auto target=Get(m_pRoot,key);
 
-    // 	if (target==nullptr) {
-    // 	    throw range_error("Key not found.");
-    // 	}else{
-    // 		if (target->Left==nullptr&&target->Right==nullptr) {
-    // 		    delete target;
-    // 		}else if(target->Left==nullptr){
-    // 			auto t=target->Right;
-    // 			*target=*target->Right;
-    // 			delete t;
-    // 		}else if(target->Right==nullptr){
-    // 			auto t=target->Left;
-    // 			*target=*target->Left;
-    // 			delete t;
-    // 		}else{
-    // 			auto min=GetMin(target->Right);
-    // 			target->Key=min->Key;
-    // 			target->Value=min->Value;
-    // 			DeleteMin(target->Right);
-    // 		}
-    // 		m_nSize--;
-    // 	}
-    // }
     void Remove(const KeyType &key){
     	Remove(m_pRoot,key);
     }
+
     ValueType Get(const KeyType &key) const{
     	auto result=Get(m_pRoot,key);
 
@@ -68,6 +45,7 @@ class BinaryTree {
     		return result->Value;
     	}
     }
+
     void Put(const KeyType &key,const ValueType &value){
     	if (m_pRoot==nullptr) {
     	    m_pRoot.reset(new NodeType(key,value,nullptr,nullptr));
@@ -81,6 +59,7 @@ class BinaryTree {
     SizeType Size() const{
     	return m_nSize;
     }
+    
     bool Contain(const KeyType &key){
     	return Get(m_pRoot,key)!=nullptr;
     }

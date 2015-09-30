@@ -19,7 +19,7 @@ void operator delete(void *ptr){
 
 using namespace std;
 
-#define TESTCASE_SIZE (1000)
+constexpr unsigned TESTCASE_SIZE= 100000;
 
 int main(int argc, char const *argv[])
 {
@@ -55,25 +55,25 @@ int main(int argc, char const *argv[])
 	assert(bst.Size()==TESTCASE_SIZE+1);
 	assert(bst.Get(TESTCASE_SIZE)==0);
 
-	cout<<"AllocateCount: "<<AllocateCount<<endl;
-	cout<<"Size: "<<bst.Size()<<endl;
-	cout<<"RealSize: "<<bst.RealSize()<<endl;
-	bst.Remove(3);
-	bst.Remove(35);
-	bst.Remove(77);
-	bst.Remove(TESTCASE_SIZE);
-	cout<<"AllocateCount: "<<AllocateCount<<endl;
-	cout<<"Size: "<<bst.Size()<<endl;
-	cout<<"RealSize: "<<bst.RealSize()<<endl;
+	// cout<<"AllocateCount: "<<AllocateCount<<endl;
+	// cout<<"Size: "<<bst.Size()<<endl;
+	// cout<<"RealSize: "<<bst.RealSize()<<endl;
+	// bst.Remove(3);
+	// bst.Remove(35);
+	// bst.Remove(77);
+	// bst.Remove(TESTCASE_SIZE);
+	// cout<<"AllocateCount: "<<AllocateCount<<endl;
+	// cout<<"Size: "<<bst.Size()<<endl;
+	// cout<<"RealSize: "<<bst.RealSize()<<endl;
 
-	assert(bst.Contain(1)==true);
-	assert(bst.Contain(3)==false);
-	assert(bst.Contain(8)==true);
-	assert(bst.Contain(35)==false);
-	assert(bst.Contain(77)==false);
-	assert(bst.Contain(233)==true);
-	assert(bst.Contain(TESTCASE_SIZE)==false);
-	assert(bst.Size()==TESTCASE_SIZE-3);
+	// assert(bst.Contain(1)==true);
+	// assert(bst.Contain(3)==false);
+	// assert(bst.Contain(8)==true);
+	// assert(bst.Contain(35)==false);
+	// assert(bst.Contain(77)==false);
+	// assert(bst.Contain(233)==true);
+	// assert(bst.Contain(TESTCASE_SIZE)==false);
+	// assert(bst.Size()==TESTCASE_SIZE-3);
 
 	assert(bst.Get(1)==2);
 	assert(bst.Get(233)==466);
