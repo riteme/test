@@ -1,3 +1,3 @@
 # Status
-Submit: 0 commit, 0 accepted  
-Ratio: N/A
+Submit: 1 commit, 1 accepted  
+Ratio: 100%
