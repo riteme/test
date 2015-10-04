@@ -1,58 +1,65 @@
 #include <iostream>
-// #include <vector>
-// #include <unordered_map>
-// #include <functional>
+#include <vector>
+#include <unordered_map>
+#include <functional>
 
 using namespace std;
 
 typedef unsigned long ValueType;
 typedef unsigned IndexType;
-// typedef vector<vector<ValueType>> Matrix;
-// typedef function<void(Matrix&,IndexType,IndexType)> CommandType;
+typedef vector<vector<ValueType>> Matrix;
+typedef function<void(IndexType,IndexType)> CommandType;
 
 constexpr char LINE_EXCHANGE='R';
 constexpr char COLUMN_EXCHANGE='C';
 constexpr char ELEMENT_ACCESS='A';
+constexpr char SHOW_MATRIX='S';
 
-// unordered_map<char,CommandType> funcMap;
+unordered_map<char,CommandType> funcMap;
 
-// void LineExchange(Matrix &m,IndexType x,IndexType y);
-// void ColumnExchange(Matrix &m,IndexType x,IndexType y);
-// void ELementAccess(Matrix &m,IndexType x,IndexType y);
+void LineExchange(IndexType x,IndexType y);
+void ColumnExchange(IndexType x,IndexType y);
+void ELementAccess(IndexType x,IndexType y);
+void ShowMatrix(IndexType x,IndexType y);
 
-void LineExchange(ValueType *m,IndexType x,IndexType y,IndexType n);
-void ColumnExchange(ValueType *m,IndexType x,IndexType y,IndexType n);
-void ELementAccess(ValueType *m,IndexType x,IndexType y,IndexType n);
+Matrix mat;
+vector<IndexType> lines;
+vector<IndexType> columns;
 
 int main()
 {
-	cout.sync_with_stdio(false);
+	ios::sync_with_stdio(false);
 
-	// funcMap[LINE_EXCHANGE]=LineExchange;
-	// funcMap[COLUMN_EXCHANGE]=ColumnExchange;
-	// funcMap[ELEMENT_ACCESS]=ELementAccess;
+	funcMap[LINE_EXCHANGE]=LineExchange;
+	funcMap[COLUMN_EXCHANGE]=ColumnExchange;
+	funcMap[ELEMENT_ACCESS]=ELementAccess;
+	funcMap[SHOW_MATRIX]=ShowMatrix;
 
 	IndexType n,k;
 	cin>>n>>k;
 
-	// Matrix mat;
-	// mat.resize(n);
-	// for (auto &line : mat) {
-	//     line.resize(n);
-	// }  // foreach in mat
+	mat.resize(n);
+	for (auto &line : mat) {
+	    line.resize(n);
+	}  // foreach in mat
 
-	ValueType mat[n][n];
-
-	for (IndexType i=0;
+	lines.resize(n);
+	columns.resize(n);
+	for (int i=0;
 	     i<n;
 	     i++) {
-		for (IndexType j=0;
-		     j<n;
-		     j++) {
-			ValueType tmp;
-			cin>>tmp;
-			mat[i][j]=tmp;
-		}  // for
+	    lines[i]=i;
+		columns[i]=i;
+	}  // for
+
+	for (int i=0;
+	     i<n;
+	     i++) {
+	    for (int j=0;
+	         j<n;
+	         j++) {
+	        cin>>mat[i][j];
+	    }  // for
 	}  // for
 
 	for (IndexType cnt=1;
@@ -63,46 +70,34 @@ int main()
 
 		cin>>command>>x>>y;
 
-		// funcMap[command](mat,x-1,y-1);
-		switch (command) {
-		    case LINE_EXCHANGE:
-		    	LineExchange(&(mat[0][0]),x-1,y-1,n);
-		    	break;
-		    case COLUMN_EXCHANGE:
-		    	ColumnExchange(&(mat[0][0]),x-1,y-1,n);
-		    	break;
-		    case ELEMENT_ACCESS:
-		    	ELementAccess(&(mat[0][0]),x-1,y-1,n);
-		    	break;
-		}  // switch to command
+		funcMap[command](x-1,y-1);
 	}  // for
 
 	return 0;
 }
 
 // R
-void LineExchange(ValueType *m,IndexType x,IndexType y,IndexType n){
-	// IndexType n=m.size();
-
-	for (IndexType i=0;
-	     i<n;
-	     i++) {
-	    std::swap(*(m+n*x+i),*(m+n*y+i));
-	}  // for
+void LineExchange(IndexType x,IndexType y){
+	std::swap(lines[x],lines[y]);
 }
 
 // C
-void ColumnExchange(ValueType *m,IndexType x,IndexType y,IndexType n){
-	// IndexType n=m.size();
-
-	for (IndexType i=0;
-	     i<n;
-	     i++) {
-	    std::swap(*(m+i*n+x),*(m+i*n+y));
-	}  // for
+void ColumnExchange(IndexType x,IndexType y){
+	std::swap(columns[x],columns[y]);
 }
 
 // A
-void ELementAccess(ValueType *m,IndexType x,IndexType y,IndexType n){
-	cout<<*(m+x*n+y)<<endl;
+void ELementAccess(IndexType x,IndexType y){
+	cout<<mat[lines[x]][columns[y]]<<'\n';
+}
+
+void ShowMatrix(IndexType x,IndexType y){
+	cout<<"====="<<'\n';
+	for (auto i : lines) {
+	    for (auto j : columns) {
+	        cout<<mat[i][j]<<' ';
+	    }  // foreach in columns
+	    cout<<'\n';
+	}  // foreach in lines
+	cout<<"====="<<'\n';
 }
