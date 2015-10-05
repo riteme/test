@@ -9,14 +9,14 @@ using namespace std;
 template <typename TIter>
 void PopSort(TIter first,TIter last){
 	for (TIter it=first;
-	     it!=last;
-	     it++) {
-	    for (TIter it2=first;
-	         it2!=last;
-	         it2++) {
-	        if (*it<*it2) {
-	            std::swap(*it,*it2);
-	        }
+      it!=last;
+      it++) {
+       for (TIter it2=first;
+          it2!=last;
+          it2++) {
+           if (*it<*it2) {
+               std::swap(*it,*it2);
+           }
 	    }  // for
 	}  // for
 }
@@ -25,17 +25,17 @@ void PopSort(TIter first,TIter last){
 template <typename TIter>
 void SelectionSort(TIter first,TIter last){
 	for (TIter it=first;
-	     it!=last;
-	     it++) {
-	    TIter minIt=it;
+      it!=last;
+      it++) {
+       TIter minIt=it;
 
 		// 一直向后面找到该去的地方
-		for (TIter it2=it;
-		     it2!=last;
-		     it2++) {
+   for (TIter it2=it;
+     it2!=last;
+     it2++) {
 		    if (*it2<*minIt) {  // 发现后面的数更小，应当将更小的数往前移
-		        minIt=it2;
-		    }
+              minIt=it2;
+          }
 		}  // for
 
 		std::swap(*minIt,*it);
@@ -46,29 +46,29 @@ void SelectionSort(TIter first,TIter last){
 template <typename TIter>
 void InsertionSort(TIter first,TIter last){
 	for (TIter it=first;
-	     it!=last;
-	     it++) {
-	    TIter min=it;
+      it!=last;
+      it++) {
+       TIter min=it;
 
-		for (TIter it2=first;
-		     it2!=it;
-		     it2++) {
-		    if (*it<*it2) {
-		        min=it2;
-		        break;
-		    }
+   for (TIter it2=first;
+     it2!=it;
+     it2++) {
+      if (*it<*it2) {
+          min=it2;
+          break;
+      }
 		}  // for
 
 		if (min==it) {
-		    continue;
-		}
+          continue;
+      }
 
-		auto tmp=*it;
+      auto tmp=*it;
 
-		for (TIter iter=it;
-		     iter!=min;
-		     iter--) {
-		    *iter=*(iter-1);
+      for (TIter iter=it;
+         iter!=min;
+         iter--) {
+          *iter=*(iter-1);
 		}  // for
 
 		*min=tmp;
@@ -88,12 +88,12 @@ void ShellSort(TIter first,TIter last){
 	
 	while (h>=1) {
 		for (TIter it=first+h;
-		     it!=last;
-		     it++) {
-		    for (TIter it2=it;
-		         it2>=first+h && *it2 < *(it2-h);
-		         it2-=h) {
-		            std::swap(*it2,*(it2-h));
+         it!=last;
+         it++) {
+          for (TIter it2=it;
+             it2>=first+h && *it2 < *(it2-h);
+             it2-=h) {
+              std::swap(*it2,*(it2-h));
 		    }  // for
 		}  // for
 
@@ -107,16 +107,16 @@ template <typename T,unsigned N>
 void Merge(T (&a)[N],T (&aux)[N],int left,int mid,int right){
 	for (unsigned index = left; index <= right; index++) { aux[index] = a[index]; }  // for
 
-	unsigned i = left, j = mid + 1;
-	for (unsigned k = left; k <= right; k++) {
-	    if (i > mid)
-	        a[k] = aux[j++];
-	    else if (j > right)
-	        a[k] = aux[i++];
-	    else if (aux[i] < aux[j])
-	        a[k] = aux[i++];
-	    else
-	        a[k] = aux[j++];
+       unsigned i = left, j = mid + 1;
+   for (unsigned k = left; k <= right; k++) {
+       if (i > mid)
+           a[k] = aux[j++];
+       else if (j > right)
+           a[k] = aux[i++];
+       else if (aux[i] < aux[j])
+           a[k] = aux[i++];
+       else
+           a[k] = aux[j++];
 	}  // for
 }
 
@@ -148,21 +148,21 @@ TIter Partition(TIter left,TIter right){
 	while (true) {
 		while (*(++i)<*k) {
 			if (i>=right) {
-			    break;
-			}
+             break;
+         }
 		}   // while
 
 		while (*k<*(--j)) {
 			if (j<=left) {
-			    break;
-			}
+             break;
+         }
 		}   // while
 
 		if (j<=i) {
-		    break;
-		}
+          break;
+      }
 
-		std::swap(*i,*j);
+      std::swap(*i,*j);
 	}   // while
 	
 	std::swap(*k,*j);
@@ -173,12 +173,12 @@ TIter Partition(TIter left,TIter right){
 template <typename TIter>
 void QuickSort(TIter first,TIter last){
 	if (last<=first) {
-	    return;
-	}
+       return;
+   }
 
-	TIter k=Partition(first,last);
-	QuickSort(first,k-1);
-	QuickSort(k+1,last);
+   TIter k=Partition(first,last);
+   QuickSort(first,k-1);
+   QuickSort(k+1,last);
 }
 //QuickSort END
 
@@ -193,12 +193,12 @@ void SuperMergeSort(TIter first,TIter last){
 	std::stable_sort(first,last);
 }
 
-#define DATA_SIZE 10000
+#define DATA_SIZE 500000
 
 #define SHUFFLE(array) std::random_shuffle(std::begin(array),std::end(array))
 #define SORT(sortFunc,data) cout << #sortFunc << endl; \
-							sortFunc(std::begin(data),std::end(data)); \
-							cout << "END " << #sortFunc << endl
+sortFunc(std::begin(data),std::end(data)); \
+cout << "END " << #sortFunc << endl
 
 #define IS_SORTED(array) assert(std::is_sorted(std::begin(array),std::end(array)))
 
@@ -208,46 +208,46 @@ int main() {
     ios::sync_with_stdio(false);
 
     for (int i=0;
-         i<DATA_SIZE;
-         i++) {
+       i<DATA_SIZE;
+       i++) {
         data[i]=i;
     }  // for
 
     // 前面三个慎重打开
 
-    SHUFFLE(data);
-    SORT(PopSort,data);
-    IS_SORTED(data);
+    // SHUFFLE(data);
+    // SORT(PopSort,data);
+    // IS_SORTED(data);
 
-    SHUFFLE(data);
-    SORT(SelectionSort,data);
-    IS_SORTED(data);
+    // SHUFFLE(data);
+    // SORT(SelectionSort,data);
+    // IS_SORTED(data);
 
-    SHUFFLE(data);
-    SORT(InsertionSort,data);
-    IS_SORTED(data);
+    // SHUFFLE(data);
+    // SORT(InsertionSort,data);
+    // IS_SORTED(data);
 
-    SHUFFLE(data);
-    SORT(ShellSort,data);
-    IS_SORTED(data);
+    // SHUFFLE(data);
+    // SORT(ShellSort,data);
+    // IS_SORTED(data);
 
-    SHUFFLE(data);
-    cout<<"MergeSort"<<endl;
-    MergeSort(data);
-    cout<<"END MergeSort"<<endl;
-    IS_SORTED(data);
+    // SHUFFLE(data);
+    // cout<<"MergeSort"<<endl;
+    // MergeSort(data);
+    // cout<<"END MergeSort"<<endl;
+    // IS_SORTED(data);
 
-    SHUFFLE(data);
-    SORT(QuickSort,data);
-    IS_SORTED(data);
+    // SHUFFLE(data);
+    // SORT(QuickSort,data);
+    // IS_SORTED(data);
 
-    SHUFFLE(data);
-    SORT(SuperQuickSort,data);
-    IS_SORTED(data);
+    // SHUFFLE(data);
+    // SORT(SuperQuickSort,data);
+    // IS_SORTED(data);
 
-    SHUFFLE(data);
-    SORT(SuperMergeSort,data);
-    IS_SORTED(data);
+    // SHUFFLE(data);
+    // SORT(SuperMergeSort,data);
+    // IS_SORTED(data);
 
     return 0;
 }  // function main
