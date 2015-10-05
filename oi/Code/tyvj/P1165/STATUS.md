@@ -1,6 +1,6 @@
-# Status
-Submit: 4 commit, 1 accepted, 3 WA  
-Ratio: 25%
+# P1165 科学计数法
+4 commit, 1 accepted, 3 WA  
+25%
 
 # Details
 ### Commit 1

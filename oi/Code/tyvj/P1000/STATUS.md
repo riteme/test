@@ -1,3 +1,3 @@
-# Status
-Submit: 1 commit, 1 accepted  
-Ratio: 100%  
+# P1000 A + B
+1 commit, 1 accepted  
+100%
