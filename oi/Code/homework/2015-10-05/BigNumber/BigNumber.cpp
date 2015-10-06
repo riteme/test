@@ -6,8 +6,8 @@
 
 using namespace std;
 
-string ONE={1};
-string ZERO={0};
+string ONE={'\1'};
+string ZERO={'\0'};
 
 void ReadBigNumber(string &area){
     char tmp;
@@ -28,6 +28,7 @@ void PrintBigNumber(const string &bigNum){
     for(int i=bigNum.size()-1;i>=0;i--){
         printf("%c",bigNum[i]+'0');
     }
+    printf("\n");
 }
 
 void Shrink(string &bigNum){
@@ -76,7 +77,7 @@ bool LessWithOperator(const string &a,bool aOp,const string &b,bool bOp){
 
 string Addition(const string &a,const string &b){
     string result;
-    // result.reserve(a.size());
+
     unsigned i=0,j=0;
 
     char upload=0;
@@ -109,6 +110,10 @@ string Subtraction(string &a,string &b,bool *getOp=NULL){
         }
 
         return Subtraction(b,a);
+    }else{
+        if (getOp!=NULL) {
+            *getOp=true;
+        }
     }
 
     string result;
@@ -146,7 +151,6 @@ string Subtraction(string &a,string &b,bool *getOp=NULL){
 
 string Multiply(const string &bigNum,char n){
     string result;
-    // result.reserve(bigNum.size()*n);
 
     char upload=0;
     for(unsigned i=0;i<bigNum.size();i++){
@@ -176,7 +180,7 @@ string MultiplyWithTen(const string &bigNum,int n){
 
     result.resize(result.size()+n);
 
-    for(unsigned i=upBound-1;i>=0;i--){
+    for(int i=upBound-1;i>=0;i--){
         result[i+n]=result[i];
     }
 
@@ -241,53 +245,34 @@ void Module(string &target,string &current,string &outCnt,string &outRemain){
     outRemain=Subtraction(current,tmp);
 }
 
-[[deprecated]]
-string DivisionWithOne(string &n,int m){
-    if (n==ONE) {
-        return MultiplyWithTen(ONE,m);
+string Division(string &a,string &b){
+    if (b==ZERO){
+        return string("");
     }
 
-    int cnt=1;
-    string result;
-    string tail=ONE,base;
-    while (cnt<=m) {
-        string target=MultiplyWithTen(tail,1);
+    if (a==ZERO) {
+        return ZERO;
+    }
 
-        int offest=0;
 
-        while (Less(target,n)) {
-            target=MultiplyWithTen(target,1);
-            offest++;
-            result.insert(0,1,'\0');
-        }   // while
-        
-        Module(target,n,base,tail);
-
-        // PrintBigNumber(base);
-        // printf(" ");
-        // PrintBigNumber(tail);
-        // printf("\n");
-
-        // // for(int i=1;i<=offest;i++){
-        // //     base+='\0';
-        // // }
-        result=base+result;
-
-        cnt+=offest+1;
-
-        if (tail==ZERO) {
-            break;
-        }
-    }   // while
-
-    return MultiplyWithTen(result,m-cnt+1);
 }
 
 int main() {
-    string m;
-    ReadBigNumber(m);
+    string m,n;
+    int p;
 
-    PrintBigNumber(StepMultiply(m));
+    ReadBigNumber(m);
+    ReadBigNumber(n);
+    // scanf("%d",&p);
+
+    // PrintBigNumber(DivisionWithOne(m,p));
+    string base,tail;
+    Module(m,n,base,tail);
+    PrintBigNumber(base);
+    PrintBigNumber(tail);
+    // bool op;
+    // PrintBigNumber(Subtraction(m,n,&op));
+    // printf("%d\n", op);
 
     return 0;
 }  // function main
