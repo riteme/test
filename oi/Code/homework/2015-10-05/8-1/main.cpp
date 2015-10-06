@@ -6,30 +6,8 @@
 
 using namespace std;
 
-string ONE={'\1'};
-string ZERO={'\0'};
-
-void ReadBigNumber(string &area){
-    char tmp;
-
-    while (true) {
-        tmp=getchar();
-
-        if (isdigit(tmp)) {
-            area+=tmp-'0';
-        }else{
-            std::reverse(area.begin(),area.end());
-            break;
-        }
-    }   // while
-}
-
-void PrintBigNumber(const string &bigNum){
-    for(int i=bigNum.size()-1;i>=0;i--){
-        printf("%c",bigNum[i]+'0');
-    }
-    printf("\n");
-}
+string ONE;
+string ZERO;
 
 string GetBigNumber(const string &bigNum){
     string number;
@@ -75,18 +53,6 @@ bool Less(const string &a,const string &b){
     }
 
     return false;
-}
-
-bool LessWithOperator(const string &a,bool aOp,const string &b,bool bOp){
-    if (aOp==true && bOp==false) {
-        return false;
-    }else if (aOp==false && bOp==true) {
-        return true;
-    }else if (aOp==true && bOp==true) {
-        return Less(a,b);
-    }else{
-        return Less(b,a);
-    }
 }
 
 string Addition(const string &a,const string &b){
@@ -326,34 +292,20 @@ string Division(string &a,string &b,int m){
 }
 
 int main() {
-    // string m,n;
-    // int p;
+    ONE+='\1';
+    ZERO+='\0';
 
-    // ReadBigNumber(m);
-    // ReadBigNumber(n);
-    // scanf("%d",&p);
+    const int EXPAND_SIZE=10;
 
-    // PrintBigNumber(Division(ONE,n,p));
-    // string base,tail;
-    // Module(m,n,base,tail);
-    // PrintBigNumber(base);
-    // PrintBigNumber(tail);
-    // bool op;
-    // PrintBigNumber(Subtraction(m,n,&op));
-    // printf("%d\n", op);
-
-    const int EXPAND_SIZE=30;
-
-    // string up;
     int m;
-    // ReadBigNumber(up);
     scanf("%d",&m);
     m+=EXPAND_SIZE;
 
     string sum=MultiplyWithTen(ONE,m);
-    // string upBound=Addition(up,ONE);
-    for(string i=ONE;/*i!=upBound*/;i=Addition(i,ONE)){
-        string step=StepMultiply(i);
+    string step=ONE;
+
+    for(string i=ONE; ;i=Addition(i,ONE)){
+    	step=Multiply(step,i);
 
         string div=Division(ONE,step,m);
         Shrink(div);
