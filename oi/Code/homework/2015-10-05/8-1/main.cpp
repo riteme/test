@@ -9,6 +9,21 @@ using namespace std;
 string ONE;
 string ZERO;
 
+void ReadBigNumber(string &area){
+    char tmp;
+
+    while (true) {
+        tmp=getchar();
+
+        if (isdigit(tmp)) {
+            area+=tmp-'0';
+        }else{
+            std::reverse(area.begin(),area.end());
+            break;
+        }
+    }   // while
+}
+
 string GetBigNumber(const string &bigNum){
     string number;
 
@@ -291,35 +306,54 @@ string Division(string &a,string &b,int m){
     return result;
 }
 
+void PrintBigNumber(const string &bigNum){
+    for(int i=bigNum.size()-1;i>=0;i--){
+        printf("%c",bigNum[i]+'0');
+    }
+    printf("\n");
+}
+
 int main() {
+    freopen("data.in","r",stdin);
+
     ONE+='\1';
     ZERO+='\0';
 
-    const int EXPAND_SIZE=10;
+    // const int EXPAND_SIZE=10;
 
-    int m;
-    scanf("%d",&m);
-    m+=EXPAND_SIZE;
+    // int m;
+    // scanf("%d",&m);
+    // m+=EXPAND_SIZE;
 
-    string sum=MultiplyWithTen(ONE,m);
-    string step=ONE;
+    // string sum=MultiplyWithTen(ONE,m);
+    // string step=ONE;
 
-    for(string i=ONE; ;i=Addition(i,ONE)){
-    	step=Multiply(step,i);
+    // for(string i=ONE; ;i=Addition(i,ONE)){
+    // 	step=Multiply(step,i);
 
-        string div=Division(ONE,step,m);
-        Shrink(div);
+    //     string div=Division(ONE,step,m);
+    //     Shrink(div);
 
-        if (div==ZERO) {
-            break;
-        }
+    //     if (div==ZERO) {
+    //         break;
+    //     }
 
-        sum=Addition(sum,div);
-    }
+    //     sum=Addition(sum,div);
+    // }
 
-    string result=GetBigNumber(sum);
+    // string result=GetBigNumber(sum);
 
-    printf("%c.%s\n", result[0], result.substr(1,m-EXPAND_SIZE).c_str());
+    // printf("%c.%s\n", result[0], result.substr(1,m-EXPAND_SIZE).c_str());
+
+    string n1,n2;
+    ReadBigNumber(n1);
+    ReadBigNumber(n2);
+
+    // string base,tail;
+    // Module(n1,n2,base,tail);
+    string result=Division(n1,n2,16);
+
+    PrintBigNumber(result);
 
     return 0;
 }  // function main
