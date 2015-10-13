@@ -3,11 +3,10 @@
 
 using namespace std;
 
-int main(int argc, char const *argv[])
-{
-	ios::sync_with_stdio(false);
+int main(int argc, char const *argv[]) {
+    ios::sync_with_stdio(false);
 
-	cout<<"Hello, World!"<<endl;
+    cout << "Hello, World!" << endl;
 
-	return 0;
+    return 0;
 }
