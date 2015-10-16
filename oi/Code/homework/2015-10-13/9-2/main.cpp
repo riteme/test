@@ -18,23 +18,26 @@ int main(/*int argc, char *argv[]*/) {
     int cnt = 0;
 
     // Not right...
-    while (!IsRepeatOf(upload, 1)) {
+    while (true) {
         for (int i = 1; i <= 9; i++) {
             mult = n * i + upload;
+            upload = mult / 10;
 
             if (mult % 10 == 1) {
-                upload = mult / 10;
-                cnt++;
+                cout << n << " * " << i << " + " << upload << " = " << mult
+                     << endl;
                 break;
             }
         }  // for
 
-        // cout << "ERROR" << endl;
-        // return -1;
+        if (IsRepeatOf(mult, 1)) { break; } else {
+            cnt++;
+        }
+
         assert(mult % 10 == 1);
     }  // while
 
-    cout << cnt + Length(upload) << endl;
+    cout << cnt + Length(mult) << endl;
 
     return 0;
 }  // function main
