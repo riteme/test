@@ -48,13 +48,15 @@ int main() {
     // 设置OpenGL属性
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
+                        SDL_GL_CONTEXT_PROFILE_CORE);
 
     // 创建窗口和OpenGL上下文
     SDL_Window *wnd = nullptr;
     SDL_GLContext context = nullptr;
 
-    wnd = SDL_CreateWindow("OpenGL 3.3", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL);
+    wnd = SDL_CreateWindow("OpenGL 3.3", SDL_WINDOWPOS_CENTERED,
+                           SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL);
     context = SDL_GL_CreateContext(wnd);
 
     assert(wnd != nullptr);
@@ -129,9 +131,11 @@ int main() {
     GLuint textures[1];
     glGenTextures(1, textures);
     glBindTexture(GL_TEXTURE_2D, textures[0]);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureData1->w, textureData1->h, 0, GL_RGB, GL_UNSIGNED_BYTE, textureData1->pixels);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureData1->w, textureData1->h, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, textureData1->pixels);
     glGenerateMipmap(GL_TEXTURE_2D);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                    GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     assert(textures[0] != 0);
@@ -196,7 +200,8 @@ int main() {
     glm::mat4 model;
 
     projection = glm::perspective(45.0f, 800.0f / 600.0f, 1.0f, 100.0f);
-    view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f),
+                       glm::vec3(0.0f, 1.0f, 0.0f));
     model = glm::mat4();
 
     constexpr GLuint AXIS_INDEX = 0;
@@ -226,26 +231,32 @@ int main() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_READ);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
+                 GL_STATIC_DRAW);
 
     glUseProgram(boxShaderProgram);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, nullptr);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, reinterpret_cast<GLvoid *>(3 * sizeof(GLfloat)));
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, reinterpret_cast<GLvoid *>(6 * sizeof(GLfloat)));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8,
+                          nullptr);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8,
+                          reinterpret_cast<GLvoid *>(3 * sizeof(GLfloat)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8,
+                          reinterpret_cast<GLvoid *>(6 * sizeof(GLfloat)));
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glEnableVertexAttribArray(2);
 
     // 设置box的uniform
-    GLint uniBoxProjection = glGetUniformLocation(boxShaderProgram, "projection");
+    GLint uniBoxProjection =
+        glGetUniformLocation(boxShaderProgram, "projection");
     GLint uniBoxView = glGetUniformLocation(boxShaderProgram, "view");
     GLint uniBoxModel = glGetUniformLocation(boxShaderProgram, "model");
     assert(uniBoxProjection != -1);
     assert(uniBoxView != -1);
     assert(uniBoxModel != -1);
 
-    glUniformMatrix4fv(uniBoxProjection, 1, GL_FALSE, glm::value_ptr(projection));
+    glUniformMatrix4fv(uniBoxProjection, 1, GL_FALSE,
+                       glm::value_ptr(projection));
     glUniformMatrix4fv(uniBoxView, 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(uniBoxModel, 1, GL_FALSE, glm::value_ptr(model));
 
@@ -255,24 +266,29 @@ int main() {
     glBindVertexArray(VAO[AXIS_INDEX]);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO[AXIS_INDEX]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(axisVertices), axisVertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(axisVertices), axisVertices,
+                 GL_STATIC_DRAW);
 
     glUseProgram(axisShaderProgram);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, nullptr);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, reinterpret_cast<GLvoid *>(3 * sizeof(GLfloat)));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6,
+                          nullptr);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6,
+                          reinterpret_cast<GLvoid *>(3 * sizeof(GLfloat)));
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
 
     // 设置坐标轴的uniform
-    GLint uniAxisProjection = glGetUniformLocation(axisShaderProgram, "projection");
+    GLint uniAxisProjection =
+        glGetUniformLocation(axisShaderProgram, "projection");
     GLint uniAxisView = glGetUniformLocation(axisShaderProgram, "view");
     GLint uniAxisModel = glGetUniformLocation(axisShaderProgram, "model");
     assert(uniAxisProjection != -1);
     assert(uniAxisView != -1);
     assert(uniAxisModel != -1);
 
-    glUniformMatrix4fv(uniAxisProjection, 1, GL_FALSE, glm::value_ptr(projection));
+    glUniformMatrix4fv(uniAxisProjection, 1, GL_FALSE,
+                       glm::value_ptr(projection));
     glUniformMatrix4fv(uniAxisView, 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(uniAxisModel, 1, GL_FALSE, glm::value_ptr(model));
 
@@ -290,6 +306,15 @@ int main() {
     GLfloat rotateX = 0.0f;
     GLfloat rotateY = 0.0f;
     GLfloat rotateZ = 0.0f;
+
+    // TODO
+    GLfloat angleX = 0.0f;
+    GLfixed angleY = 0.0f;
+    GLfloat angleZ = 0.0f;
+    chrono::high_resolution_clock::time_point startX;
+    chrono::high_resolution_clock::time_point startY;
+    chrono::high_resolution_clock::time_point startZ;
+    startX = startY = startZ = chrono::high_resolution_clock::now();
 
     string text;
     string finalText;
@@ -330,20 +355,6 @@ int main() {
                             break;
                     }  // switch to e.key.keysym.sym
                     break;
-                case SDL_TEXTINPUT:
-                    /* Add new text onto the end of our text */
-                    if (e.key.keysym.sym == SDLK_BACKSPACE) {
-                        text.pop_back();
-                        break;
-                    } else { text += e.text.text; }
-                    cout << "text: " << text << endl;
-                    break;
-                case SDL_TEXTEDITING:
-                    finalText = e.edit.text;
-                    textStart = e.edit.start;
-                    selLen = e.edit.length;
-                    cout << "FINAL: " << finalText << endl;
-                    break;
             }  // switch to e.type
         }
 
@@ -352,11 +363,13 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         auto end = chrono::high_resolution_clock::now();
-        auto passedTime = chrono::duration_cast<chrono::duration<float>>(end - start).count();
+        auto passedTime =
+            chrono::duration_cast<chrono::duration<float>>(end - start).count();
 
         model = glm::mat4();
         if (!(rotateX == 0.0f && rotateY == 0.0f && rotateZ == 0.0f)) {
-            model = glm::rotate(model, passedTime * 20.0f, glm::vec3(rotateX, rotateY, rotateZ));
+            model = glm::rotate(model, passedTime * 20.0f,
+                                glm::vec3(rotateX, rotateY, rotateZ));
         }
 
         // glBindBuffer(GL_ARRAY_BUFFER, VBO[BOX_INDEX]);
