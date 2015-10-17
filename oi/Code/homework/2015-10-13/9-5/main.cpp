@@ -25,7 +25,7 @@ int main(/*int argc, char *argv[]*/) {
     int cnt = 0;
 
     // k < n
-    for (unsigned i = 1U; i < end - 1; i++) {
+    for (unsigned i = 1U; i <= end; i++) {
         if (IsPrime(ComputeExpression(i, numbers))) { cnt++; }
     }  // for
 
