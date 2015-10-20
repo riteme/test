@@ -41,21 +41,22 @@ int main(/*int argc, char *argv[]*/) {
     return 0;
 }  // function main
 
-// Wrong
 int DP(const vector<int> &W, const vector<int> &V, const vector<int> &C,
        const int size) {
     int n = W.size();
-    vector<int> d(size + 1);
+    vector<vector<int>> d(n);
+    for (auto &e : d) { e.resize(size + 1); }  // foreach in d
 
     for (int i = 0; i < n; i++) {
         for (int j = W[i]; j <= size; j++) {
-            for (int k = 1; k <= C[i] && k * W[i] <= j; k++) {
-                d[j] = std::max(d[j], d[j - k * W[i]] + k * V[i]);
-            }                                   // for
-        }                                       // for
-        for (auto e : d) { cout << e << ' '; }  // foreach in d
-        cout << endl;
-    }  // for
+            for (int k = 0; k <= C[i] && k * W[i] <= j; k++) {
+                if (i > 0) {
+                    d[i][j] = std::max(d[i - 1][j],
+                                       d[i - 1][j - k * W[i]] + k * V[i]);
+                } else { d[i][j] = k * V[i]; }
+            }  // for
+        }      // for
+    }          // for
 
-    return d[size];
+    return d[n - 1][size];
 }
