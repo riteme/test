@@ -1,65 +1,77 @@
-// 16/40 TLE
+// 16/40 TLE - Commit #1
 
 #include <cmath>
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
 typedef vector<unsigned> VectorType;
-typedef vector<VectorType> DFA;
 typedef VectorType BigNumber;
+typedef unsigned long long Number;
 
-void GenerateDFA(const string &patten, DFA &target);
 void Increase(BigNumber &n);
 inline unsigned ToNumber(const char c);
+Number ToNumber(const BigNumber &n);
+Number GetPosition(const Number n);
 
 int main(/*int argc, char *argv[]*/) {
     ios::sync_with_stdio(false);
 
-    string pat;
-    cin >> pat;
+    VectorType pat;
+    pat.reserve(200);
 
-    DFA d;
-    GenerateDFA(pat, d);
+    char tmp;
+    while (cin >> tmp) { pat.push_back(ToNumber(tmp)); }  // while
+    std::reverse(pat.begin(), pat.end());
 
-    unsigned i = 1U, j = 0U;
     BigNumber n;
-    n.push_back(1U);
-    n.reserve(200U);
+    BigNumber s;
+    Number offest = 0;
+    bool found = false;
+    for (unsigned len = 1; len <= pat.size() && !found; len++) {
+        for (unsigned j = 0; j < len; j++) {
+            n.resize(len);
+            std::copy_n(pat.end() - j - 1, len, n.begin());
+            s = n;
 
-    while (j < pat.size()) {
-        for (VectorType::reverse_iterator beg = n.rbegin();
-             beg != n.rend() && j < pat.size();
-             beg++) {
-            j = d[*beg][j];
-            i++;
+            found = true;
+            for (unsigned k = j + len; k < pat.size(); k += len) {
+                // for (auto &e : n) { cout << e; }  // foreach in s
+                // cout << endl;
+
+                for (auto beg = pat.end() - k; beg != pat.end() - k + len;
+                     beg++) {
+                    cout << *beg;
+                }  // for
+                cout << endl;
+
+                if (!std::equal(pat.end() - k, pat.end() - k + len,
+                                n.begin())) {
+                    found = false;
+
+                    break;
+                }
+
+                Increase(n);
+            }  // for
+
+            if (found) {
+                offest = j;
+
+                break;
+            }
         }  // for
+    }      // for
 
-        Increase(n);
-    }  // while
+    for (auto &e : s) { cout << e; }  // foreach in s
+    cout << endl;
 
-    cout << i - pat.size() << endl;
+    cout << GetPosition(ToNumber(s)) - offest << endl;
 
     return 0;
 }  // function main
-
-void GenerateDFA(const string &patten, DFA &target) {
-    target.resize(10);
-    for (DFA::iterator e = target.begin(); e != target.end(); e++) {
-        e->resize(patten.size());
-    }  // foreach in target
-
-    target[ToNumber(patten[0])][0] = 1U;
-    for (unsigned x = 0U, j = 1U; j < patten.size(); j++) {
-        for (unsigned c = 0U; c < 10U; c++) {
-            target[c][j] = target[c][x];
-        }  // for
-
-        target[ToNumber(patten[j])][j] = j + 1;
-        x = target[ToNumber(patten[j])][x];
-    }  // for
-}
 
 void Increase(BigNumber &n) {
     unsigned upload = 1U;
@@ -81,6 +93,14 @@ void Increase(BigNumber &n) {
     if (upload > 0U) { n.push_back(upload); }
 }
 
+Number GetPosition(const Number n) {
+    if (n < 10ULL) { return n; }
+
+    Number length = Number(log10(n));
+    Number down = pow(10ULL, length) - 1ULL;
+    return (n - down) * (length + 1) + GetPosition(down) - length;
+}
+
 inline unsigned ToNumber(const char c) {
     switch (c) {
         case '0': return 0U;
@@ -96,4 +116,15 @@ inline unsigned ToNumber(const char c) {
     }  // switch to c
 
     return 10U;
+}
+
+inline Number ToNumber(const BigNumber &n) {
+    Number result = 0ULL;
+
+    for (int i = n.size() - 1; i >= 0; i--) {
+        result *= 10ULL;
+        result += n[i];
+    }  // for
+
+    return result;
 }
