@@ -1,40 +1,44 @@
 #include <cmath>
 #include <cfloat>
 #include <iostream>
+#include <complex>
 
 using namespace std;
 
-typedef long double Double;
+typedef complex<long double> Complex;
 
-Double Compute(Double x);
-bool AlmostEqualToZero(Double n);
+Complex Compute(Complex x);
+bool AlmostEqualToZero(Complex n);
 
-#define EPSILON 100
+#define EPSILON 16
 
 int main() {
     ios::sync_with_stdio(false);
 
-    Double a, b;
+    long double a, b;
     cin >> a >> b;
 
-    // Double l = a, r = b;
-    Double x = (a + b) / 2.0L;
-    Double v = Compute(x);
+    Complex l = Complex(a);
+    Complex r = Complex(b);
+    Complex x = (l + r) / 2.0L;
+    Complex v = Compute(x);
     int n = 1;
 
     cout.precision(EPSILON);
+    cout << std::fixed;
 
     while (!AlmostEqualToZero(v) && n < EPSILON) {
-        if (v < 0.0) {
-            b = x;
-            x = (x + a) / 2.0;
+        cout << "x: " << x << endl;
+
+        if (v.real() < 0.0L) {
+            r = x;
+            x = (x + l) / 2.0L;
         } else {
-            a = x;
-            x = (x + b) / 2.0;
+            l = x;
+            x = (x + r) / 2.0L;
         }
 
         n++;
-        cout << "x: " << x << endl;
         v = Compute(x);
     }  // while
 
@@ -43,9 +47,17 @@ int main() {
     return 0;
 }  // function main
 
-Double Compute(Double x) {
-    return std::exp(x * std::log(2.0)) + std::exp(x * std::log(3.0)) -
-           std::exp(x * std::log(4.0));
+// Complex Compute(Complex x) {
+//     return std::exp(x * std::log(Complex(2.0L))) +
+//            std::exp(x * std::log(Complex(3.0L))) -
+//            std::exp(x * std::log(Complex(4.0L)));
+// }
+
+Complex Compute(Complex x) {
+    return std::pow(Complex(2.0L), x) + std::pow(Complex(3.0L), x) -
+           std::pow(Complex(4.0L), x);
 }
 
-bool AlmostEqualToZero(Double n) { return std::fabs(n) < LDBL_EPSILON; }
+bool AlmostEqualToZero(Complex n) {
+    return std::fabs(n.real() / n.imag()) < LDBL_EPSILON;
+}
