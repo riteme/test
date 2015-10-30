@@ -5,18 +5,10 @@
 
 using namespace std;
 
-struct Item {
-    int Value;
-    int Position;
-
-    bool operator<(const Item &lhs) const { return lhs.Value < lhs.Value; }
-};  // struct Item
-
-typedef vector<Item> VectorType;
+typedef vector<int> VectorType;
 typedef VectorType::iterator Iterator;
 
-int Count(const VectorType &a, int l, int m, int r);
-void Merge(VectorType &a, VectorType &aux, int l, int m, int r);
+void Merge(VectorType &a, VectorType &aux, int l, int m, int r, int &result);
 int Compute(VectorType &a);
 void Compute(VectorType &a, VectorType &aux, int l, int r, int &result);
 
@@ -27,10 +19,7 @@ int main() {
     cin >> n;
 
     VectorType d(n);
-    for (int i = 0; i < n; i++) {
-        cin >> d[i].Value;
-        d[i].Position = i;
-    }  // for
+    for (int i = 0; i < n; i++) { cin >> d[i]; }  // for
 
     cout << Compute(d);
 
@@ -39,7 +28,7 @@ int main() {
 
 int Count(const VectorType &a, int l, int m, int r);
 
-void Merge(VectorType &a, VectorType &aux, int l, int m, int r) {
+void Merge(VectorType &a, VectorType &aux, int l, int m, int r, int &result) {
     for (int pos = l; pos <= r; pos++) { aux[pos] = a[pos]; }  // for
 
     int i = l;
@@ -49,12 +38,17 @@ void Merge(VectorType &a, VectorType &aux, int l, int m, int r) {
     while (k <= r) {
         if (i > m)
             a[k++] = aux[j++];
-        else if (j > r)
+        else if (j > r) {
             a[k++] = aux[i++];
-        else if (aux[i] < aux[j])
+            result += r - m;
+        } else if (aux[i] < aux[j]) {
             a[k++] = aux[i++];
-        else
+            result += j - m - 1;
+        } else if (aux[i] == aux[j])
+            a[k++] = aux[i++];
+        else {
             a[k++] = aux[j++];
+        }
     }  // while
 
     // assert(std::is_sorted(a.begin() + l, a.begin() + r));
@@ -77,6 +71,5 @@ void Compute(VectorType &a, VectorType &aux, int l, int r, int &result) {
     Compute(a, aux, l, m, result);
     Compute(a, aux, m + 1, r, result);
 
-    result += Count(a, l, m, r);
-    Merge(a, aux, l, m, r);
+    Merge(a, aux, l, m, r, result);
 }
