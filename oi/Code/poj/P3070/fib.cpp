@@ -1,5 +1,4 @@
 #include <iostream>
-#include <algorithm>
 #include <vector>
 
 using namespace std;
@@ -78,8 +77,6 @@ int main() {
             break;
         }
     }  // while
-
-    std::sort(exps.begin(), exps.end());
 
     for (int i = 0; i < exps.size(); i++) { cout << Compute(exps[i]) << '\n'; }
 
