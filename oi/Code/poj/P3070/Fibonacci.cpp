@@ -1,3 +1,9 @@
+//
+// Copyright 2015 riteme
+//
+
+// Accepted
+
 #include <iostream>
 #include <vector>
 
