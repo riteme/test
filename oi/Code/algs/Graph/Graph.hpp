@@ -33,6 +33,10 @@ class Graph {
         }
         m_nEdgeCount++;
     }
+    void DirectedConnect(int v, int w) {
+        m_data[v].push_back(w);
+        m_nEdgeCount++;
+    }
 
     std::string ToString() const {
         std::ostringstream s;
