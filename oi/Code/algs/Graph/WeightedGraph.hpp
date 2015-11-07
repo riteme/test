@@ -24,6 +24,8 @@ class WeightedGraph {
     WeightedGraph() { m_nVertexCount = m_nEdgeCount = 0; }
     WeightedGraph(int n) {
         m_data.resize(n);
+        m_indegree.resize(n);
+        m_outdegree.resize(n);
         m_nVertexCount = n;
         m_nEdgeCount = 0;
     }
@@ -35,16 +37,30 @@ class WeightedGraph {
     std::list<WeightedEdge> GetRelative(int v) const { return m_data[v]; }
 
     void Connect(int v, int w, double dist) {
-        if (v == w) { m_data[v].push_back({ v, v, dist }); } else {
+        if (v == w) {
+            m_data[v].push_back({ v, v, dist });
+            m_indegree[v]++;
+            m_outdegree[v]++;
+        } else {
             m_data[v].push_back({ v, w, dist });
             m_data[w].push_back({ w, v, dist });
+            m_indegree[v]++;
+            m_indegree[w]++;
+            m_outdegree[v]++;
+            m_outdegree[w]++;
         }
         m_nEdgeCount++;
     }
     void DirectedConnect(int v, int w, double dist) {
         m_data[v].push_back({ v, w, dist });
+        m_indegree[w]++;
+        m_outdegree[v]++;
         m_nEdgeCount++;
     }
+
+    int GetIndegree(int v) const { return m_indegree[v]; }
+
+    int GetOutdegree(int v) const { return m_outdegree[v]; }
 
     std::string ToString() const {
         std::ostringstream s;
@@ -75,12 +91,28 @@ class WeightedGraph {
 
  private:
     std::vector<std::list<WeightedEdge>> m_data;
+    std::vector<int> m_indegree;
+    std::vector<int> m_outdegree;
     int m_nVertexCount;
     int m_nEdgeCount;
 };  // class WeightedGraph
 
 template <typename TStream, typename TGraph>
 void ReadIntoWeightedGraph(TStream &in, TGraph &G) {
+    int n;
+    in >> n;
+
+    G = TGraph(n);
+
+    int v, w;
+    double d;
+    while (in >> v >> w >> d) { G.Connect(v, w, d); }  // while
+
+    std::cout << "Data read." << std::endl;
+}
+
+template <typename TStream, typename TGraph>
+void ReadIntoDirectedWeightedGraph(TStream &in, TGraph &G) {
     int n;
     in >> n;
 
