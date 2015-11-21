@@ -23,7 +23,7 @@ public:
 
 int main(int argc, char const *argv[])
 {
-	auto io=StreamRedirect("chicken.in","chicken.out");
+//	auto io=StreamRedirect("chicken.in","chicken.out");
 
 	double n,m;
 	while (cin>>n>>m) {
