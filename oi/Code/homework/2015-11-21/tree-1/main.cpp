@@ -1,22 +1,22 @@
 #include <cstring>
 #include <iostream>
+#include <vector>
 
 using namespace std;
-
-#define NODE_MAX 1048575
-#define END_MAX 524288
 
 typedef int ntype;
 
 static ntype D, I;
-static bool tree[NODE_MAX + 10];
-static ntype h[END_MAX + 10];
+static vector<bool> tree;
+static vector<ntype> h;
 
 inline ntype left(ntype x) { return x * 2; }
 
 inline ntype right(ntype x) { return x * 2 + 1; }
 
 inline ntype pow_of_two(ntype e) {
+    if (e == 0) return 1;
+
     ntype result = 2;
 
     while (e > 1) {
@@ -32,30 +32,41 @@ int main() {
 
     cin >> D >> I;
 
-    memset(tree, false, sizeof(tree));
-    memset(h, 0, sizeof(h));
+    ntype size = pow_of_two(D - 1);
+    ntype n = 0;
+    for (int i = 0; i < D; i++) { n += pow_of_two(i); }  // for
 
-    ntype bound = pow_of_two(D - 1);
-    for (ntype i = 1; i <= bound; i++) {
-        ntype pos = 1;
+    tree.resize(n + 1, false);
+    h.resize(size + 1, 0);
+
+    for (ntype i = 1; i < h.size(); i++) {
         ntype depth = 1;
+        ntype pos = 1;
 
+        // cout << pos;
         while (depth < D) {
-            if (tree[pos] == false)
+            bool flag = tree[pos];
+            tree[pos] = !flag;
+
+            if (flag == false)
                 pos = left(pos);
             else
                 pos = right(pos);
 
-            tree[i] = !tree[i];
+            // cout << " -> " << pos;
             depth++;
         }  // while
+        // cout << endl;
 
         h[i] = pos;
     }  // for
 
-    h[0] = h[bound - 1];
+    h[0] = h[h.size() - 1];
 
-    cout << h[I % (bound - 1)];
+    // for (auto i : h) { cout << i << " "; }  // foreach in h
+    // cout << endl;
+
+    cout << h[I % (h.size() - 1)];
 
     return 0;
 }  // function main
