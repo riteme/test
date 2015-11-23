@@ -16,4 +16,7 @@ My bashrc.
 # test/project
 Current project.
 
+# test/oi
+Code for OI.
+
 Copyright 2015 riteme.
