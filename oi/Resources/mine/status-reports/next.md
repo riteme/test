@@ -5,4 +5,6 @@
 编辑距离(Codevs P2598)
 金明的预算方案(NOIP 2006, Vijos 1313)
 
+借教室(NOIP 2012, Vijos P1782/Codevs P1217)
+
 优先队列

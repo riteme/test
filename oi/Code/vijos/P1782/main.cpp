@@ -1,16 +1,26 @@
 // 借教室
+// Codevs: AC
+// Vijos: 4 TLE
 
 #include <cstdlib>
 #include <string>
-#include <iostream>
+#include <cstdio>
 #include <algorithm>
 
 using namespace std;
 
 #define NMAX 1000000
 #define MMAX 1000000
+#define MEMORY_SIZE 2097151
 
-typedef long long ntype;
+#define LEFT(x) (x << 1)
+#define RIGHT(x) ((x << 1) | 1)
+#define PARENT(x) (x >> 1)
+
+// #define FMT "%lld"
+// typedef long long ntype;
+#define FMT "%d"
+typedef int ntype;
 
 struct Reservation {
     Reservation() : start(0), end(0), need(0) {}
@@ -21,59 +31,140 @@ struct Reservation {
     ntype need;
 };  // struct Reservation
 
-struct Node{
-	Node():l(0),r(0),left(NULL),right(NULL),sum(0){}
-	Node(ntype _l,ntype _r):l(_l),r(_r),left(NULL),right(NULL),sum(0){{
+struct Node {
+    Node() : pos(1), l(0), r(0), sum(0) {}
+    Node(ntype _l, ntype _r) : pos(1), l(_l), r(_r), sum(0) {}
 
-	ntype l;
-	ntype r;
-	Node *left;
-	Node *right;
-	ntype sum;
+    ntype pos;
+    ntype l;
+    ntype r;
+    ntype sum;
 };
 
 static ntype n, m;
 static ntype r[NMAX + 10];
 static Reservation q[MMAX + 10];
+static Node heap[MEMORY_SIZE];
+static bool flag;
+static ntype id;
 
-Node *build_tree(ntype lb,ntype rb){
-	Node *x=new Node(lb,rb);
+Node *build_tree(ntype lb, ntype rb, ntype p = 1);
+void insert(ntype s, ntype t, ntype value, ntype p = 1);
+ntype query(ntype d, ntype p = 1);
 
-	if(lb!=rb){
-		ntype mid=(lb+rb)/2;
-		x->left=build_tree(lb,mid);
-		x->right=build_tree(mid+1,rb);
-	}
-
-	return x;
-}
-
-void insert(ntype s,ntype t,ntype value,Node *x){
-	if(s==x->l and t==x->r)
-		x->sum=value;
-
-}
-
-ntype query(ntype d,Node *x){
-
+inline ntype read() {
+    ntype x = 0;
+    char c = getchar();
+    while (c < '0' or c > '9') c = getchar();
+    while ('0' <= c and c <= '9') x = x * 10 + c - '0', c = getchar();
+    return x;
 }
 
 void initialize();
 void quit();
 
 int main() {
-    ios::sync_with_stdio(false);
     initialize();
+
+    for (int i = 1; i <= m; i++) {
+        insert(q[i].start, q[i].end, -q[i].need, 1);
+    }  // for
+
+    ntype j = m + 1;
+    for (ntype i = 1; i <= n; i++) {
+        while (query(i, 1) < 0) {
+            j--;
+            insert(q[j].start, q[j].end, q[j].need, 1);
+        }  // while
+    }      // for
+
+    if (j != m + 1) {
+        flag = true;
+        id = j;
+    }
 
     quit();
     return 0;
 }  // function main
 
 void initialize() {
-    cin >> n >> m;
+    n = read();
+    m = read();
 
-    for (int i = 1; i <= n; i++) cin >> r[i];
-    for (int i = 1; i <= m; i++) cin >> q[i].need >> q[i].start >> q[i].end;
+    for (int i = 1; i <= n; i++) r[i] = read();
+    for (int i = 1; i <= m; i++)
+        q[i].need = read(), q[i].start = read(), q[i].end = read();
+
+    flag = false;
+    id = 0;
+
+    build_tree(1, n);
 }
 
-void quit();
+void quit() {
+    if (!flag)
+        puts("0");
+    else {
+        puts("-1");
+        printf(FMT, id);
+    }
+}
+
+Node *build_tree(ntype lb, ntype rb, ntype p) {
+    Node *x = &heap[p];
+    x->l = lb;
+    x->r = rb;
+
+    if (lb != rb) {
+        ntype mid = (lb + rb) / 2;
+        build_tree(lb, mid, LEFT(p));
+        build_tree(mid + 1, rb, RIGHT(p));
+        x->sum = 0;
+    } else
+        x->sum = r[lb];
+
+    return x;
+}
+
+void insert(ntype s, ntype t, ntype value, ntype p) {
+    Node *x = &heap[p];
+
+    if (s <= x->l and x->r <= t)
+        x->sum += value;
+    else {
+        ntype mid = (x->l + x->r) / 2;
+
+        if (t <= mid)
+            insert(s, t, value, LEFT(p));
+        else if (s > mid)
+            insert(s, t, value, RIGHT(p));
+        else {
+            insert(s, t, value, LEFT(p));
+            insert(s, t, value, RIGHT(p));
+        }
+    }
+}
+
+ntype query(ntype d, ntype p) {
+recursive:
+    Node *x = &heap[p];
+    Node *left = &heap[LEFT(p)];
+    Node *right = &heap[RIGHT(p)];
+
+    if (d == x->l and d == x->r) return x->sum;
+
+    ntype mid = (x->l + x->r) / 2;
+
+    if (x->sum != 0) {
+        left->sum += x->sum;
+        right->sum += x->sum;
+        x->sum = 0;
+    }
+
+    if (d <= mid)
+        p = LEFT(p);
+    else
+        p = RIGHT(p);
+
+    goto recursive;
+}
