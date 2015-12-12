@@ -1,5 +1,7 @@
 // 借教室
 
+#include <cstdlib>
+#include <string>
 #include <iostream>
 #include <algorithm>
 
@@ -19,9 +21,42 @@ struct Reservation {
     ntype need;
 };  // struct Reservation
 
+struct Node{
+	Node():l(0),r(0),left(NULL),right(NULL),sum(0){}
+	Node(ntype _l,ntype _r):l(_l),r(_r),left(NULL),right(NULL),sum(0){{
+
+	ntype l;
+	ntype r;
+	Node *left;
+	Node *right;
+	ntype sum;
+};
+
 static ntype n, m;
 static ntype r[NMAX + 10];
 static Reservation q[MMAX + 10];
+
+Node *build_tree(ntype lb,ntype rb){
+	Node *x=new Node(lb,rb);
+
+	if(lb!=rb){
+		ntype mid=(lb+rb)/2;
+		x->left=build_tree(lb,mid);
+		x->right=build_tree(mid+1,rb);
+	}
+
+	return x;
+}
+
+void insert(ntype s,ntype t,ntype value,Node *x){
+	if(s==x->l and t==x->r)
+		x->sum=value;
+
+}
+
+ntype query(ntype d,Node *x){
+
+}
 
 void initialize();
 void quit();
