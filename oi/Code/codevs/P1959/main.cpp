@@ -1,70 +1,47 @@
-#include <cmath>
-#include <cstring>
+#include <climits>
 #include <iostream>
 #include <algorithm>
 
 using namespace std;
 
+#define NMAX 100
+#define BMAX 22500
+#define INVAILD false
+
 static int n;
-static int bound;
-static int W[101];
-static bool f[51][22501][101];
+static int s;
+static int b;
+static int w[NMAX + 10];
+static bool f[BMAX + 10];
+
+void initialize();
+void output();
 
 int main() {
     ios::sync_with_stdio(false);
+    initialize();
 
-    cin >> n;
-
-    int sum = 0;
     for (int i = 1; i <= n; i++) {
-        cin >> W[i];
-        sum += W[i];
-    }  // for
-    bound = sum / 2;
+        for (int j = b; j >= w[i]; j--) { f[j] = f[j - w[i]]; }  // for
+    }                                                            // for
 
-    memset(f, false, sizeof(f));
-    // memset(b, false, sizeof(b));
-
-    f[0][0][0] = true;
-    for (int i = 1; i <= n / 2 + (n % 2 == 1 ? 1 : 0); i++) {
-        for (int j = 1; j <= n; j++) {
-            for (int k = W[j]; k <= bound; k++) {
-                if (!f[i - 1][k - W[j]][j] and f[i - 1][k - W[j]][0]) {
-                    f[i][k][0] = f[i][k][j] = true;
-                }
-            }  // for
-        }      // for
-    }          // for
-
-    int m = 0;
-    for (int i = bound; i >= 0; i--) {
-        if (f[n / 2][i][0] or (n % 2 == 1 and f[n / 2 + 1][i][0])) {
-            m = i;
-            break;
-        }
-    }  // for
-
-    // int m = 0;
-    // for (int k = bound; k >= 0; k--) {
-    //     if (!f[k]) continue;
-
-    //     int cnt = std::count(&b[k][1], &b[k][n + 1], true);
-
-    //     if ((cnt == n / 2 or cnt == n / 2 + (n % 2 == 1 ? 1 : 0)) and m < k)
-    //     {
-    //         m = k;
-    //     }
-    // }  // for
-
-    // for (int i = 1; i <= bound; i++) { cout << f[i]; }  // for
-    // cout << endl;
-
-    // for (int x = 1; x <= n / 2 + (n % 2 == 1 ? 1 : 0); x++) {
-    //     for (int y = 1; y <= bound; y++) { cout << f[x][y][0]; }  // for
-    //     cout << endl;
-    // }  // for
-
-    cout << m << ' ' << sum - m;
-
+    output();
     return 0;
 }  // function main
+
+void initialize() {
+    cin >> n;
+
+    for (int i = 1; i <= n; i++) {
+        cin >> w[i];
+        s += w[i];
+    }  // for
+    b = s / 2;
+
+    fill(&f[0], &f[b + 1], INVAILD);
+    f[0] = true;
+}
+
+void output() {
+    for (int i = b; i; /* process */) { /* your code */ }  // for
+}
