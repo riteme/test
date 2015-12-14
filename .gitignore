@@ -132,3 +132,8 @@ target/
 # Sublime Text
 *.sublime-project
 *.sublime-workspace
+
+# Input and Output files
+*.in
+*.out
+*.ans
