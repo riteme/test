@@ -1,4 +1,6 @@
 // 借教室
+// Codevs: AC
+// Vijos: 4 TLE
 
 #include <cstdlib>
 #include <string>
@@ -64,21 +66,21 @@ void quit();
 int main() {
     initialize();
 
-    for (Reservation *beg = &q[1]; beg != &q[n + 1]; beg++) {
-        insert(beg->start, beg->end, -beg->need, 1);
+    for (int i = 1; i <= m; i++) {
+        insert(q[i].start, q[i].end, -q[i].need, 1);
     }  // for
 
-    Reservation *j = &q[m + 1];
+    ntype j = m + 1;
     for (ntype i = 1; i <= n; i++) {
         while (query(i, 1) < 0) {
             j--;
-            insert(j->start, j->end, j->need, 1);
+            insert(q[j].start, q[j].end, q[j].need, 1);
         }  // while
     }      // for
 
-    if (j != &q[m + 1]) {
+    if (j != m + 1) {
         flag = true;
-        id = j - &q[1] + 1;
+        id = j;
     }
 
     quit();
@@ -89,9 +91,9 @@ void initialize() {
     n = read();
     m = read();
 
-    for (int *beg = &r[1]; beg != &r[n + 1]; beg++) *beg = read();
-    for (Reservation *beg = &q[1]; beg != &q[m + 1]; beg++)
-        beg->need = read(), beg->start = read(), beg->end = read();
+    for (int i = 1; i <= n; i++) r[i] = read();
+    for (int i = 1; i <= m; i++)
+        q[i].need = read(), q[i].start = read(), q[i].end = read();
 
     flag = false;
     id = 0;
@@ -114,9 +116,10 @@ Node *build_tree(ntype lb, ntype rb, ntype p) {
     x->r = rb;
 
     if (lb != rb) {
-        ntype mid = (lb + rb) >> 1;
+        ntype mid = (lb + rb) / 2;
         build_tree(lb, mid, LEFT(p));
         build_tree(mid + 1, rb, RIGHT(p));
+        x->sum = 0;
     } else
         x->sum = r[lb];
 
@@ -124,23 +127,18 @@ Node *build_tree(ntype lb, ntype rb, ntype p) {
 }
 
 void insert(ntype s, ntype t, ntype value, ntype p) {
-recursive:
     Node *x = &heap[p];
 
     if (s <= x->l and x->r <= t)
         x->sum += value;
     else {
-        ntype mid = (x->l + x->r) >> 1;
+        ntype mid = (x->l + x->r) / 2;
 
-        if (t <= mid) {
-            // insert(s, t, value, LEFT(p));
-            p = LEFT(p);
-            goto recursive;
-        } else if (s > mid) {
-            // insert(s, t, value, RIGHT(p));
-            p = RIGHT(p);
-            goto recursive;
-        } else {
+        if (t <= mid)
+            insert(s, t, value, LEFT(p));
+        else if (s > mid)
+            insert(s, t, value, RIGHT(p));
+        else {
             insert(s, t, value, LEFT(p));
             insert(s, t, value, RIGHT(p));
         }
@@ -156,7 +154,7 @@ recursive:
     if (d == x->l and d == x->r) return result + x->sum;
 
     result += x->sum;
-    ntype mid = (x->l + x->r) >> 1;
+    ntype mid = (x->l + x->r) / 2;
 
     if (d <= mid)
         p = LEFT(p);
