@@ -7,30 +7,29 @@
 
 using namespace std;
 
-#define DEBUG
+// #define DEBUG
 
-#define NMAX 100000
-#define QMAX 100000
+#define NMAX 200000
+#define QMAX 200000
 #define AMAX 1000000000
 #define CMAX 10000
-#define ADD_COMMAND 'C'
-#define QUERY_COMMAND 'Q'
-#define EXIT_COMMAND 'E'
+#define MEMORY_SIZE 600000
+#define ADD_COMMAND 1
+#define QUERY_COMMAND 2
+#define EXIT_COMMAND 3
+// #define ADD_COMMAND 'C'
+// #define QUERY_COMMAND 'Q'
+// #define EXIT_COMMAND 'E'
 
-#define ZERO (1 << h)
 #define LEFT(x) (x << 1)
 #define RIGHT(x) (x << 1 | 1)
 #define PARENT(x) (x >> 1)
-
-#define TO_STRING(x) bitset<sizeof(size_type) * 8>((x)).to_string()
 
 #ifdef DEBUG
 #define LOG(msg) cout << msg << endl
 #else
 #define LOG(msg)
 #endif  // IFDEF DEBUG
-
-#define MEMORY_SIZE 2097151
 
 #define FMT "%lld"
 typedef unsigned long long ntype;
@@ -52,12 +51,15 @@ static Node tree[MEMORY_SIZE + 1];
 
 template <typename TReturn>
 inline TReturn read() {
-    TReturn x = 0;
+    TReturn x = 0, f = 1;
     char c = getchar();
-    while (c < '0' or c > '9') c = getchar();
+    while (c < '0' or c > '9') {
+        if (c == '-') f = -1;
+        c = getchar();
+    }
     while ('0' <= c and c <= '9') x = x * 10 + c - '0', c = getchar();
 
-    return x;
+    return x * f;
 }
 
 void initialize();
@@ -70,31 +72,29 @@ ntype query(size_type l, size_type r);
 int main() {
     initialize();
 
-    // for (ntype cnt = 0; cnt < q; cnt++) {
-    while (true) {
-        // Get the command.
-        char command = getchar();
-        while (command != QUERY_COMMAND and command != ADD_COMMAND and
-               command != EXIT_COMMAND)
-            command = getchar();
+    for (ntype cnt = 0; cnt < q; cnt++) {
+        // while (true) {
+        // char command = getchar();
+        // while (command != QUERY_COMMAND and command != ADD_COMMAND and
+        //        command != EXIT_COMMAND)
+        //     command = getchar();
+        ntype command = read<ntype>();
 
-        size_type s, t;
+        ntype s, t;
         ntype c;
 
-        // scanf("%d %d", &s, &t);
         switch (command) {
             case ADD_COMMAND:
-                // scanf(FMT, &c);
-                s = read<size_type>();
-                t = read<size_type>();
+                s = read<ntype>();
+                t = read<ntype>();
                 c = read<ntype>();
 
                 insert(s, t, c);
                 break;
 
             case QUERY_COMMAND:
-                s = read<size_type>();
-                t = read<size_type>();
+                s = read<ntype>();
+                t = read<ntype>();
 
                 printf(FMT "\n", query(s, t));
                 break;
@@ -109,10 +109,11 @@ exit_point:
 }  // function main
 
 void initialize() {
-    // scanf(FMT, &n);
     n = read<ntype>();
 
     for (int i = 1; i <= n; i++) { v[i] = read<ntype>(); }  // for
+
+    q = read<ntype>();
 
     build();
 }
@@ -120,13 +121,21 @@ void initialize() {
 void quit() {}
 
 inline void update(size_type x) {
-    tree[x].value = tree[LEFT(x)].value + tree[RIGHT(x)].value;
+    tree[x].value = tree[LEFT(x)].value + tree[RIGHT(x)].value +
+                    tree[x].mark * tree[x].size;
 
     LOG("(update) tree[x]: {left: "
         << tree[x].left << ", right: " << tree[x].right
         << ", value: " << tree[x].value << ", mark: " << tree[x].mark
         << ", size: " << tree[x].size << "}");
 }
+
+/**
+ * 时间复杂度
+ * build: O(n)
+ * insert: O(logn)
+ * query: O(logn)
+ */
 
 ntype build(size_type x, ntype l, ntype r);
 void insert(size_type x, ntype l, ntype r, ntype value);
@@ -161,6 +170,11 @@ void insert(size_type x, ntype l, ntype r, ntype value) {
 
         tree[x].mark += value;
         tree[x].value += value * tree[x].size;
+
+        LOG("(insert) tree[x]: {left: "
+            << tree[x].left << ", right: " << tree[x].right
+            << ", value: " << tree[x].value << ", mark: " << tree[x].mark
+            << ", size: " << tree[x].size << "}");
 
         return;
     }
