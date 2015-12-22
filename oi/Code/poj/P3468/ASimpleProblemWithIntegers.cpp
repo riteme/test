@@ -7,7 +7,7 @@
 
 using namespace std;
 
-// #define DEBUG
+#define DEBUG
 
 #define NMAX 200000
 #define QMAX 200000
