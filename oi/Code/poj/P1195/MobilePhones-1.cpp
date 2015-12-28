@@ -8,13 +8,13 @@
 
 using namespace std;
 
-#define SMAX 1024
+#define SMAX 1025
 #define ADD 1
 #define QUERY 2
 #define TERMINATE 3
 
 static int s;
-static int m[SMAX + 10][SMAX + 10];
+static int m[SMAX][SMAX];
 
 inline int read() {
     int x = 0;
@@ -37,18 +37,16 @@ inline int read_with_sign() {
     return x * f;
 }
 
-inline int query(int x, int y) {
+inline int query(int col, int r) {
     int result = 0;
 
-    for (int ax = x; ax; ax -= ax & (-ax))
-        for (int ay = y; ay; ay -= ay & (-ay)) result += m[ax][ay];
+    for (; r; r -= r & (-r)) result += m[col][r];
 
     return result;
 }
 
-inline void insert(int x, int y, int v) {
-    for (int ax = x; ax <= s; ax += ax & (-ax))
-        for (int ay = y; ay <= s; ay += ay & (-ay)) m[ax][ay] += v;
+inline void insert(int col, int r, int v) {
+    for (; r <= s; r += r & (-r)) m[col][r] += v;
 }
 
 void initialize();
@@ -79,17 +77,13 @@ int main() {
                 top = read() + 1;
 
                 int ans = 0;
-                ans = query(right, top) - query(left - 1, top) -
-                      query(right, bottom - 1) + query(left - 1, bottom - 1);
+                for (int i = left; i <= right; i++) {
+                    ans += query(i, top) - query(i, bottom - 1);
+                }  // for
 
                 printf("%d\n", ans);
                 break;
         }  // switch to instruction
-
-        for (int x = 1; x <= s; x++) {
-            for (int y = 1; y <= s; y++) { printf("%d ", m[x][y]); }  // for
-            printf("\n");
-        }  // for
     }      // while
 
 exit_point:
