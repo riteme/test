@@ -5,3 +5,6 @@ Mobile Phones(POJ P1195)
 
 Tarjan-LCA算法
 索引优先队列
+
+KMP算法
+DFA字符串匹配
