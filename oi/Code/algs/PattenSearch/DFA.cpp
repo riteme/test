@@ -14,8 +14,8 @@
 using namespace std;
 
 #define TESTCOUNT 100
-#define STRING_MAX_LENGTH 5000000
-#define PATTERN_MAX_LENGTH 1000
+#define STRING_MAX_LENGTH 50000
+#define PATTERN_MAX_LENGTH 100
 
 auto GenerateDFA(const string &pattern) -> vector<vector<int>>;
 auto DFAMatch(const string &text, const string &pattern) -> int;
@@ -36,17 +36,15 @@ int main() {
 
         // cout << "a: " << a << "\nb: " << b << "\n";
 
-        // int std =
-        //     distance(a.begin(), search(a.begin(), a.end(), b.begin(),
-        //     b.end()));
+        int std =
+            distance(a.begin(), search(a.begin(), a.end(), b.begin(), b.end()));
         // cout << "STD OK" << endl;
 
         int mine = DFAMatch(a, b);
         // cout << "KMP OK" << endl;
 
-        // if (std == a.size()) std = -1;
+        if (std == a.size()) std = -1;
         if (mine == a.size()) mine = -1;
-        int std = mine;
 
         if (std != mine) {
             cout << "a: " << a << "\nb: " << b << "\n";
