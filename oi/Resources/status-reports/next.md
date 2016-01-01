@@ -4,6 +4,11 @@ Mobile Phones(POJ P1195)
 寻找道路(UOJ P19/NOIP2014 Day2T2)
 关押罪犯(NOIP 2010/Vijos P1776)
 
+Palindrome(POJ P3974)
+
+LCA(Codevs P4605)
+
+
 Tarjan-LCA算法
 索引优先队列
 
