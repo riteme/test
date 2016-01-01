@@ -40,15 +40,17 @@ inline int read_with_sign() {
 inline int query(int x, int y) {
     int result = 0;
 
-    for (int ax = x; ax; ax -= ax & (-ax))
-        for (int ay = y; ay; ay -= ay & (-ay)) result += m[ax][ay];
+    for (int i = x; i > 0; i -= i & (-i)) {
+        for (int j = y; j > 0; j -= j & (-j)) { result += m[i][j]; }  // for
+    }                                                                 // for
 
     return result;
 }
 
 inline void insert(int x, int y, int v) {
-    for (int ax = x; ax <= s; ax += ax & (-ax))
-        for (int ay = y; ay <= s; ay += ay & (-ay)) m[ax][ay] += v;
+    for (int i = x; i <= s; i += i & (-i)) {
+        for (int j = y; j <= s; j += j & (-j)) { m[i][j] += v; }  // for
+    }                                                             // for
 }
 
 void initialize();
@@ -85,11 +87,6 @@ int main() {
                 printf("%d\n", ans);
                 break;
         }  // switch to instruction
-
-        for (int x = 1; x <= s; x++) {
-            for (int y = 1; y <= s; y++) { printf("%d ", m[x][y]); }  // for
-            printf("\n");
-        }  // for
     }      // while
 
 exit_point:
