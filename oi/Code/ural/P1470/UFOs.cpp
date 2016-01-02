@@ -43,10 +43,10 @@ int main() {
         int command;
         scanf("%d", &command);
 
+        int x, y, z, k;
+        int x1, y1, z1, x2, y2, z2;
         switch (command) {
-            case 3: goto exit_point;
-            case 1:
-                int x, y, z, k;
+            case 1: {
                 scanf("%d %d %d %d", &x, &y, &z, &k);
                 x++;
                 y++;
@@ -54,8 +54,8 @@ int main() {
 
                 insert(x, y, z, k);
                 break;
-            case 2:
-                int x1, y1, z1, x2, y2, z2;
+            }
+            case 2: {
                 scanf("%d %d %d %d %d %d", &x1, &y1, &z1, &x2, &y2, &z2);
                 x1++;
                 y1++;
@@ -64,12 +64,15 @@ int main() {
                 y2++;
                 z2++;
 
-                int answer = query(x2, y2, z2) - query(x1, y2, z2) -
-                             query(x2, y1, z2) - query(x2, y2, z1) +
-                             query(x1, y1, z2) + query(x1, y2, z1) +
-                             query(x2, y1, z1) - query(x1, y1, z1);
+                int answer =
+                    query(x2, y2, z2) - query(x1 - 1, y2, z2) -
+                    query(x2, y1 - 1, z2) - query(x2, y2, z1 - 1) +
+                    query(x1 - 1, y1 - 1, z2) + query(x1 - 1, y2, z1 - 1) +
+                    query(x2, y1 - 1, z1 - 1) - query(x1 - 1, y1 - 1, z1 - 1);
                 printf("%d\n", answer);
                 break;
+            }
+            case 3: goto exit_point;
         }  // switch to command
     }      // while
 
