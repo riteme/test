@@ -6,6 +6,7 @@ UFOs(P1470)
 关押罪犯(NOIP 2010/Vijos P1776)
 
 Palindrome(POJ P3974)
+回文串(POJ P1159)
 
 LCA(Codevs P4605)
 
