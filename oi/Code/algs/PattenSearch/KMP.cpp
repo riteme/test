@@ -2,7 +2,7 @@
 // Copyright 2015 riteme
 //
 
-// BUGGY
+// Accepted
 
 #include <cassert>
 #include <vector>
