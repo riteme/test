@@ -105,12 +105,10 @@ void initialize() {
 
 static ntype length;
 static ntype max_length;
-ntype bfs(const Node *root);
 ntype dfs(const Node *x, const ntype depth);
 
 void quit() {
     // 计算答案
-    length = 0;
     max_length = 0;
     length = dfs(root, 0);
 
