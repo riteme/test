@@ -21,17 +21,13 @@ inline char get_command() {
 inline bool query(int x, int y) {
     bool result = 0;
 
-    for (int i = y; i != 0 and i <= n; i += i & (-i)) {
-        if (matrix[x][i]) {
-            result = !result;
-        }
-    }  // for
-
-    for (int i = x; i != 0 and i <= n; i += i & (-i)) {
-        if (matrix[i][n]) {
-            result = !result;
-        }
-    }  // for
+    for (int i = x; i <= n; i += i & (-i)) {
+        for (int j = y; j <= n; j += j & (-j)) {
+            if (matrix[i][j]) {
+                result = !result;
+            }
+        }  // for
+    }      // for
 
     return result;
 }
@@ -81,13 +77,10 @@ int main() {
                 case 'C':
                     scanf("%d %d %d %d", &x1, &y1, &x2, &y2);
                     insert(x2, y2);
-                    print_matrix();
                     insert(x1 - 1, y2);
-                    print_matrix();
                     insert(x2, y1 - 1);
-                    print_matrix();
                     insert(x1 - 1, y1 - 1);
-                    print_matrix();
+                    // print_matrix();
                     break;
             }  // switch to command
 
