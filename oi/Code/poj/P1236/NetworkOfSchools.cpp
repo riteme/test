@@ -30,20 +30,8 @@ static bool exist[NMAX + 10];
 static stack<int> s;
 static int W[NMAX + 10][NMAX + 10];
 static int in[NMAX + 10];
+static int out[NMAX + 10];
 static int scc[NMAX + 10];
-static vector<Edge> edges;
-static int set[NMAX + 10];
-static int total;
-
-inline void make_set(int size) {
-    for (int i = 1; i <= size; i++) {
-        set[i] = i;
-    }  // for
-}
-
-inline int find_set(int x) {
-    return x == set[x] ? x : set[x] = find_set(set[x]);
-}
 
 void initialize() {
     scanf("%d", &n);
@@ -105,41 +93,10 @@ void tarjan_scc(int u) {
     }
 }
 
-void kruskal() {
-    make_set(scccnt);
-
-    sort(edges.begin(), edges.end());
-
-    int index = 0;
-    int edgeCnt = 0;
-
-    total = 0;
-    while (edgeCnt < n - 1 and index < edges.size()) {
-        Edge &e = edges[index];
-
-        int x = find_set(e.u);
-        int y = find_set(e.v);
-
-        if (x != y) {
-            set[x] = y;
-            total += e.w;
-            edgeCnt++;
-        }
-
-        index++;
-    }  // while
-}
-
 int main() {
     initialize();
 
-    for (int i = 1; i <= n; i++) {
-        if (low[i] == 0) {
-            s = stack<int>();
-
-            tarjan_scc(i);
-        }
-    }  // for
+    tarjan_scc(1);
 
     // for (int i = 1; i <= n; i++) {
     //     printf("%d ", scc[i]);
@@ -157,14 +114,6 @@ int main() {
         }  // for
     }      // for
 
-    for (int i = 1; i <= scccnt; i++) {
-        for (int j = i + 1; j <= scccnt; j++) {
-            int edgecnt = W[i][j] + W[j][i];
-
-            edges.push_back(Edge(i, j, 2 - edgecnt));
-        }  // for
-    }      // for
-
     int zerocnt = 0;
     for (int i = 1; i <= scccnt; i++) {
         if (in[i] == 0) {
@@ -172,9 +121,26 @@ int main() {
         }
     }  // for
 
-    kruskal();
+    memset(in, 0, sizeof(in));
+    memset(out, 0, sizeof(out));
+    for (int i = 1; i <= scccnt; i++) {
+        for (int j = 1; j <= scccnt; j++) {
+            if (W[i][j]) {
+                out[i]++;
+                in[j]++;
+            }
+        }  // for
+    }      // for
 
-    printf("%d\n%d\n", zerocnt, total);
+    int i = 0, o = 0;
+    if (scccnt != 1) {
+        for (int j = 1; j <= scccnt; j++) {
+            i += in[j] ? 1 : 0;
+            o += out[j] ? 1 : 0;
+        }  // for
+    }
+
+    printf("%d\n%d\n", zerocnt, max(i, o));
 
     return 0;
 }  // function main
