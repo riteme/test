@@ -1,12 +1,7 @@
-# 2016-1-25
-## 最短路
-Frogger(POJ P2253): 
+# 2016-1-26
+## 强连通分量
+Network of Schools(POJ P1236): [Code]()
+Popular Cows(POJ P2186): [Code]()
 
-* [二分+并查集]()
-* [Floyd/DP]()
-
-## 拓扑排序
-Genealogical tree(POJ P2367): [Code]()
-
-## 算法
-强联通分量: [Strongly-Connected-Components]()
+## 线段树
+天才的记忆(POJ P1514): [RMQ]()
