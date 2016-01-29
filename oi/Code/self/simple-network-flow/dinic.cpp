@@ -2,6 +2,7 @@
 #include <cstring>
 #include <climits>
 #include <queue>
+#include <stack>
 #include <vector>
 #include <algorithm>
 
@@ -10,14 +11,19 @@ using namespace std;
 #define NMAX 200
 #define MMAX 1000
 
+struct Edge {
+    int u;
+    int v;
+    int w;
+    Edge *reverse_edge;
+};  // struct Edge
+
 static int n;
 static int m;
 static int level[NMAX + 10];
-static vector<int> G[NMAX + 10];
+static Edge edges[2 * (MMAX + 10)];
+static vector<Edge *> G[NMAX + 10];
 static bool marked[NMAX + 10];
-static int W[NMAX + 10][NMAX + 10];
-static bool flag;
-static int edge_to[NMAX + 10];
 static int answer;
 
 void bfs() {
@@ -36,14 +42,15 @@ void bfs() {
         q.pop();
 
         for (int i = 0; i < G[u].size(); i++) {
-            int v = G[u][i];
+            Edge *e = G[u][i];
+            int v = e->v;
 
-            if (W[u][v] <= 0) {
+            if (e->w == 0) {
                 continue;
             }
 
             if (!marked[v]) {
-                level[v] = min(level[v], level[u] + 1);
+                level[v] = level[u] + 1;
                 marked[v] = true;
                 q.push(v);
             }
@@ -51,38 +58,39 @@ void bfs() {
     }      // while
 }
 
-void dfs(int u) {
-    for (int i = 0; i < G[u].size() and !flag; i++) {
-        int v = G[u][i];
+int dfs(int u, int maxflow, int t) {
+    if (u == t) {
+        return maxflow;
+    }
 
-        if (W[u][v] <= 0) {
+    int current = 0;  // 表示当前已经增广的流
+    for (int i = 0; i < G[u].size(); i++) {
+        Edge *e = G[u][i];
+        int v = e->v;
+
+        if (level[u] + 1 != level[v] or e->w == 0) {
             continue;
         }
 
-        if (level[u] + 1 == level[v] and !marked[v]) {
-            marked[v] = true;
-            edge_to[v] = u;
+        int flow =
+            min(maxflow - current, e->w);  // 减去当前已获得的流确保不会超出限制
+        flow = dfs(v, flow, t);
+        e->w -= flow;
+        e->reverse_edge->w += flow;
+        current += flow;
 
-            if (v == n) {
-                flag = true;
-            } else {
-                dfs(v);
-            }
+        if (current == maxflow) {
+            return current;  // 如果流量已到上限，则不再继续增广
         }
     }  // for
-}
 
-void dfs() {
-    memset(marked, false, sizeof(marked));
-    memset(edge_to, 0, sizeof(edge_to));
-    marked[1] = true;
-    edge_to[1] = 0;
-    flag = false;
-
-    dfs(1);
+    return current;
 }
 
 void dinic() {
+    int s = 1;
+    int t = n;
+
     while (true) {
         bfs();
 
@@ -90,36 +98,11 @@ void dinic() {
             return;
         }
 
-        dfs();
-
-        int x = n;
-        int newflow = INT_MAX;
-        while (edge_to[x] != 0) {
-            int u = edge_to[x];
-            newflow = min(newflow, W[u][x]);
-
-            x = edge_to[x];
-        }  // while
-
-        answer += newflow;
-        x = n;
-        while (edge_to[x] != 0) {
-            int u = edge_to[x];
-            W[u][x] -= newflow;
-            W[x][u] += newflow;
-
-            x = edge_to[x];
-        }  // while
-    }      // while
+        answer += dfs(s, INT_MAX, t);
+    }  // while
 }
 
 void initialize() {
-    for (int x = 1; x <= n; x++) {
-        for (int y = 1; y <= n; y++) {
-            W[x][y] = 0;
-        }  // for
-    }      // for
-
     for (int i = 1; i <= n; i++) {
         G[i].clear();
     }  // for
@@ -129,9 +112,20 @@ void initialize() {
         int w;
         scanf("%d%d%d", &u, &v, &w);
 
-        G[u].push_back(v);
-        G[v].push_back(u);
-        W[u][v] = w;
+        Edge &e = edges[i];
+        Edge &re = edges[i + m];
+        e.u = u;
+        e.v = v;
+        e.w = w;
+        e.reverse_edge = &re;
+
+        re.u = v;
+        re.v = u;
+        re.w = 0;
+        re.reverse_edge = &e;
+
+        G[u].push_back(&e);
+        G[v].push_back(&re);
     }  // for
 
     answer = 0;
