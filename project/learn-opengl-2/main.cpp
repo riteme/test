@@ -7,7 +7,11 @@
 
 #include <GL/glew.h>
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
+// #include <SDL2/SDL_image.h>
+
+#define ILUT_USE_OPENGL
+#include <IL/il.h>
+#include <IL/ilut.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -124,15 +128,23 @@ int main() {
     glDeleteShader(axisFragmentShader);
 
     // 加载材质
-    SDL_Surface *textureData1 = nullptr;
-    textureData1 = IMG_Load(TEXTURE_FILE_1);
-    assert(textureData1 != nullptr);
+    ilInit();
+    ILuint textureDate;
+    textureDate = ilGenImage();
+    ilBindImage(textureDate);
+
+    ilLoadImage(TEXTURE_FILE_1);
+    ILint width = ilGetInteger(IL_IMAGE_WIDTH);
+    ILint height = ilGetInteger(IL_IMAGE_HEIGHT);
+    ILubyte *texturePtr = ilGetData();
+
+    ilBindImage(0);
 
     GLuint textures[1];
     glGenTextures(1, textures);
     glBindTexture(GL_TEXTURE_2D, textures[0]);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureData1->w, textureData1->h, 0,
-                 GL_RGB, GL_UNSIGNED_BYTE, textureData1->pixels);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+                 GL_UNSIGNED_BYTE, texturePtr);
     glGenerateMipmap(GL_TEXTURE_2D);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                     GL_LINEAR_MIPMAP_LINEAR);
@@ -140,7 +152,7 @@ int main() {
 
     assert(textures[0] != 0);
 
-    SDL_FreeSurface(textureData1);
+    ilDeleteImage(textureDate);
 
     // 设置顶点数据
     GLfloat axisVertices[] = {
@@ -336,6 +348,27 @@ int main() {
                         case SDLK_z: rotateZ = -1.0f; break;
                         case SDLK_x: rotateZ = 1.0f; break;
 
+                        case SDLK_p: {
+                            cout << "Saving screenshot..." << endl;
+
+                            unsigned char *data =
+                                new unsigned char[800 * 600 * 4];
+                            glPixelStorei(GL_PACK_ALIGNMENT, 1);
+                            glReadPixels(0, 0, 800, 600, GL_RGB,
+                                         GL_UNSIGNED_BYTE, data);
+                            ILuint image = ilGenImage();
+
+                            ilBindImage(image);
+                            ilutGLScreen();
+
+                            ilEnable(IL_FILE_OVERWRITE);
+                            ilSaveImage("screenshot.png");
+                            ilBindImage(0);
+
+                            delete[] data;
+                            ilDeleteImage(image);
+                        } break;
+
                         case SDLK_ESCAPE: flag = false; continue;
                     }  // switch to e.key.keysym.sym
                     break;
@@ -359,7 +392,7 @@ int main() {
         }
 
         // 渲染区
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         auto end = chrono::high_resolution_clock::now();
