@@ -2,6 +2,11 @@
 # Copyright 2000-2025 riteme
 #
 
+import sys
+import time
+import socket
+import threading
+
 from math import *
 from sfml import *
 
@@ -29,6 +34,113 @@ class Game(object):
 		self.setup_chess()
 
 	# Utility
+
+	def setup_network(self):
+		self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+	def connect_to(self, address, port):
+		self.socket.connect((address, port))
+
+	def bind_to(self, address, port):
+		self.socket.bind((address, port))
+		self.socket.listen(1)
+
+	def serve(self):
+		# Wait for connection
+		connection, address = self.socket.accept()
+
+		while True:
+			# Wait for white
+			message = connection.recv(1024).decode("ascii")
+			tokens = message.strip().split(" ")
+			command = tokens[0].lower()
+
+			if command == "place":
+				x = int(tokens[1])
+				y = int(tokens[2])
+				self.place(x, y, Color.BLACK)
+			else:
+				raise RuntimeError("Unexpected command!")
+
+			# Already finished
+			if self.finished:
+				break
+
+			# Wait for mouse input
+			self.disabled = False
+			while self.data is None:
+				time.sleep(0.01)
+
+			# Already won
+			if self.finished:
+				break
+
+			self.disabled = True
+			connection.sendall(
+				("place %s %s" % data).encode("ascii")
+			)
+
+		connection.close()
+
+	def listen(self):
+		self.disabled = True
+
+		while True:
+			# Wait for black
+			message = self.socket.recv(1024).decode("ascii")
+			tokens = message.strip().split(" ")
+			command = tokens[0].lower()
+
+			if command == "place":
+				x = int(tokens[1])
+				y = int(tokens[2])
+				self.place(x, y, Color.BLACK)
+			else:
+				raise RuntimeError("Unexpected command!")
+
+			# Already finished
+			if self.finished:
+				return
+
+			# Wait for mouse input
+			self.disabled = False
+			while self.data is None:
+				time.sleep(0.01)
+
+			# Already won
+			if self.finished:
+				return
+
+			self.disabled = True
+			self.socket.sendall(
+				("place %s %s" % data).encode("ascii")
+			)
+
+		self.socket.close()
+
+	def setup_server(self):
+		self.server = threading.Thread(target=Game.serve, args=(self))
+		self.server.start()
+
+	def setup_client(self):
+		self.listener = threading.Thread(target=Game.listen, args=(self))
+		self.listener.start()
+
+	def place(self, i, j, color):
+		self.data = None
+
+		if self.chess[i][j].fill_color == Color.TRANSPARENT:
+			self.chess[i][j].fill_color = self.current_color
+			self.history.append((i, j))
+
+			result = self.check_winner()
+
+			if not result is None:
+				self.finish(result)
+			else:
+				self.change_color()
+
+			self.data = (i, j)
 
 	def setup_board(self):
 		self.board = VertexArray(PrimitiveType.LINES)
@@ -107,6 +219,7 @@ class Game(object):
 		self.current_color = Color.BLACK
 
 		self.disabled = False
+		self.finished = False
 		self.history = []
 
 	def change_color(self):
@@ -158,6 +271,7 @@ class Game(object):
 
 	def finish(self, result):
 		self.disabled = True
+		self.finished = True
 
 		x1, y1, x2, y2, color = result
 
@@ -197,18 +311,7 @@ class Game(object):
 				elif event.button == Mouse.LEFT:
 					mx, my = event.position
 					i, j = self.to_index(mx, my)
-
-					if self.chess[i][j].fill_color == Color.TRANSPARENT:
-						self.chess[i][j].fill_color = self.current_color
-						self.history.append((i, j))
-
-						result = self.check_winner()
-
-						if not result is None:
-							self.finish(result)
-
-						else:
-							self.change_color()
+					self.place(i, j, self.current_color)
 
 			elif type(event) is MouseMoveEvent:
 				mx, my = event.position
@@ -217,17 +320,17 @@ class Game(object):
 				self.current_block.position = self.to_position(i, j)
 				self.current_block.position -= (self.CHESS_RADIUS, self.CHESS_RADIUS)
 
-			elif type(event) is KeyEvent:
-				if not event.released:
-					continue
+			# elif type(event) is KeyEvent:
+			# 	if not event.released:
+			# 		continue
 
-				if event.code == window.Keyboard.ESCAPE:
-					self.setup_chess()
+			# 	if event.code == window.Keyboard.ESCAPE:
+			# 		self.setup_chess()
 
-				elif event.code == window.Keyboard.Z and event.control:
-					if len(self.history) > 0:
-						i, j = self.history.pop()
-						self.chess[i][j].fill_color = Color.TRANSPARENT
+			# 	elif event.code == window.Keyboard.Z and event.control:
+			# 		if len(self.history) > 0:
+			# 			i, j = self.history.pop()
+			# 			self.chess[i][j].fill_color = Color.TRANSPARENT
 
 	# Updating
 
@@ -266,5 +369,20 @@ class Game(object):
 			self.render()
 
 if __name__ == "__main__":
+	command = sys.argv[1]
+	address = sys.argv[2]
+	port = int(sys.argv[3])
+
 	game = Game()
+
+	game.setup_network()
+	if command == "create":
+		game.bind_to(address, port)
+		game.setup_server()
+	elif command == "join":
+		game.connect_to(address, port)
+		game.setup_client()
+	else:
+		print("(error) Unknown command: {}".format(command))
+
 	game.run()

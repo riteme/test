@@ -340,6 +340,7 @@ int main() {
             switch (e.type) {
                 case SDL_QUIT: flag = false; continue;
                 case SDL_KEYDOWN:
+                    cout << e.key.keysym.sym << endl;
                     switch (e.key.keysym.sym) {
                         case SDLK_q: rotateX = -1.0f; break;
                         case SDLK_w: rotateX = 1.0f; break;
