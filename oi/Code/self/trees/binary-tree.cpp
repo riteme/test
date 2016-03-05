@@ -87,6 +87,7 @@ Node *insert(Node *node, int key, int value) {
     return node;
 }
 
+// TODO(riteme): Improve this
 Node *remove(Node *node, int key) {
     if (node->key == key) {
         Node *origin = node;
