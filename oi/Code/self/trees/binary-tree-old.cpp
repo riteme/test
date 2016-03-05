@@ -87,55 +87,32 @@ Node *insert(Node *node, int key, int value) {
     return node;
 }
 
-inline Node *get_pervious(Node *node, Node **parent) {
-    if (node == nullptr) {
-        return nullptr;
-    }
-
-    if (node->right != nullptr) {
-        *parent = node;
-        return get_pervious(node->right, parent);
-    }
-
-    return node;
-}
-
-inline Node *real_remove(Node *node) {
-    if (node->left != nullptr and node->right != nullptr) {
-        Node *parent = node;
-        Node *prev = get_pervious(node->left, &parent);
-
-        swap(prev->key, node->key);
-        swap(prev->value, node->value);
-
-        Node *update = real_remove(prev);
-        if (parent == node) {
-            node->left = update;
-        } else {
-            parent->right = update;
-        }
-
-        return node;
-    } else {
-        Node *next = nullptr;
-
-        if (node->left != nullptr) {
-            next = node->left;
-        }
-
-        if (node->right != nullptr) {
-            next = node->right;
-        }
-
-        delete node;
-        return next;
-    }
-}
-
 // TODO(riteme): Improve this
 Node *remove(Node *node, int key) {
     if (node->key == key) {
-        return real_remove(node);
+        Node *origin = node;
+        Node *parent = node;
+
+        while (node->left != nullptr and node->right != nullptr) {
+            cw_rotate(node);
+            parent = node;
+            node = node->right;
+        }  // while
+
+        Node *next = nullptr;
+        if (node->left != nullptr)
+            next = node->left;
+        if (node->right != nullptr)
+            next = node->right;
+
+        delete node;
+
+        if (parent == node) {
+            return next;
+        } else {
+            parent->right = next;
+            return origin;
+        }
     } else {
         if (key < node->key) {
             node->left = remove(node->left, key);
