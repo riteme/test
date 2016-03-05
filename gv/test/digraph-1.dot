@@ -1,0 +1,19 @@
+graph {
+    node [shape = circle];
+
+    i:sw -- c [color = red];
+    c:sw -- b;
+    c:se -- g;
+    i:se -- j;
+    g:sw -- e [color = red];
+    b:sw -- a;
+    e:sw -- d;
+    e:se -- f;
+    g:se -- h;
+
+    {rank = same; i;}
+    {rank = same; c; j;}
+    {rank = same; b; g;}
+    {rank = same; a; e; h}
+    {rank = same; d; f;}
+}
