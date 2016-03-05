@@ -211,9 +211,11 @@ int main() {
     glm::mat4 view;
     glm::mat4 model;
 
-    projection = glm::perspective(45.0f, 800.0f / 600.0f, 1.0f, 100.0f);
-    view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f),
-                       glm::vec3(0.0f, 1.0f, 0.0f));
+    // projection = glm::perspective(45.0f, 800.0f / 600.0f, 1.0f, 100.0f);
+    projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f);
+    // view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f),
+    //                   glm::vec3(0.0f, 1.0f, 0.0f));
+    view = glm::mat4();
     model = glm::mat4();
 
     constexpr GLuint AXIS_INDEX = 0;
@@ -422,6 +424,7 @@ int main() {
         glDrawArrays(GL_LINES, 0, 6);
 
         // 提交
+	glFlush();
         SDL_GL_SwapWindow(wnd);
     }  // while
 
