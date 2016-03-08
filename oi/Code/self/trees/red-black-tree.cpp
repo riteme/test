@@ -1,18 +1,21 @@
+#include <cassert>
 #include <cstring>
 #include <climits>
 #include <vector>
+#include <fstream>
+#include <sstream>
 #include <algorithm>
 
 using namespace std;
 
 // #define USE_FILE_IO
+// #define NDEBUG
 
 #ifndef USE_FILE_IO
 #include <iostream>
 using std::cin;
 using std::cout;
 #else
-#include <fstream>
 static ifstream cin("tree.in");
 static ofstream cout("tree.out");
 #endif  // IFNDEF USE_FILE_IO
@@ -25,62 +28,92 @@ inline void initialize() {
 
 #define BLACK false
 #define RED true
+#define IS_RED(x) (x != nullptr && x->is_red())
 
 struct Node {
     Node() = default;
     Node(int _key = 0, int _value = 0, bool _color = BLACK,
-         Node *_parent = nullptr, Node *_left = nullptr, Node *_right = nullptr)
+         Node *_left = nullptr, Node *_right = nullptr)
             : key(_key)
             , value(_value)
-            , color(_color)
-            , parent(_parent)
             , left(_left)
-            , right(_right) {}
+            , right(_right)
+            , color(_color) {}
 
     int key = 0;
     int value = 0;
-    bool color = BLACK;
-    Node *parent = nullptr;
     Node *left = nullptr;
     Node *right = nullptr;
+    bool color = BLACK;
 
     auto is_red() const -> bool {
         return color;
     }
 
-    void print_node() {
-        cout << this << ": { key = " << key << ", value = " << value
-             << ", color = " << (color == RED ? "RED" : "BLACK")
-             << ", parent = " << parent << ", left = " << left
-             << ", right = " << right << " }" << endl;
+    std::string print_node() {
+        stringstream buffer;
+
+        buffer << key;
+        if (color == RED) {
+            buffer << "[color=red]";
+        }
+        buffer << ";";
+
+        if (left != nullptr) {
+            buffer << key << ":sw -> " << left->key << ";";
+        }
+
+        if (right != nullptr) {
+            buffer << key << ":se -> " << right->key << ";";
+        }
+
+        return buffer.str();
     }
 };  // struct Node
 
 static Node *tree = nullptr;
 
-Node *insert(Node *node, int key, int value);
-Node *remove(Node *node, int key);
-int query(Node *node, int key);
-void cw_rotate(Node *node);
-void ccw_rotate(Node *node);
-Node *max_node(Node *node);
+Node *insert(Node *h, int key, int value);
+Node *remove(Node *h, int key);
+int query(Node *h, int key);
+
+Node *min_node(Node *h);
+Node *remove_min_node(Node *h);
+
+Node *right_rotate(Node *h);
+Node *left_rotate(Node *h);
+void flip_color(Node *h);
+Node *move_red_left(Node *h);
+Node *move_red_right(Node *h);
+Node *balance(Node *h);
+
 void print_tree(Node *node);
+void print_tree(Node *node, std::string &data);
 
 int main() {
     initialize();
 
     char command;
-    int key, value;
+    int key = INT_MAX, value = INT_MAX;
     while (cin >> command) {
         switch (command) {
             case 'A':
                 cin >> key >> value;
                 tree = insert(tree, key, value);
 
+                tree->color = BLACK;
+
                 break;
             case 'D':
                 cin >> key;
+
+                if (!IS_RED(tree->left) && !IS_RED(tree->right))
+                    tree->color = RED;
+
                 tree = remove(tree, key);
+
+                if (tree != nullptr)
+                    tree->color = BLACK;
 
                 break;
             case 'Q':
@@ -90,148 +123,218 @@ int main() {
                 break;
         }  // switch to command
 
-        if (tree != nullptr)
-            tree->color = BLACK;
+#ifndef NDEBUG
+        // if (command == 'A') {
+        //     cout << "A " << key << " " << value << endl;
+        // }
+        // if (command == 'D') {
+        //     cout << "D " << key << endl;
+        // }
 
-        print_tree(tree);
-    }  // while
+        if (command == 'P') {
+            print_tree(tree);
+        }
+#endif  // IFNDEF NDEBUG
+    }   // while
 
     return 0;
 }  // function main
 
 void print_tree(Node *node) {
+    std::string data;
+    data = "digraph{\nnode [shape=circle];";
+
+    print_tree(node, data);
+
+    data += "}";
+    ofstream file("/tmp/tree.tmp.dot");
+    file << data;
+    file.close();
+    system("showdot /tmp/tree.tmp.dot");
+}
+
+void print_tree(Node *node, std::string &data) {
     if (node == nullptr)
         return;
 
-    print_tree(node->left);
-    node->print_node();
-    print_tree(node->right);
+    data += node->print_node();
+    print_tree(node->left, data);
+    print_tree(node->right, data);
 }
 
-Node *insert(Node *node, int key, int value) {
-    if (node == nullptr) {
-        node = new Node(key, value, RED);
+Node *insert(Node *h, int key, int value) {
+    if (h == nullptr)
+        return new Node(key, value, RED);
+
+    if (key < h->key)
+        h->left = insert(h->left, key, value);
+    else if (key > h->key)
+        h->right = insert(h->right, key, value);
+    else
+        h->value = value;
+
+    if (IS_RED(h->right) && !IS_RED(h->left))
+        h = left_rotate(h);
+    if (IS_RED(h->left) && IS_RED(h->left->left))
+        h = right_rotate(h);
+    if (IS_RED(h->left) && IS_RED(h->right))
+        flip_color(h);
+
+    return h;
+}
+
+Node *remove(Node *h, int key) {
+#ifndef NDEBUG
+    print_tree(h);
+#endif  // IFNDEF NDEBUG
+
+    if (key < h->key) {
+        if (!IS_RED(h->left) && h->left != nullptr && !IS_RED(h->left->left))
+            h = move_red_left(h);
+
+        h->left = remove(h->left, key);
     } else {
-        if (key < node->key) {
-            node->left = insert(node->left, key, value);
-            node->left->parent = node;
-        } else if (key > node->key) {
-            node->right = insert(node->right, key, value);
-            node->right->parent = node;
+        if (IS_RED(h->left))
+            h = right_rotate(h);
+
+        if (key == h->key && h->right == nullptr) {
+            delete h;
+            return nullptr;
+        }
+
+        if (!IS_RED(h->right) && h->right != nullptr &&
+            !IS_RED((h->right->left)))
+            h = move_red_right(h);
+
+        if (key == h->key) {
+            Node *x = min_node(h->right);
+            h->key = x->key;
+            h->value = x->value;
+            h->right = remove_min_node(h->right);
         } else {
-            node->value = value;
+            h->right = remove(h->right, key);
         }
     }
 
-    if ((node->right != nullptr and node->right->is_red()) and
-        (node->left == nullptr ? true : not node->left->is_red())) {
-        ccw_rotate(node);
-    }
-
-    if (node->left != nullptr and node->left->left != nullptr and
-        node->left->is_red() and node->left->left->is_red()) {
-        cw_rotate(node);
-    };
-
-    if (node->left != nullptr and node->right != nullptr and
-        node->left->is_red() and node->right->is_red()) {
-        node->left->color = BLACK;
-        node->right->color = BLACK;
-        node->color = RED;
-        node->left->parent = node;
-    }
-
-    return node;
+    return balance(h);
 }
 
-inline Node *real_remove(Node *node) {
-    // if (node->left != nullptr and node->right != nullptr) {
-    //     Node *parent = node;
-    //     Node *prev = get_pervious(node->left, &parent);
-
-    //     swap(prev->key, node->key);
-    //     swap(prev->value, node->value);
-
-    //     Node *update = real_remove(prev);
-    //     if (parent == node) {
-    //         node->left = update;
-    //     } else {
-    //         parent->right = update;
-    //     }
-
-    //     return node;
-    // } else {
-    //     Node *next = nullptr;
-
-    //     if (node->left != nullptr) {
-    //         next = node->left;
-    //     }
-
-    //     if (node->right != nullptr) {
-    //         next = node->right;
-    //     }
-
-    //     delete node;
-    //     return next;
-    // }
-}
-
-Node *remove(Node *node, int key) {
-    if (node->key == key) {
-        return real_remove(node);
-    } else {
-        if (key < node->key) {
-            node->left = remove(node->left, key);
-        } else {
-            node->right = remove(node->right, key);
-        }
-    }
-
-    return node;
-}
-
-int query(Node *node, int key) {
-    if (node == nullptr) {
+int query(Node *h, int key) {
+    if (h == nullptr) {
         return -1;
     }
 
-    if (key < node->key) {
-        return query(node->left, key);
-    } else if (key > node->key) {
-        return query(node->right, key);
+    if (key < h->key) {
+        return query(h->left, key);
+    } else if (key > h->key) {
+        return query(h->right, key);
     } else {
-        return node->value;
+        return h->value;
     }
 }
 
-void cw_rotate(Node *node) {
-    if (node->left == nullptr)
-        return;
-
-    swap(node->left->left, node->left->right);
-    swap(node->left->right, node->right);
-    swap(node->key, node->left->key);
-    swap(node->value, node->left->value);
-    swap(node->left, node->right);
-}
-
-void ccw_rotate(Node *node) {
-    if (node->right == nullptr)
-        return;
-
-    swap(node->right->left, node->right->right);
-    swap(node->right->right, node->left);
-    swap(node->key, node->right->key);
-    swap(node->value, node->right->value);
-    swap(node->left, node->right);
-}
-
-Node *max_node(Node *node) {
-    if (node == nullptr)
+Node *min_node(Node *h) {
+    if (h == nullptr)
         return nullptr;
 
-    if (node->right != nullptr)
-        return max_node(node->right);
+    if (h->left != nullptr)
+        return min_node(h->left);
 
-    return node;
+    return h;
+}
+
+Node *remove_min_node(Node *h) {
+#ifndef NDEBUG
+    print_tree(h);
+#endif  // IFNDEF NDEBUG
+
+    if (h->left == nullptr) {
+        delete h;
+
+        return nullptr;
+    }
+
+    if (!IS_RED(h->left) && h->left != nullptr && !IS_RED(h->left->left)) {
+        h = move_red_left(h);
+    }
+
+    h->left = remove_min_node(h->left);
+
+    return balance(h);
+}
+
+Node *right_rotate(Node *h) {
+    assert(h != nullptr);
+    assert(h->left != nullptr);
+
+    Node *x = h->left;
+    h->left = x->right;
+    x->right = h;
+    x->color = x->right->color;
+    x->right->color = RED;
+
+    return x;
+}
+
+Node *left_rotate(Node *h) {
+    assert(h != nullptr);
+    assert(h->right != nullptr);
+
+    Node *x = h->right;
+    h->right = x->left;
+    x->left = h;
+    x->color = x->left->color;
+    x->left->color = RED;
+
+    return x;
+}
+
+void flip_color(Node *h) {
+    assert(h != nullptr);
+    assert(h->left != nullptr);
+    assert(h->right != nullptr);
+
+    h->color = !h->color;
+    h->left->color = !h->left->color;
+    h->right->color = !h->right->color;
+}
+
+Node *move_red_left(Node *h) {
+    assert(h != nullptr);
+    assert(h->right != nullptr);
+
+    flip_color(h);
+    if (IS_RED(h->right->left)) {
+        h->right = right_rotate(h->right);
+        h = left_rotate(h);
+        flip_color(h);
+    }
+
+    return h;
+}
+
+Node *move_red_right(Node *h) {
+    assert(h != nullptr);
+    assert(h->left != nullptr);
+
+    flip_color(h);
+    if (IS_RED(h->left->left)) {
+        h = right_rotate(h);
+        flip_color(h);
+    }
+
+    return h;
+}
+
+Node *balance(Node *h) {
+    assert(h != nullptr);
+
+    if (IS_RED(h->right))
+        h = left_rotate(h);
+    if (IS_RED(h->left) && IS_RED(h->left->left))
+        h = right_rotate(h);
+    if (IS_RED(h->left) && IS_RED(h->right))
+        flip_color(h);
+
+    return h;
 }
