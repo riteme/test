@@ -5,6 +5,7 @@
 #include <cstring>
 #include <climits>
 #include <vector>
+#include <random>
 #include <fstream>
 #include <sstream>
 #include <algorithm>
@@ -26,37 +27,27 @@ inline void initialize() {
 #endif
 };
 
-#define BLACK false
-#define RED true
-#define IS_RED(x) (x != nullptr && x->is_red())
-
 struct Node {
     Node() = default;
-    Node(int _key = 0, int _value = 0, bool _color = BLACK,
-         Node *_left = nullptr, Node *_right = nullptr)
+    Node(int _key = 0, int _value = 0, int _weight = 0, Node *_left = nullptr,
+         Node *_right = nullptr)
             : key(_key)
             , value(_value)
+            , weight(_weight)
             , left(_left)
-            , right(_right)
-            , color(_color) {}
+            , right(_right) {}
 
     int key = 0;
     int value = 0;
+    int weight = 0;
     Node *left = nullptr;
     Node *right = nullptr;
-    bool color = BLACK;
-
-    auto is_red() const -> bool {
-        return color;
-    }
 
     std::string print_node() {
         stringstream buffer;
 
         buffer << key;
-        if (color == RED) {
-            buffer << "[color=red]";
-        }
+        buffer << "[label=\"" << key << "/" << weight << "\"]";
         buffer << ";";
 
         if (left != nullptr) {
@@ -71,20 +62,26 @@ struct Node {
     }
 };  // struct Node
 
+struct MyRandom {
+    MyRandom(const unsigned seed) {
+        srand(seed);
+    }
+
+    auto operator()() -> int {
+        return rand();
+    }
+};  // struct MyRandom
+
 static Node *tree = nullptr;
+static random_device rd;
+static MyRandom randint(rd());
 
 Node *insert(Node *h, int key, int value);
 Node *remove(Node *h, int key);
 int query(Node *h, int key);
 
-Node *min_node(Node *h);
-Node *remove_min_node(Node *h);
-
 Node *right_rotate(Node *h);
 Node *left_rotate(Node *h);
-void flip_color(Node *h);
-Node *move_red_left(Node *h);
-Node *move_red_right(Node *h);
 Node *balance(Node *h);
 
 void print_tree(Node *node);
@@ -101,19 +98,10 @@ int main() {
                 cin >> key >> value;
                 tree = insert(tree, key, value);
 
-                tree->color = BLACK;
-
                 break;
             case 'D':
                 cin >> key;
-
-                if (!IS_RED(tree->left) && !IS_RED(tree->right))
-                    tree->color = RED;
-
                 tree = remove(tree, key);
-
-                if (tree != nullptr)
-                    tree->color = BLACK;
 
                 break;
             case 'Q':
@@ -164,59 +152,66 @@ void print_tree(Node *node, std::string &data) {
 
 Node *insert(Node *h, int key, int value) {
     if (h == nullptr)
-        return new Node(key, value, RED);
+        return new Node(key, value, randint());
 
-    if (key < h->key)
+    if (key < h->key) {
         h->left = insert(h->left, key, value);
-    else if (key > h->key)
-        h->right = insert(h->right, key, value);
-    else
-        h->value = value;
 
-    if (IS_RED(h->right) && !IS_RED(h->left))
-        h = left_rotate(h);
-    if (IS_RED(h->left) && IS_RED(h->left->left))
-        h = right_rotate(h);
-    if (IS_RED(h->left) && IS_RED(h->right))
-        flip_color(h);
+        if (h->left->weight < h->weight) {
+            h = right_rotate(h);
+        }
+    } else if (key > h->key) {
+        h->right = insert(h->right, key, value);
+
+        if (h->right->weight < h->weight) {
+            h = left_rotate(h);
+        }
+    } else {
+        h->value = value;
+    }
+
+    return h;
+}
+
+static Node *remove(Node *h) {
+    if (h->left != nullptr and h->right != nullptr) {
+        if (h->left->weight >= h->right->weight) {
+            h = right_rotate(h);
+
+            h->right = remove(h->right);
+        } else {
+            h = left_rotate(h);
+
+            h->left = remove(h->left);
+        }
+    } else {
+        Node *next = nullptr;
+
+        if (h->left != nullptr) {
+            next = h->left;
+        } else {
+            next = h->right;
+        }
+
+        delete h;
+        return next;
+    }
 
     return h;
 }
 
 Node *remove(Node *h, int key) {
-#ifndef NDEBUG
-    print_tree(h);
-#endif  // IFNDEF NDEBUG
+    assert(h != nullptr);
 
     if (key < h->key) {
-        if (!IS_RED(h->left) && h->left != nullptr && !IS_RED(h->left->left))
-            h = move_red_left(h);
-
         h->left = remove(h->left, key);
+    } else if (key > h->key) {
+        h->right = remove(h->right, key);
     } else {
-        if (IS_RED(h->left))
-            h = right_rotate(h);
-
-        if (key == h->key && h->right == nullptr) {
-            delete h;
-            return nullptr;
-        }
-
-        if (!IS_RED(h->right) && h->right != nullptr &&
-            !IS_RED((h->right->left)))
-            h = move_red_right(h);
-
-        if (key == h->key) {
-            Node *x = min_node(h->right);
-            h->key = x->key;
-            h->value = x->value;
-            h->right = remove_min_node(h->right);
-        } else {
-            h->right = remove(h->right, key);
-        }
+        return remove(h);
     }
 
-    return balance(h);
+    return h;
 }
 
 int query(Node *h, int key) {
@@ -231,36 +226,6 @@ int query(Node *h, int key) {
     return current != nullptr ? current->value : -1;
 }
 
-Node *min_node(Node *h) {
-    if (h == nullptr)
-        return nullptr;
-
-    if (h->left != nullptr)
-        return min_node(h->left);
-
-    return h;
-}
-
-Node *remove_min_node(Node *h) {
-#ifndef NDEBUG
-    print_tree(h);
-#endif  // IFNDEF NDEBUG
-
-    if (h->left == nullptr) {
-        delete h;
-
-        return nullptr;
-    }
-
-    if (!IS_RED(h->left) && h->left != nullptr && !IS_RED(h->left->left)) {
-        h = move_red_left(h);
-    }
-
-    h->left = remove_min_node(h->left);
-
-    return balance(h);
-}
-
 Node *right_rotate(Node *h) {
     assert(h != nullptr);
     assert(h->left != nullptr);
@@ -268,8 +233,6 @@ Node *right_rotate(Node *h) {
     Node *x = h->left;
     h->left = x->right;
     x->right = h;
-    x->color = x->right->color;
-    x->right->color = RED;
 
     return x;
 }
@@ -281,58 +244,6 @@ Node *left_rotate(Node *h) {
     Node *x = h->right;
     h->right = x->left;
     x->left = h;
-    x->color = x->left->color;
-    x->left->color = RED;
 
     return x;
-}
-
-void flip_color(Node *h) {
-    assert(h != nullptr);
-    assert(h->left != nullptr);
-    assert(h->right != nullptr);
-
-    h->color = !h->color;
-    h->left->color = !h->left->color;
-    h->right->color = !h->right->color;
-}
-
-Node *move_red_left(Node *h) {
-    assert(h != nullptr);
-    assert(h->right != nullptr);
-
-    flip_color(h);
-    if (IS_RED(h->right->left)) {
-        h->right = right_rotate(h->right);
-        h = left_rotate(h);
-        flip_color(h);
-    }
-
-    return h;
-}
-
-Node *move_red_right(Node *h) {
-    assert(h != nullptr);
-    assert(h->left != nullptr);
-
-    flip_color(h);
-    if (IS_RED(h->left->left)) {
-        h = right_rotate(h);
-        flip_color(h);
-    }
-
-    return h;
-}
-
-Node *balance(Node *h) {
-    assert(h != nullptr);
-
-    if (IS_RED(h->right))
-        h = left_rotate(h);
-    if (IS_RED(h->left) && IS_RED(h->left->left))
-        h = right_rotate(h);
-    if (IS_RED(h->left) && IS_RED(h->right))
-        flip_color(h);
-
-    return h;
 }
