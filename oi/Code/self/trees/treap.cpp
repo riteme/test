@@ -1,5 +1,5 @@
-#define USE_FILE_IO
-#define NDEBUG
+// #define USE_FILE_IO
+// #define NDEBUG
 
 #include <cassert>
 #include <cstring>
@@ -76,9 +76,12 @@ static Node *tree = nullptr;
 static random_device rd;
 static MyRandom randint(rd());
 
+typedef pair<Node *, Node *> NodePair;
+
 Node *insert(Node *h, int key, int value);
 Node *remove(Node *h, int key);
 int query(Node *h, int key);
+NodePair nearest(Node *h, int target);
 
 Node *right_rotate(Node *h);
 Node *left_rotate(Node *h);
@@ -107,6 +110,25 @@ int main() {
             case 'Q':
                 cin >> key;
                 cout << query(tree, key) << "\n";
+
+                break;
+
+            case 'N':
+                cin >> key;
+
+                NodePair result = nearest(tree, key);
+                Node *a = result.first, *b = result.second;
+
+                if (a == nullptr) {
+                    cout << b->key << "\n";
+                } else if (b == nullptr) {
+                    cout << a->key << "\n";
+                } else {
+                    cout << min(a->key, b->key,
+                                [key](const int &_a, const int &_b) {
+                                    return abs(key - _a) < abs(key - _b);
+                                }) << "\n";
+                }
 
                 break;
         }  // switch to command
@@ -224,6 +246,28 @@ int query(Node *h, int key) {
     }
 
     return current != nullptr ? current->value : -1;
+}
+
+NodePair nearest(Node *h, int target) {
+    Node *current = h;
+    Node *left = nullptr;
+    Node *right = nullptr;
+
+    while (current != nullptr and target != current->key) {
+        if (target < current->key) {
+            right = current;
+            current = current->left;
+        } else if (target > current->key) {
+            left = current;
+            current = current->right;
+        }
+    }
+
+    if (current != nullptr and target == current->key) {
+        left = right = current;
+    }
+
+    return NodePair(left, right);
 }
 
 Node *right_rotate(Node *h) {
