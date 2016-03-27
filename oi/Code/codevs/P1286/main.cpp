@@ -2,22 +2,22 @@
 #include <cstring>
 #include <climits>
 #include <cstdlib>
+#include <vector>
 #include <algorithm>
 
 using namespace std;
 
-#define OP_UNION 0
-#define OP_QUERY 1
-
-#define NMAX 200000
+#define OP_INIT 'I'
+#define OP_INC 'A'
+#define OP_DEC 'S'
+#define OP_QUERY 'F'
 
 struct Node {
-    Node() : key(0), size(1), weight(0), left(NULL), right(NULL) {}
-    Node(int _key = 0, int _size = 1, int _weight = 0, Node *_left = NULL,
-         Node *_right = NULL)
+    Node() : key(0), size(0), weight(0), left(NULL), right(NULL) {}
+    Node(int _key, int _size = 1, Node *_left = NULL, Node *_right = NULL)
             : key(_key)
             , size(_size)
-            , weight(_weight)
+            , weight(rand())
             , left(_left)
             , right(_right) {}
 
@@ -37,77 +37,52 @@ struct Node {
 };  // struct Node
 
 static int n, m;
-static int set[NMAX + 10];
-static int size[NMAX + 10];
 static Node *tree = NULL;
-static int tree_size;
+static vector<int> kickoff;
+static int kicked = 0;
+static int tree_size = 0;
 
 Node *insert(Node *h, int key);
 Node *remove(Node *h, int key);
+Node *modify(Node *h, int value);
 Node *rank_min(Node *h, int k);
-
-inline void make_set() {
-    for (int i = 1; i <= n; i++) {
-        set[i] = i;
-        size[i] = 1;
-    }  // for
-}
-
-static int find_set(int u) {
-    return set[u] == u ? u : set[u] = find_set(set[u]);
-}
-
-static void union_set(int u, int v) {
-    u = find_set(u);
-    v = find_set(v);
-
-    if (u != v) {
-        set[u] = v;
-        size[v] += size[u];
-    }
-}
+Node *rank_max(Node *h, int k);
 
 static void initialize() {
     scanf("%d%d", &n, &m);
     srand(145647U);
-
-    make_set();
-
-    tree_size = n;
-    for (int i = 1; i <= n; i++) {
-        tree = insert(tree, 1);
-    }  // for
 }
 
 int main() {
     initialize();
 
-    for (int i = 0; i < m; ++i) {
-        int command;
-        int a, b;
-        scanf("%d", &command);
+    for (int i = 0; i < n; ++i) {
+        char q = getchar();
+        while (q < 'A' or q > 'Z')
+            q = getchar();
 
-        switch (command) {
-            case OP_UNION: {
-                scanf("%d%d", &a, &b);
-                if (find_set(a) == find_set(b))
-                    continue;
+        int k;
+        scanf("%d", &k);
+        switch (q) {
+            case OP_INIT:
+                if (k >= m)
+                    tree = insert(tree, k);
+                break;
+            case OP_INC: tree = modify(tree, k); break;
+            case OP_DEC: tree = modify(tree, -k); break;
+            case OP_QUERY:
+                Node *person = rank_max(tree, k);
 
-                tree = remove(tree, size[find_set(a)]);
-                tree = remove(tree, size[find_set(b)]);
+                if (person == NULL)
+                    printf("-1\n");
+                else
+                    printf("%d\n", person->key);
 
-                union_set(a, b);
-                tree_size--;
-
-                tree = insert(tree, size[find_set(a)]);
-            } break;
-
-            case OP_QUERY: {
-                scanf("%d", &a);
-                printf("%d\n", rank_min(tree, tree_size - a + 1)->key);
-            } break;
-        }  // switch to command
+                break;
+        }  // switch to q
     }      // for
+
+    printf("%d", kicked);
 
     return 0;
 }  // function main
@@ -129,8 +104,10 @@ static Node *right_rotate(Node *h) {
 }
 
 Node *insert(Node *h, int key) {
-    if (h == NULL)
-        return new Node(key, 1, rand());
+    if (h == NULL) {
+        tree_size++;
+        return new Node(key);
+    }
 
     if (key < h->key) {
         h->left = insert(h->left, key);
@@ -155,16 +132,16 @@ Node *insert(Node *h, int key) {
     return h;
 }
 
-static Node *remove(Node *h) {
+static Node *_remove(Node *h) {
     if (h->left != NULL and h->right != NULL) {
         if (h->left->weight < h->right->weight) {
             h = left_rotate(h);
 
-            h->right = remove(h->right);
+            h->right = _remove(h->right);
         } else {
             h = right_rotate(h);
 
-            h->left = remove(h->left);
+            h->left = _remove(h->left);
         }
     } else {
         Node *next;
@@ -175,6 +152,8 @@ static Node *remove(Node *h) {
             next = h->right;
 
         delete h;
+        tree_size--;
+
         return next;
     }
 
@@ -188,15 +167,47 @@ Node *remove(Node *h, int key) {
     } else if (key > h->key) {
         h->right = remove(h->right, key);
     } else {
-        return remove(h);
+        return _remove(h);
     }
 
     h->update();
     return h;
 }
 
+static void _modify(Node *h, int value) {
+    if (h == NULL)
+        return;
+
+    h->key += value;
+    if (h->key < m)
+        kickoff.push_back(h->key);
+
+    _modify(h->left, value);
+    _modify(h->right, value);
+}
+
+Node *modify(Node *h, int value) {
+    kickoff.clear();
+
+    _modify(h, value);
+
+    for (unsigned i = 0; i < kickoff.size(); i++) {
+        h = remove(h, kickoff[i]);
+        kicked++;
+    }
+
+    return h;
+}
+
+Node *rank_max(Node *h, int k) {
+    return rank_min(h, tree_size - k + 1);
+}
+
 Node *rank_min(Node *h, int k) {
 recursive:
+    if (h == NULL)
+        return NULL;
+
     int lsize;
     if (h->left == NULL)
         lsize = 0;
