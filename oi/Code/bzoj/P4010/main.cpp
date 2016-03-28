@@ -12,11 +12,15 @@ using namespace std;
 static int n, m;
 static int indegree[NMAX + 10];
 static int sorted[NMAX + 10];
-static int a[NMAX + 10];
 static vector<int> G[NMAX + 10];
+static bool flag;
 
 static void initialize() {
     scanf("%d%d", &n, &m);
+
+    for (int i = 1; i <= n; i++) {
+        G[i].clear();
+    }  // for
 
     memset(indegree, 0, sizeof(indegree));
     for (int i = 0; i < m; i++) {
@@ -60,19 +64,29 @@ static void topological_sort() {
             }
         }  // for
     }      // while
+
+    flag = pos == 0;
 }
 
 int main() {
-    initialize();
-    topological_sort();
+    int d;
+    scanf("%d", &d);
 
-    for (int i = 1; i <= n; i++) {
-        a[sorted[i]] = i;
-    }  // for
+    while (d > 0) {
+	initialize();
+	topological_sort();
 
-    for (int i = 1; i <= n; i++) {
-        printf("%d ", a[i]);
-    }  // for
+        if (!flag) {
+            printf("Impossible!\n");
+        } else {
+            for (int i = 1; i <= n; i++) {
+                printf("%d ", sorted[i]);
+            }  // for
+            printf("\n");
+        }
+
+        d--;
+    }  // while
 
     return 0;
 }  // function main
