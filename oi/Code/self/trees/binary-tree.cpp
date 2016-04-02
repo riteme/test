@@ -132,7 +132,6 @@ inline Node *real_remove(Node *node) {
     }
 }
 
-// TODO(riteme): Improve this
 Node *remove(Node *node, int key) {
     if (node->key == key) {
         return real_remove(node);
