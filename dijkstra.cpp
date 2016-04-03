@@ -39,14 +39,10 @@ static KeyType heap[SIZEMAX + 10];
 static unsigned heapSize;
 
 // O(1)
-inline void make_heap() {
-    heapSize = 0;
-}
+inline void make_heap() { heapSize = 0; }
 
 // O(1)
-inline unsigned heap_size() {
-    return heapSize;
-}
+inline unsigned heap_size() { return heapSize; }
 
 // O(logn)
 inline void swim(unsigned x) {
@@ -82,9 +78,7 @@ inline void sink(unsigned x) {
     }  // while
 }
 
-inline KeyType top() {
-    return heap[1];
-}
+inline KeyType top() { return heap[1]; }
 
 inline void push(KeyType key) {
     heapSize++;
@@ -100,9 +94,7 @@ inline void pop() {
     sink(1);
 }
 
-inline bool empty() {
-    return heapSize == 0;
-}
+inline bool empty() { return heapSize == 0; }
 
 /////////////////////
 // IndexedHeap end //
@@ -140,7 +132,7 @@ int main() {
         Number w;
         scanf("%d%d%lld", &u, &v, &w);
 
-        G[u].push_back(new Edge({ u, v, w }));
+        G[u].push_back(new Edge({u, v, w}));
     }  // for
 
     for (int i = 1; i <= n; i++) {
