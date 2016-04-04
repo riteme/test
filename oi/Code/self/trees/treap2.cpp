@@ -15,7 +15,7 @@
 using namespace std;
 
 // #define SEED 20000926
-#define SEED random_device()()
+#define SEED (random_device()())
 
 struct MyRandom {
     MyRandom() {
