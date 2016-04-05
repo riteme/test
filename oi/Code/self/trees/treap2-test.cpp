@@ -78,7 +78,7 @@ struct Node {
     KeyType key;
     ValueType value;
     int weight;
-    size_t size;
+    int size;
     Node *left;
     Node *right;
 
@@ -156,7 +156,8 @@ static void show(Treap h) {
 Treap rebuild(vector<NodeData> &data);
 Treap merge(Treap a, Treap b);
 TreapPair split(Treap h, int k);
-int rank_key(Treap h, int key);
+// int rank_key(Treap h, int key);
+int rank_key(Treap h, int key, int offest = 0);
 Treap query(Treap h, int key);
 Treap insert(Treap h, int key, int value);
 Treap remove(Treap h, int key);
@@ -200,7 +201,7 @@ int main() {
     return 0;
 }  // function main
 
-inline size_t size(Treap h) {
+inline int size(Treap h) {
     if (!h)
         return 0;
     else
@@ -275,16 +276,28 @@ TreapPair split(Treap h, int k) {
     return result;
 }
 
-int rank_key(Treap h, int key) {
+// int rank_key(Treap h, int key) {
+//     if (h == NULL)
+//         return 1;
+
+//     if (key < h->key)
+//         return rank_key(h->left, key);
+//     else if (key > h->key)
+//         return size(h->left) + 1 + rank_key(h->right, key);
+//     else
+//         return size(h->left) + 1;
+// }
+
+int rank_key(Treap h, int key, int offest) {
     if (h == NULL)
-        return 1;
+        return 1 + offest;
 
     if (key < h->key)
-        return rank_key(h->left, key);
+        return rank_key(h->left, key, offest);
     else if (key > h->key)
-        return size(h->left) + 1 + rank_key(h->right, key);
+        return rank_key(h->right, key, offest + size(h->left) + 1);
     else
-        return size(h->left) + 1;
+        return size(h->left) + 1 + offest;
 }
 
 Treap query(Treap h, int key) {
