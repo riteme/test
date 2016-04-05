@@ -187,11 +187,7 @@ int main() {
             case 'A':
                 cin >> key >> value;
 
-                auto ptr = query(tree, key);
-                if (ptr)
-                    ptr->value = value;
-                else
-                    tree = insert(tree, key, value);
+                tree = insert(tree, key, value);
 
                 break;
         }  // switch to command
@@ -305,9 +301,17 @@ Treap insert(Treap h, int key, int value) {
 
     int k = rank_key(h, key);
     TreapPair a = split(h, k - 1);
-    Treap node = new TreapNode(key, value);
+    TreapPair b = split(a.second, 1);
+    if (b.second && b.second->key == key) {
+        b.second->value = value;
 
-    return merge(merge(a.first, node), a.second);
+        return merge(a.first, merge(b.first, b.second));
+    } else {
+        a.second = merge(b.first, b.second);
+        Treap node = new TreapNode(key, value);
+
+        return merge(merge(a.first, node), a.second);
+    }
 }
 
 Treap remove(Treap h, int key) {

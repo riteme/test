@@ -30,13 +30,18 @@ inline void initialize() {
 struct Node {
     Node() = default;
     Node(int _key = 0, int _value = 0, Node *_left = nullptr,
-         Node *_right = nullptr)
-            : key(_key), value(_value), left(_left), right(_right) {}
+         Node *_right = nullptr, Node *_parent = nullptr)
+            : key(_key)
+            , value(_value)
+            , left(_left)
+            , right(_right)
+            , parent(_parent) {}
 
     int key = 0;
     int value = 0;
     Node *left = nullptr;
     Node *right = nullptr;
+    Node *parent = nullptr;
 
     std::string print_node() {
         stringstream buffer;
@@ -46,11 +51,15 @@ struct Node {
         buffer << ";";
 
         if (left != nullptr) {
-            buffer << key << ":sw -> " << left->key << ";";
+            buffer << key << ":sw -> " << left->key << "[style=bold];";
         }
 
         if (right != nullptr) {
-            buffer << key << ":se -> " << right->key << ";";
+            buffer << key << ":se -> " << right->key << "[style=bold];";
+        }
+
+        if (parent != nullptr) {
+            buffer << key << " -> " << parent->key << ";";
         }
 
         return buffer.str();
@@ -86,7 +95,7 @@ int main() {
                 break;
             case 'D':
                 cin >> key;
-                tree = remove(tree, key);
+                // tree = remove(tree, key);
 
                 break;
             case 'Q':
@@ -135,23 +144,114 @@ void print_tree(Node *node, std::string &data) {
     print_tree(node->right, data);
 }
 
-Node *insert(Node *h, int key, int value) {
-    if (h == nullptr)
-        return new Node(key, value);
+static Node *splay(Node *x) {
+    while (x->parent != nullptr) {
+        if (x->parent->parent == nullptr) {
+            if (x == x->parent->left) {
+                left_rotate(x->parent);
 
-    if (key < h->key) {
-        h->left = insert(h->left, key, value);
+                // cout << "L" << endl;
+            } else {
+                right_rotate(x->parent);
 
-        h = right_rotate(h);
-    } else if (key > h->key) {
-        h->right = insert(h->right, key, value);
+                // cout << "R" << endl;
+            }
 
-        h = left_rotate(h);
-    } else {
-        h->value = value;
+            x->parent->parent = x;
+            x->parent = nullptr;
+        } else {
+            Node *p1 = x->parent, *p2 = x->parent->parent;
+            Node *top = p2->parent;
+
+            constexpr bool LEFT = true;
+            constexpr bool RIGHT = false;
+            bool direction = LEFT;
+            if (top)
+                direction = top->left == p2 ? LEFT : RIGHT;
+
+            if (x == x->parent->left) {
+                if (x->parent == x->parent->parent->left) {
+                    left_rotate(p2);
+                    left_rotate(p1);
+
+                    x->parent = top;
+                    p1->parent = x;
+                    p2->parent = p1;
+
+                    // cout << "LL" << endl;
+                } else {
+                    left_rotate(p1);
+                    p2->right = x;
+                    right_rotate(p2);
+
+                    p1->parent = x;
+                    p2->parent = x;
+                    x->parent = top;
+
+                    // cout << "LR" << endl;
+                }
+            } else {
+                if (x->parent == x->parent->parent->right) {
+                    right_rotate(p2);
+                    right_rotate(p1);
+
+                    x->parent = top;
+                    p1->parent = x;
+                    p2->parent = p1;
+
+                    // cout << "RR" << endl;
+                } else {
+                    right_rotate(p1);
+                    p2->left = x;
+                    left_rotate(p2);
+
+                    p1->parent = x;
+                    p2->parent = x;
+                    x->parent = top;
+
+                    // cout << "RL" << endl;
+                }
+            }
+
+            if (top) {
+                if (direction == LEFT)
+                    top->left = x;
+                else
+                    top->right = x;
+            }
+        }
     }
 
-    return h;
+    return x;
+}
+
+Node *insert(Node *h, int key, int value) {
+    if (!h)
+        return new Node(key, value);
+
+    while (true) {
+        if (key < h->key) {
+            if (h->left == nullptr) {
+                h->left = new Node(key, value);
+                h->left->parent = h;
+
+                return splay(h->left);
+            } else
+                h = h->left;
+        } else if (key > h->key) {
+            if (h->right == nullptr) {
+                h->right = new Node(key, value);
+                h->right->parent = h;
+
+                return splay(h->right);
+            } else
+                h = h->right;
+        } else {
+            h->value = value;
+
+            return splay(h);
+        }
+    }  // while
 }
 
 static Node *remove(Node *h) {
@@ -195,38 +295,30 @@ Node *remove(Node *h, int key) {
     return h;
 }
 
-static Node *_query(Node *h, int key, Node *&result) {
+static Node *_query(Node *h, int key) {
     if (h == nullptr)
-        result = nullptr;
+        return nullptr;
 
-    if (key < h->key) {
-        h->left = _query(h->left, key, result);
-
-        h = right_rotate(h);
-    } else if (key > h->key) {
-        h->right = _query(h->right, key, result);
-
-        h = left_rotate(h);
-    } else {
-        result = h;
-    }
-
-    return h;
+    if (key < h->key)
+        return _query(h->left, key);
+    else if (key > h->key)
+        return _query(h->right, key);
+    else
+        return h;
 }
 
 int query(Node *&h, int key) {
-    if (h == nullptr)
-        return -1;
+    Node *result = _query(h, key);
 
-    Node *result = nullptr;
-    h = _query(h, key, result);
     if (result == nullptr)
         return -1;
-    else
-        return result->value;
+    else {
+        h = splay(result);
+        return h->value;
+    }
 }
 
-Node *right_rotate(Node *h) {
+Node *left_rotate(Node *h) {
     assert(h != nullptr);
     assert(h->left != nullptr);
 
@@ -234,16 +326,22 @@ Node *right_rotate(Node *h) {
     h->left = x->right;
     x->right = h;
 
+    if (h->left)
+        h->left->parent = h;
+
     return x;
 }
 
-Node *left_rotate(Node *h) {
+Node *right_rotate(Node *h) {
     assert(h != nullptr);
     assert(h->right != nullptr);
 
     Node *x = h->right;
     h->right = x->left;
     x->left = h;
+
+    if (h->right)
+        h->right->parent = h;
 
     return x;
 }
