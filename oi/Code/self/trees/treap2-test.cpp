@@ -1,4 +1,4 @@
-#define USE_FILE_IO
+// #define USE_FILE_IO
 // #define NDEBUG
 
 #include <cassert>
@@ -78,7 +78,7 @@ struct Node {
     KeyType key;
     ValueType value;
     int weight;
-    int size;
+    size_t size;
     Node *left;
     Node *right;
 
@@ -95,7 +95,7 @@ struct Node {
         stringstream buffer;
 
         buffer << key;
-        buffer << "[label=\"" << key << ": " << value << "\"]";
+        buffer << "[label=\"" << key << ": " << weight << "\"]";
         buffer << ";";
 
         if (left != nullptr) {
@@ -156,8 +156,7 @@ static void show(Treap h) {
 Treap rebuild(vector<NodeData> &data);
 Treap merge(Treap a, Treap b);
 TreapPair split(Treap h, int k);
-// int rank_key(Treap h, int key);
-int rank_key(Treap h, int key, int offest = 0);
+int rank_key(Treap h, int key);
 Treap query(Treap h, int key);
 Treap insert(Treap h, int key, int value);
 Treap remove(Treap h, int key);
@@ -173,35 +172,28 @@ int main() {
 
     while (cin >> command) {
         switch (command) {
-            case 'Q':
+            case 'Q': {
                 cin >> key;
                 cout << query(tree, key)->value << '\n';
-
-                break;
-
-            case 'D':
+            } break;
+            case 'D': {
                 cin >> key;
                 tree = remove(tree, key);
-
-                break;
-
-            case 'A':
+            } break;
+            case 'A': {
                 cin >> key >> value;
-
-                auto ptr = query(tree, key);
-                if (ptr)
-                    ptr->value = value;
-                else
-                    tree = insert(tree, key, value);
-
-                break;
+                tree = insert(tree, key, value);
+            } break;
+            case 'P': {
+                show(tree);
+            } break;
         }  // switch to command
     }      // while
 
     return 0;
 }  // function main
 
-inline int size(Treap h) {
+inline size_t size(Treap h) {
     if (!h)
         return 0;
     else
@@ -276,28 +268,16 @@ TreapPair split(Treap h, int k) {
     return result;
 }
 
-// int rank_key(Treap h, int key) {
-//     if (h == NULL)
-//         return 1;
-
-//     if (key < h->key)
-//         return rank_key(h->left, key);
-//     else if (key > h->key)
-//         return size(h->left) + 1 + rank_key(h->right, key);
-//     else
-//         return size(h->left) + 1;
-// }
-
-int rank_key(Treap h, int key, int offest) {
+int rank_key(Treap h, int key) {
     if (h == NULL)
-        return 1 + offest;
+        return 1;
 
     if (key < h->key)
-        return rank_key(h->left, key, offest);
+        return rank_key(h->left, key);
     else if (key > h->key)
-        return rank_key(h->right, key, offest + size(h->left) + 1);
+        return size(h->left) + 1 + rank_key(h->right, key);
     else
-        return size(h->left) + 1 + offest;
+        return size(h->left) + 1;
 }
 
 Treap query(Treap h, int key) {
@@ -318,9 +298,17 @@ Treap insert(Treap h, int key, int value) {
 
     int k = rank_key(h, key);
     TreapPair a = split(h, k - 1);
-    Treap node = new TreapNode(key, value);
+    TreapPair b = split(a.second, 1);
+    if (b.second && b.second->key == key) {
+        b.second->value = value;
 
-    return merge(merge(a.first, node), a.second);
+        return merge(a.first, merge(b.first, b.second));
+    } else {
+        a.second = merge(b.first, b.second);
+        Treap node = new TreapNode(key, value);
+
+        return merge(merge(a.first, node), a.second);
+    }
 }
 
 Treap remove(Treap h, int key) {

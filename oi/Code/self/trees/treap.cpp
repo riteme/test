@@ -1,5 +1,5 @@
-// #define USE_FILE_IO
-// #define NDEBUG
+#define USE_FILE_IO
+#define NDEBUG
 
 #include <cassert>
 #include <cstring>
@@ -40,8 +40,13 @@ struct Node {
     int key = 0;
     int value = 0;
     int weight = 0;
+    int size = 1;
     Node *left = nullptr;
     Node *right = nullptr;
+
+    void update() {
+        size = 1 + (left ? left->size : 0) + (right ? right->size : 0);
+    }
 
     std::string print_node() {
         stringstream buffer;
@@ -85,7 +90,6 @@ NodePair nearest(Node *h, int target);
 
 Node *right_rotate(Node *h);
 Node *left_rotate(Node *h);
-Node *balance(Node *h);
 
 void print_tree(Node *node);
 void print_tree(Node *node, std::string &data);
@@ -147,6 +151,11 @@ int main() {
 #endif  // IFNDEF NDEBUG
     }   // while
 
+#ifndef NDEBUG
+    cout << static_cast<double>(max(tree->left->size, tree->right->size)) /
+                tree->size << endl;
+#endif  // IFNDEF NDEBUG
+
     return 0;
 }  // function main
 
@@ -179,19 +188,17 @@ Node *insert(Node *h, int key, int value) {
     if (key < h->key) {
         h->left = insert(h->left, key, value);
 
-        if (h->left->weight < h->weight) {
+        if (h->left->weight < h->weight)
             h = right_rotate(h);
-        }
     } else if (key > h->key) {
         h->right = insert(h->right, key, value);
 
-        if (h->right->weight < h->weight) {
+        if (h->right->weight < h->weight)
             h = left_rotate(h);
-        }
-    } else {
+    } else
         h->value = value;
-    }
 
+    h->update();
     return h;
 }
 
@@ -219,20 +226,21 @@ static Node *remove(Node *h) {
         return next;
     }
 
+    h->update();
     return h;
 }
 
 Node *remove(Node *h, int key) {
     assert(h != nullptr);
 
-    if (key < h->key) {
+    if (key < h->key)
         h->left = remove(h->left, key);
-    } else if (key > h->key) {
+    else if (key > h->key)
         h->right = remove(h->right, key);
-    } else {
+    else
         return remove(h);
-    }
 
+    h->update();
     return h;
 }
 

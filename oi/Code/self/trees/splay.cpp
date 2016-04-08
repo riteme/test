@@ -1,5 +1,5 @@
-// #define USE_FILE_IO
-// #define NDEBUG
+#define USE_FILE_IO
+#define NDEBUG
 
 #include <cassert>
 #include <cstring>
@@ -42,7 +42,6 @@ struct Node {
     Node *left = nullptr;
     Node *right = nullptr;
     Node *parent = nullptr;
-
     std::string print_node() {
         stringstream buffer;
 
@@ -147,15 +146,10 @@ void print_tree(Node *node, std::string &data) {
 static Node *splay(Node *x) {
     while (x->parent != nullptr) {
         if (x->parent->parent == nullptr) {
-            if (x == x->parent->left) {
+            if (x == x->parent->left)
                 left_rotate(x->parent);
-
-                // cout << "L" << endl;
-            } else {
+            else
                 right_rotate(x->parent);
-
-                // cout << "R" << endl;
-            }
 
             x->parent->parent = x;
             x->parent = nullptr;
@@ -177,8 +171,6 @@ static Node *splay(Node *x) {
                     x->parent = top;
                     p1->parent = x;
                     p2->parent = p1;
-
-                    // cout << "LL" << endl;
                 } else {
                     left_rotate(p1);
                     p2->right = x;
@@ -187,8 +179,6 @@ static Node *splay(Node *x) {
                     p1->parent = x;
                     p2->parent = x;
                     x->parent = top;
-
-                    // cout << "LR" << endl;
                 }
             } else {
                 if (x->parent == x->parent->parent->right) {
@@ -198,8 +188,6 @@ static Node *splay(Node *x) {
                     x->parent = top;
                     p1->parent = x;
                     p2->parent = p1;
-
-                    // cout << "RR" << endl;
                 } else {
                     right_rotate(p1);
                     p2->left = x;
@@ -208,8 +196,6 @@ static Node *splay(Node *x) {
                     p1->parent = x;
                     p2->parent = x;
                     x->parent = top;
-
-                    // cout << "RL" << endl;
                 }
             }
 

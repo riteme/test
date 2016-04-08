@@ -1,5 +1,5 @@
 #define USE_FILE_IO
-// #define NDEBUG
+#define NDEBUG
 
 #include <cassert>
 #include <cstdio>
