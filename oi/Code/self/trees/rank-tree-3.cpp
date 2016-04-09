@@ -1,5 +1,5 @@
 // #define NDEBUG
-#define NPROFILE
+// #define NPROFILE
 
 #include <cassert>
 #include <cstdio>
@@ -42,7 +42,7 @@ int size_of(Node *);
 int rank_of(Node *);
 ntype sum_of(Node *);
 
-#define TOLERANCE 3
+#define TOLERANCE 4
 
 struct Node {
     Node(int _key = 0, ntype _value = 0, Node *_left = nullptr,
