@@ -1,5 +1,6 @@
-// #define USE_FILE_IO
+#define USE_FILE_IO
 // #define NDEBUG
+#define NPROFILE
 
 #include <cassert>
 #include <cstdio>
@@ -14,6 +15,10 @@
 #include <fstream>
 #include <algorithm>
 
+#ifndef NDEBUG
+#include <gperftools/profiler.h>
+#endif  // IFNDEF NDEBUG
+
 using namespace std;
 
 #ifndef USE_FILE_IO
@@ -21,8 +26,8 @@ using namespace std;
 using std::cin;
 using std::cout;
 #else
-static ifstream cin("tree.in");
-static ofstream cout("tree.out");
+static ifstream cin("interval.in");
+static ofstream cout("interval.out");
 #endif  // IFNDEF USE_FILE_IO
 
 inline void initialize() {
@@ -31,17 +36,22 @@ inline void initialize() {
 #endif
 };
 
+typedef long long ntype;
+
 struct Node;
 int size_of(Node *);
 int rank_of(Node *);
+ntype sum_of(Node *);
 
 #define TOLERANCE 1
 
 struct Node {
-    Node(int _key = 0, int _value = 0, Node *_left = nullptr,
+    Node(int _key = 0, ntype _value = 0, Node *_left = nullptr,
          Node *_right = nullptr)
             : key(_key)
             , value(_value)
+            , sum(_value)
+            , mark(0)
             , rank(1)
             , size(1)
             , left(_left)
@@ -49,14 +59,31 @@ struct Node {
 
     int key;
     int value;
-    int rank;
+    ntype sum;
+    ntype mark;
+    ntype rank;
     int size;
     Node *left;
     Node *right;
 
+    void pushdown() {
+        if (mark != 0) {
+            sum += mark * size;
+            value += mark;
+
+            if (left)
+                left->mark += mark;
+            if (right)
+                right->mark += mark;
+
+            mark = 0;
+        }
+    }
+
     void update() {
         size = size_of(left) + size_of(right) + 1;
         rank = max(rank_of(left), rank_of(right)) + 1;
+        sum = sum_of(left) + sum_of(right) + value;
     }
 
     std::string to_string() {
@@ -72,7 +99,7 @@ struct Node {
         stringstream buffer;
 
         buffer << key;
-        buffer << "[label=\"" << key << "(" << rank << ")"
+        buffer << "[label=\"" << key << "(" << sum << ", " << mark << ")"
                << "\"]";
         buffer << ";";
 
@@ -129,39 +156,39 @@ static void show(Node *h) {
 typedef pair<Node *, Node *> NodePair;
 
 Node *query(Node *h, int key);
-Node *insert(Node *h, int key, int value);
+Node *insert(Node *h, int key, ntype value);
 Node *remove(Node *h, int key);
 Node *swim(Node *h, int key);
 Node *sink(Node *h, int key);
 int rank_key(Node *h, int key, int offest = 0);
 Node *kth(Node *h, int k);
-NodePair split(Node *h, int key);
+NodePair split(Node *h, int k);
 Node *merge(Node *a, Node *b);
 
 int main() {
+#ifndef NPROFILE
+    ProfilerStart("/tmp/rank-tree.profile");
+#endif  // IFNDEF NPROFILE
+
     initialize();
 
     char command;
-    int key, value;
-
+    int key;
+    ntype value;
     while (cin >> command) {
         switch (command) {
             case 'D': {
                 cin >> key;
-                // tree = remove(tree, key);
+                tree = remove(tree, key);
             } break;
-            case 'Q': {
-                cin >> key;
-                cout << query(tree, key)->value << '\n';
-            } break;
+            // case 'Q': {
+            //     cin >> key;
+            //     cout << query(tree, key)->value << '\n';
+            // } break;
             case 'A': {
                 cin >> key >> value;
 
-                auto ptr = query(tree, key);
-                if (ptr)
-                    ptr->value = value;
-                else
-                    tree = insert(tree, key, value);
+                tree = insert(tree, key, value);
             } break;
             case 'N': {
                 cin >> key;
@@ -177,7 +204,6 @@ int main() {
             } break;
             case 'S': {
                 cin >> key;
-                key = kth(tree, key)->key;
                 NodePair a = split(tree, key);
 
                 show(a.first);
@@ -188,6 +214,29 @@ int main() {
             case 'K': {
                 cin >> key;
                 cout << kth(tree, key)->key << '\n';
+            } break;
+            case 'C': {
+                int x, y;
+                ntype v;
+                cin >> x >> y >> v;
+
+                NodePair a = split(tree, x - 1);
+                NodePair b = split(a.second, y - x + 1);
+                b.first->mark += v;
+
+                tree = merge(a.first, merge(b.first, b.second));
+            } break;
+            case 'Q': {
+                int x, y;
+                cin >> x >> y;
+
+                NodePair a = split(tree, x - 1);
+                NodePair b = split(a.second, y - x + 1);
+
+                // b.first->pushdown();
+                cout << b.first->sum << '\n';
+
+                tree = merge(a.first, merge(b.first, b.second));
             } break;
 #ifndef NDEBUG
             case 'P': {
@@ -202,6 +251,10 @@ int main() {
                 max(size_of(tree->left), size_of(tree->right))) /
                 tree->size << endl;
 #endif  // IFNDEF NDEBUG
+
+#ifndef NPROFILE
+    ProfilerStop();
+#endif  // IFNDEF NPROFILE
 
     return 0;
 }  // function main
@@ -220,9 +273,18 @@ int rank_of(Node *h) {
         return 0;
 }
 
+ntype sum_of(Node *h) {
+    if (h)
+        return h->sum + h->mark * h->size;
+    else
+        return 0;
+}
+
 static Node *left_rotate(Node *h) {
     assert(h);
+    assert(h->mark == 0);
     assert(h->left);
+    assert(h->left->mark == 0);
 
     Node *x = h->left;
     h->left = x->right;
@@ -236,7 +298,9 @@ static Node *left_rotate(Node *h) {
 
 static Node *right_rotate(Node *h) {
     assert(h);
+    assert(h->mark == 0);
     assert(h->right);
+    assert(h->right->mark == 0);
 
     Node *x = h->right;
     h->right = x->left;
@@ -249,23 +313,31 @@ static Node *right_rotate(Node *h) {
 }
 
 static Node *balance(Node *h) {
-    if (rank_of(h->left) > rank_of(h->right)) {
-        if (rank_of(h->left) - rank_of(h->right) > TOLERANCE) {
-            if (rank_of(h->left->right) > rank_of(h->left->left))
-                h->left = right_rotate(h->left);
+    if (rank_of(h->left) > rank_of(h->right) &&
+        rank_of(h->left) - rank_of(h->right) > TOLERANCE) {
+        h->pushdown();
+        h->left->pushdown();
 
-            h = left_rotate(h);
+        if (rank_of(h->left->right) > rank_of(h->left->left)) {
+            h->left->right->pushdown();
+            h->left = right_rotate(h->left);
         }
-    } else {
-        if (rank_of(h->right) - rank_of(h->left) > TOLERANCE) {
-            if (rank_of(h->right->left) > rank_of(h->right->right))
-                h->right = left_rotate(h->right);
 
-            h = right_rotate(h);
+        h = left_rotate(h);
+    } else if (rank_of(h->left) < rank_of(h->right) &&
+               rank_of(h->right) - rank_of(h->left) > TOLERANCE) {
+        h->pushdown();
+        h->right->pushdown();
+
+        if (rank_of(h->right->left) > rank_of(h->right->right)) {
+            h->right->left->pushdown();
+            h->right = left_rotate(h->right);
         }
-    }
 
-    h->update();
+        h = right_rotate(h);
+    } else
+        h->update();
+
     return h;
 }
 
@@ -281,76 +353,110 @@ Node *query(Node *h, int key) {
         return h;
 }
 
-Node *insert(Node *h, int key, int value) {
+Node *insert(Node *h, int key, ntype value) {
     if (!h)
         return new Node(key, value);
 
+    h->pushdown();
     if (key < h->key) {
         h->left = insert(h->left, key, value);
 
-        h = balance(h);
+        return balance(h);
     } else if (key > h->key) {
         h->right = insert(h->right, key, value);
 
-        h = balance(h);
+        return balance(h);
     } else
         h->value = value;
 
     return h;
 }
 
+static Node *remove(Node *h) {
+    h->pushdown();
+    if (h->left && h->right) {
+        if (rank_of(h->left) > rank_of(h->right)) {
+            h->left->pushdown();
+            h = left_rotate(h);
+            h->right = remove(h->right);
+        } else {
+            h->right->pushdown();
+            h = right_rotate(h);
+            h->left = remove(h->left);
+        }
+    } else {
+        if (h->left)
+            return h->left;
+        else
+            return h->right;
+    }
+
+    return balance(h);
+}
+
 Node *remove(Node *h, int key) {
-    h = reinterpret_cast<Node *>(key);
-    return h;
+    if (key < h->key)
+        h->left = remove(h->left, key);
+    else if (key > h->key)
+        h->right = remove(h->right, key);
+    else
+        return remove(h);
+
+    return balance(h);
 }
 
 Node *swim(Node *h, int key) {
+    h->pushdown();
+
     if (key < h->key) {
         h->left = swim(h->left, key);
 
         h = left_rotate(h);
-        h->right = balance(h->right);
+        // h->right = balance(h->right);
     } else if (key > h->key) {
         h->right = swim(h->right, key);
 
         h = right_rotate(h);
-        h->left = balance(h->left);
+        // h->left = balance(h->left);
     }
 
     return h;
 }
 
-static Node *sink(Node *h) {
+static Node *_sink(Node *h) {
     if (!h->left && !h->right)
         return h;
 
     if (rank_of(h->left) > rank_of(h->right)) {
+        h->left->pushdown();
         h = left_rotate(h);
 
-        h->right = sink(h->right);
+        h->right = _sink(h->right);
     } else {
+        h->right->pushdown();
         h = right_rotate(h);
 
-        h->left = sink(h->left);
+        h->left = _sink(h->left);
     }
 
-    h->update();
-    h = balance(h);
-    return h;
+    return balance(h);
+}
+
+static Node *sink(Node *h) {
+    h->pushdown();
+
+    return _sink(h);
 }
 
 Node *sink(Node *h, int key) {
-    if (key < h->key) {
+    if (key < h->key)
         h->left = sink(h->left, key);
-
-        return balance(h);
-    } else if (key > h->key) {
+    else if (key > h->key)
         h->right = sink(h->right, key);
+    else
+        return sink(h);
 
-        return balance(h);
-    }
-
-    return sink(h);
+    return balance(h);
 }
 
 int rank_key(Node *h, int key, int offest) {
@@ -362,10 +468,14 @@ int rank_key(Node *h, int key, int offest) {
         return size_of(h->left) + offest + 1;
 }
 
-NodePair split(Node *h, int key) {
-    h = swim(h, key);
+NodePair split(Node *h, int k) {
+    if (k < 1)
+        return NodePair(nullptr, h);
 
+    k = kth(h, k)->key;
+    h = swim(h, k);
     NodePair result = { h, h->right };
+    h->pushdown();
     h->right = nullptr;
     h->update();
 
@@ -373,10 +483,16 @@ NodePair split(Node *h, int key) {
 }
 
 Node *merge(Node *a, Node *b) {
+    if (!a)
+        return sink(b);
+    if (!b)
+        return sink(a);
+
     assert(!a->right);
 
+    a->pushdown();
     a->right = b;
-    return sink(a, a->key);
+    return sink(a);
 }
 
 Node *kth(Node *h, int k) {
