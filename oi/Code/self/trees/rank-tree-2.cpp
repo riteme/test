@@ -1,4 +1,4 @@
-// #define USE_FILE_IO
+#define USE_FILE_IO
 // #define NDEBUG
 #define NPROFILE
 
@@ -46,16 +46,16 @@ ntype sum_of(Node *);
 #define TOLERANCE 1
 
 struct Node {
-    Node(int _key = 0, ntype _value = 0, Node *_left = nullptr,
-         Node *_right = nullptr)
+    Node(int _key = 0, ntype _value = 0)
             : key(_key)
             , value(_value)
             , sum(_value)
             , mark(0)
             , rank(1)
             , size(1)
-            , left(_left)
-            , right(_right) {}
+            , left(nullptr)
+            , right(nullptr)
+            , parent(nullptr) {}
 
     int key;
     int value;
@@ -65,6 +65,7 @@ struct Node {
     int size;
     Node *left;
     Node *right;
+    Node *parent;
 
     void pushdown() {
         if (mark != 0) {
@@ -103,13 +104,12 @@ struct Node {
                << "\"]";
         buffer << ";";
 
-        if (left != nullptr) {
-            buffer << key << ":sw -> " << left->key << ";";
-        }
-
-        if (right != nullptr) {
-            buffer << key << ":se -> " << right->key << ";";
-        }
+        if (left != nullptr)
+            buffer << key << ":sw->" << left->key << "[style=bold];";
+        if (right != nullptr)
+            buffer << key << ":se->" << right->key << "[style=bold];";
+        if (parent)
+            buffer << key << "->" << parent->key << ";";
 
         return buffer.str();
     }
@@ -159,7 +159,9 @@ Node *query(Node *h, int key);
 Node *insert(Node *h, int key, ntype value);
 Node *remove(Node *h, int key);
 Node *swim(Node *h, int key);
+Node *swim(Node *h);
 Node *sink(Node *h, int key);
+Node *sink(Node *h);
 int rank_key(Node *h, int key, int offest = 0);
 Node *kth(Node *h, int k);
 NodePair split(Node *h, int k);
@@ -192,11 +194,11 @@ int main() {
             } break;
             case 'N': {
                 cin >> key;
-                tree = sink(tree, key);
+                tree = sink(kth(tree, key));
             } break;
             case 'U': {
                 cin >> key;
-                tree = swim(tree, key);
+                tree = swim(kth(tree, key));
             } break;
             case 'R': {
                 cin >> key;
@@ -290,6 +292,11 @@ static Node *left_rotate(Node *h) {
     h->pushdown();
     x->pushdown();
 
+    if (x->right)
+        x->right->parent = h;
+    x->parent = h->parent;
+    h->parent = x;
+
     h->left = x->right;
     x->right = h;
 
@@ -308,6 +315,11 @@ static Node *right_rotate(Node *h) {
     Node *x = h->right;
     h->pushdown();
     x->pushdown();
+
+    if (x->left)
+        x->left->parent = h;
+    x->parent = h->parent;
+    h->parent = x;
 
     h->right = x->left;
     x->left = h;
@@ -366,10 +378,12 @@ Node *insert(Node *h, int key, ntype value) {
     h->pushdown();
     if (key < h->key) {
         h->left = insert(h->left, key, value);
+        h->left->parent = h;
 
         return balance(h);
     } else if (key > h->key) {
         h->right = insert(h->right, key, value);
+        h->right->parent = h;
 
         return balance(h);
     } else
@@ -385,29 +399,54 @@ static Node *remove(Node *h) {
             // h->left->pushdown();
             h = left_rotate(h);
             h->right = remove(h->right);
+
+            // if (h->right) {
+            //     h->right->parent = h;
+            // }
         } else {
             // h->right->pushdown();
             h = right_rotate(h);
             h->left = remove(h->left);
+
+            // if (h->left) {
+            //     h->left->parent = h;
+            // }
         }
     } else {
         h->pushdown();
 
-        if (h->left)
+        if (h->left) {
+            if (h->left) {
+                h->left->parent = h->parent;
+            }
+
             return h->left;
-        else
+        } else {
+            if (h->right) {
+                h->right->parent = h->parent;
+            }
+
             return h->right;
+        }
     }
 
     return balance(h);
 }
 
 Node *remove(Node *h, int key) {
-    if (key < h->key)
+    if (key < h->key) {
         h->left = remove(h->left, key);
-    else if (key > h->key)
+
+        // if (h->left) {
+        //     h->left->parent = h;
+        // }
+    } else if (key > h->key) {
         h->right = remove(h->right, key);
-    else
+
+        // if (h->right) {
+        //     h->right->parent = h;
+        // }
+    } else
         return remove(h);
 
     return balance(h);
@@ -429,7 +468,32 @@ Node *swim(Node *h, int key) {
     return h;
 }
 
-static Node *sink(Node *h) {
+Node *swim(Node *h) {
+    while (h->parent) {
+        Node *p1 = h->parent;
+        Node *p2 = h->parent->parent;
+
+        if (h == p1->left) {
+            left_rotate(p1);
+        } else {
+            assert(h == p1->right);
+            right_rotate(p1);
+        }
+
+        if (p2) {
+            if (p1 == p2->left)
+                p2->left = h;
+            else
+                p2->right = h;
+
+            p2->update();
+        }
+    }  // while
+
+    return h;
+}
+
+Node *sink(Node *h) {
     if (!h->left && !h->right)
         return h;
 
@@ -478,10 +542,13 @@ NodePair split(Node *h, int k) {
     if (k < 1)
         return NodePair(nullptr, h);
 
-    k = kth(h, k)->key;
-    h = swim(h, k);
+    // k = kth(h, k)->key;
+    // h = swim(h, k);
+    h = swim(kth(h, k));
     NodePair result = { h, h->right };
-    // h->pushdown();
+    h->pushdown();
+    if (h->right)
+        h->right->parent = nullptr;
     h->right = nullptr;
     h->update();
 
@@ -497,15 +564,29 @@ Node *merge(Node *a, Node *b) {
     assert(!a->right);
 
     a->pushdown();
+    b->parent = a;
     a->right = b;
     return sink(a);
 }
 
+// Node *kth(Node *h, int k) {
+//     if (k <= size_of(h->left))
+//         return kth(h->left, k);
+//     else if (k > size_of(h->left) + 1)
+//         return kth(h->right, k - size_of(h->left) - 1);
+//     else
+//         return h;
+// }
+
 Node *kth(Node *h, int k) {
-    if (k <= size_of(h->left))
-        return kth(h->left, k);
-    else if (k > size_of(h->left) + 1)
-        return kth(h->right, k - size_of(h->left) - 1);
-    else
-        return h;
+    while (k != size_of(h->left) + 1) {
+        if (k <= size_of(h->left))
+            h = h->left;
+        else {
+            k -= size_of(h->left) + 1;
+            h = h->right;
+        }
+    }  // while
+
+    return h;
 }
