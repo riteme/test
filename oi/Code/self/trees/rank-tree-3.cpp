@@ -1,5 +1,5 @@
 // #define NDEBUG
-// #define NPROFILE
+#define NPROFILE
 
 #include <cassert>
 #include <cstdio>
