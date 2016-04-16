@@ -1,0 +1,7 @@
+graph {  // <-- Here
+    a -- b;
+    b -- c;
+    a -- c;
+    c -- c;
+    a -- c;
+}
