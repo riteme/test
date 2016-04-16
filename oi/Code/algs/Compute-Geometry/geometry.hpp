@@ -114,6 +114,46 @@ bool is_on_segment(const TVector &a, const TVector &b, const TVector &c) {
            min(a.y, b.y) <= c.y && c.y <= max(a.y, b.y);
 }
 
+enum Direction {
+    E = 0,
+    NE = 1,
+    N = 2,
+    NW = 3,
+    W = 4,
+    SW = 5,
+    S = 6,
+    SE = 7
+};  // enum Direction
+
+template <typename TVector>
+Direction direction(const TVector &vec) {
+    if (is_same(vec.x, 0.0)) {
+        if (is_same(vec.y, 0.0)) {
+            return E;
+        } else if (vec.y > 0.0) {
+            return N;
+        } else {
+            return S;
+        }
+    } else if (vec.x > 0.0) {
+        if (is_same(vec.y, 0.0)) {
+            return E;
+        } else if (vec.y > 0.0) {
+            return NE;
+        } else {
+            return SE;
+        }
+    } else {
+        if (is_same(vec.y, 0.0)) {
+            return W;
+        } else if (vec.y > 0.0) {
+            return NW;
+        } else {
+            return SW;
+        }
+    }
+}
+
 template <typename TVector>
 bool is_intersect(const TVector &a, const TVector &b, const TVector &c,
                   const TVector &d) {
@@ -152,8 +192,9 @@ bool brute_any_segment_intersect(const TIterator &beg, const TIterator &end) {
 
 template <typename TIterator>
 void polar_sort(const TIterator &beg, const TIterator &end) {
-    std::sort(beg, end,
-              [](const Vector2 &a, const Vector2 &b) { return b * a < 0; });
+    std::stable_sort(beg, end, [](const Vector2 &a, const Vector2 &b) {
+        return direction(a) < direction(b) || (a * b > 0);
+    });
 }
 
 #endif  // IFNDEF GEOMETRY_HPP_
