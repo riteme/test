@@ -1,35 +1,67 @@
-#include <iostream>
-#include <string>
-#include <vector>
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
+#include <climits>
 
 using namespace std;
 
-void generate_next(const string pat, vector<int> &next) {
-    for (int i = 1; i < pat.size(); i++) {
-        int k = next[i - 1];
+#define LMAX 1000000
+#define MOD 1000000007L
 
-        while (k > 0 and pat[k] != pat[i]) { k = next[k - 1]; }  // while
+typedef long long ntype;
 
-        if (pat[k] == pat[i])
-            next[i] = k + 1;
-        else
-            next[i] = 0;
-    }  // for
-}
+static ntype n;
+static char s[LMAX + 10];
+static ntype prefix[LMAX + 10];
+static ntype next[LMAX + 10];
+static ntype cnt[LMAX + 10];
 
 int main() {
-    ios::sync_with_stdio(false);
+    scanf("%lld", &n);
 
-    vector<int> next;
-    string pat;
+    for (ntype c = 0; c < n; c++) {
+        scanf("%s", s + 1);
 
-    cin >> pat;
-    next.resize(pat.size(), 0);
+        ntype answer = 1;
+        prefix[0] = prefix[1] = 0;
+        cnt[0] = -1;
+        cnt[1] = 0;
+        for (int i = 2; s[i] != '\0'; i++) {
+            ntype k = prefix[i - 1];
+            while (k != 0 && s[i] != s[k + 1]) {
+                k = prefix[k];
+            }  // while
 
-    generate_next(pat, next);
+            if (s[k + 1] == s[i]) {
+                k++;
+            }
 
-    for (auto i : next) { cout << i << " "; }  // foreach in next
-    cout << endl;
+            prefix[i] = k;
+            cnt[i] = cnt[k] + 1;
+        }  // for
+
+        next[0] = next[1] = 0;
+        for (int i = 2; s[i] != '\0'; i++) {
+            ntype k = next[i - 1];
+            if (k + 1 > i / 2) {
+                k = prefix[k];
+            }
+
+            while (k != 0 && s[k + 1] != s[i]) {
+                k = prefix[k];
+            }  // while
+
+            if (s[k + 1] == s[i]) {
+                k++;
+            }
+
+            next[i] = k;
+            answer *= cnt[next[i]] + 2;
+            answer %= MOD;
+        }  // for
+
+        printf("%lld\n", answer);
+    }  // for
 
     return 0;
 }  // function main

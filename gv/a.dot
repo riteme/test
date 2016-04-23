@@ -1,7 +1,23 @@
-graph {  // <-- Here
-    a -- b;
-    b -- c;
-    a -- c;
-    c -- c;
-    a -- c;
+digraph {
+    node [shape = circle];
+
+	3 [color = red];
+	5 [color = red];
+
+    3:sw -> 2 [style = bold];
+	2 -> 3 [style = dotted];
+    3:se -> 8 [style = bold];
+    8 -> 3 [style = dotted];
+    2:sw -> 1 [style = bold];
+    1 -> 2 [style = dotted];
+    8:sw -> 5 [style = bold];
+    5 -> 8 [style = dotted];
+    8:se -> 9 [style = bold];
+    9 -> 8 [style = dotted];
+    5:sw -> 4 [style = bold];
+    4 -> 5 [style = dotted];
+    5:se -> 7 [style = bold];
+    7 -> 5 [style = dotted];
+    7:sw -> 6 [style = bold];
+    6 -> 7 [style = dotted];
 }

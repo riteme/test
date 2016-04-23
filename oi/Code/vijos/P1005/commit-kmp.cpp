@@ -1,16 +1,19 @@
-// 16/40 TLE - Commit #1
+// 16/40 TLE
+// DFA test
 
 #include <cmath>
 #include <iostream>
 #include <vector>
 
+// #pragma GCC optimize("O2")
+
 using namespace std;
 
 typedef vector<unsigned> VectorType;
-typedef vector<VectorType> DFA;
+typedef vector<unsigned> PrefixArray;
 typedef VectorType BigNumber;
 
-void GenerateDFA(const string &patten, DFA &target);
+void GeneratePrefixArray(const string &pattern, PrefixArray &target);
 void Increase(BigNumber &n);
 inline unsigned ToNumber(const char c);
 
@@ -20,8 +23,8 @@ int main(/*int argc, char *argv[]*/) {
     string pat;
     cin >> pat;
 
-    DFA d;
-    GenerateDFA(pat, d);
+    PrefixArray prefix;
+    GeneratePrefixArray(pat, prefix);
 
     unsigned i = 1U, j = 0U;
     BigNumber n;
@@ -30,10 +33,14 @@ int main(/*int argc, char *argv[]*/) {
 
     while (j < pat.size()) {
         for (VectorType::reverse_iterator beg = n.rbegin();
-             beg != n.rend() && j < pat.size();
-             beg++) {
-            j = d[*beg][j];
-            i++;
+             beg != n.rend() && j < pat.size(); beg++, i++) {
+            while (j != 0 && pat[j] != (*beg + '0')) {
+                j = prefix[j];
+            }  // while
+
+            if (pat[j] == (*beg + '0')) {
+                j++;
+            }
         }  // for
 
         Increase(n);
@@ -44,21 +51,22 @@ int main(/*int argc, char *argv[]*/) {
     return 0;
 }  // function main
 
-void GenerateDFA(const string &patten, DFA &target) {
-    target.resize(10);
-    for (DFA::iterator e = target.begin(); e != target.end(); e++) {
-        e->resize(patten.size());
-    }  // foreach in target
+void GeneratePrefixArray(const string &pattern, PrefixArray &target) {
+    target.resize(pattern.size() + 1);
+    target[0] = target[1] = 0;
 
-    target[ToNumber(patten[0])][0] = 1U;
-    for (unsigned x = 0U, j = 1U; j < patten.size(); j++) {
-        for (unsigned c = 0U; c < 10U; c++) {
-            target[c][j] = target[c][x];
-        }  // for
+    for (unsigned i = 1; i < pattern.size(); i++) {
+        int k = target[i];
+        while (k != 0 && pattern[k] != pattern[i]) {
+            k = target[k];
+        }  // while
 
-        target[ToNumber(patten[j])][j] = j + 1;
-        x = target[ToNumber(patten[j])][x];
-    }  // for
+        if (pattern[k] == pattern[i]) {
+            k++;
+        }
+
+        target[i + 1] = k;
+    }
 }
 
 void Increase(BigNumber &n) {
@@ -78,7 +86,9 @@ void Increase(BigNumber &n) {
         }
     }  // while
 
-    if (upload > 0U) { n.push_back(upload); }
+    if (upload > 0U) {
+        n.push_back(upload);
+    }
 }
 
 inline unsigned ToNumber(const char c) {
