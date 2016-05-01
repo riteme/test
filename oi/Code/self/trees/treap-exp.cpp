@@ -1,301 +1,316 @@
-#define USE_FILE_IO
-#define NDEBUG
+// #define NDEBUG
+#define NPROFILE
+// #define USE_FILE_IO
 
 #include <cassert>
+#include <cstdio>
 #include <cstring>
+#include <cstdlib>
 #include <climits>
-#include <vector>
-#include <random>
-#include <fstream>
-#include <sstream>
+#include <ctime>
 #include <algorithm>
 
 using namespace std;
 
-#ifndef USE_FILE_IO
-#include <iostream>
-using std::cin;
-using std::cout;
-#else
-static ifstream cin("tree.in");
-static ofstream cout("tree.out");
-#endif  // IFNDEF USE_FILE_IO
-
-inline void initialize() {
-#ifndef USE_FILE_IO
-    ios::sync_with_stdio(false);
-#endif
-};
-
-struct Node {
-    Node() = default;
-    Node(int _key = 0, int _value = 0, int _weight = 0, Node *_left = nullptr,
-         Node *_right = nullptr)
-            : key(_key)
-            , value(_value)
-            , weight(_weight)
-            , left(_left)
-            , right(_right) {}
-
-    int key = 0;
-    int value = 0;
-    int weight = 0;
-    int size = 1;
-    Node *left = nullptr;
-    Node *right = nullptr;
-
-    void update() {
-        size = 1 + (left ? left->size : 0) + (right ? right->size : 0);
-    }
-
-    std::string print_node() {
-        stringstream buffer;
-
-        buffer << key;
-        buffer << "[label=\"" << key << "/" << weight << "\"]";
-        buffer << ";";
-
-        if (left != nullptr) {
-            buffer << key << ":sw -> " << left->key << ";";
-        }
-
-        if (right != nullptr) {
-            buffer << key << ":se -> " << right->key << ";";
-        }
-
-        return buffer.str();
-    }
-};  // struct Node
-
+// #define SEED (time(0))
+#define SEED 233
 struct MyRandom {
-    MyRandom(const unsigned seed) {
-        srand(seed);
+    MyRandom() {
+        srand(SEED);
     }
 
-    auto operator()() -> int {
+    int operator()() const {
         return rand();
     }
 };  // struct MyRandom
 
-static Node *tree = nullptr;
-static random_device rd;
-static MyRandom randint(rd());
+static MyRandom randint;
 
-typedef pair<Node *, Node *> NodePair;
+typedef long long longint;
 
-Node *insert(Node *h, int key, int value);
-Node *remove(Node *h, int key);
-int query(Node *h, int key);
-NodePair nearest(Node *h, int target);
+class Treap {
+ public:
+    Treap(int _key, longint _value);
+    ~Treap();
 
-Node *right_rotate(Node *h);
-Node *left_rotate(Node *h);
+    int key;
+    int weight;
+    int size;
+    longint value;
+    longint sum;
 
-void print_tree(Node *node);
-void print_tree(Node *node, std::string &data);
+    struct Mark {
+        longint sum;
+    } mark;
+
+    Treap *left;
+    Treap *right;
+
+    longint get_sum();
+
+    Treap *left_rotate();
+    Treap *right_rotate();
+
+    void update();
+    void pushdown();
+
+    Treap *insert(int _key, int _value);
+    longint query(int _key);
+    Treap *remove(int _key);
+
+ private:
+    Treap *remove();
+};  // class Treap
+
+static Treap *null = new Treap(0, 0);
+
+Treap::Treap(int _key, longint _value)
+        : key(_key)
+        , weight(randint())
+        , size(1)
+        , value(_value)
+        , sum(_value)
+        , left(null)
+        , right(null) {}
+
+Treap::~Treap() {
+    // if (left)
+    // delete left;
+    // if (right)
+    // delete right;
+}
+
+longint Treap::get_sum() {
+    return sum + mark.sum * size;
+}
+
+Treap *Treap::left_rotate() {
+    assert(mark.sum == 0);
+    assert(left->mark.sum == 0);
+
+    Treap *x = this->left;
+    this->left = x->right;
+    x->right = this;
+    this->update();
+    x->update();
+
+    return x;
+}
+
+Treap *Treap::right_rotate() {
+    assert(mark.sum == 0);
+    assert(right->mark.sum == 0);
+
+    Treap *x = this->right;
+    this->right = x->left;
+    x->left = this;
+    this->update();
+    x->update();
+
+    return x;
+}
+
+void Treap::update() {
+    size = left->size + right->size + 1;
+    sum = left->get_sum() + right->get_sum() + value;
+}
+
+void Treap::pushdown() {
+    if (mark.sum != 0) {
+        value += mark.sum;
+        sum += mark.sum * size;
+
+        if (left != null)
+            left->mark.sum += mark.sum;
+        if (right != null)
+            right->mark.sum += mark.sum;
+
+        mark.sum = 0;
+        // this->update();
+    }
+}
+
+Treap *Treap::insert(int _key, int _value) {
+    if (this == null) {
+        return new Treap(_key, _value);
+    }
+
+    this->pushdown();
+    if (_key < this->key) {
+        this->left = this->left->insert(_key, _value);
+
+        if (this->weight > this->left->weight)
+            return this->left_rotate();
+    } else {
+        this->right = this->right->insert(_key, _value);
+
+        if (this->weight > this->right->weight)
+            return this->right_rotate();
+    }
+
+    this->update();
+    return this;
+}
+
+longint Treap::query(int _key) {
+    if (this == null)
+        return INT_MIN;
+
+    if (_key < this->key)
+        return this->left->query(_key);
+    else if (_key > this->key)
+        return this->right->query(_key);
+    else
+        return this->value;
+}
+
+Treap *Treap::remove() {
+    if (this->left != null && this->right != null) {
+        this->pushdown();
+
+        Treap *x;
+        if (left->weight < right->weight) {
+            left->pushdown();
+            x = this->left_rotate();
+            x->right = x->right->remove();
+        } else {
+            right->pushdown();
+            x = this->right_rotate();
+            x->left = x->left->remove();
+        }
+
+        x->update();
+        return x;
+    } else {
+        this->pushdown();
+
+        Treap *next;
+        if (left != null)
+            next = left;
+        else
+            next = right;
+        // delete this;
+
+        return next;
+    }
+}
+
+Treap *Treap::remove(int _key) {
+    this->pushdown();
+    if (_key < this->key)
+        left = left->remove(_key);
+    else if (_key > this->key)
+        right = right->remove(_key);
+    else
+        return this->remove();
+
+    this->update();
+    return this;
+}
+
+typedef pair<Treap *, Treap *> TreapPair;
+
+static TreapPair split(Treap *h, int k) {
+    if (h == null)
+        return make_pair(null, null);
+
+    h->pushdown();
+    TreapPair result;
+    if (k <= h->left->size) {
+        result = split(h->left, k);
+        h->left = result.second;
+        result.second = h;
+        h->update();
+    } else {
+        result = split(h->right, k - h->left->size - 1);
+        h->right = result.first;
+        result.first = h;
+        h->update();
+    }
+
+    return result;
+}
+
+static Treap *merge(Treap *a, Treap *b) {
+    if (a == null)
+        return b;
+    if (b == null)
+        return a;
+
+    if (a->weight < b->weight) {
+        a->pushdown();
+        a->right = merge(a->right, b);
+        a->update();
+
+        return a;
+    } else {
+        b->pushdown();
+        b->left = merge(a, b->left);
+        b->update();
+
+        return b;
+    }
+}
+
+static void initialize() {
+    null->size = 0;
+    null->left = null;
+    null->right = null;
+
+#ifdef USE_FILE_IO
+    freopen("interval.in", "r", stdin);
+    freopen("interval.out", "w", stdout);
+#endif  // IFDEF USE_FILE_IO
+}
+
+static void shutdown() {
+#ifdef USE_FILE_IO
+    fcloseall();
+#endif  // IFDEF USE_FILE_IO
+}
 
 int main() {
     initialize();
 
-    char command;
-    int key = INT_MAX, value = INT_MAX;
-    while (cin >> command) {
-        switch (command) {
-            case 'A':
-                cin >> key >> value;
-                tree = insert(tree, key, value);
+    char buffer[10];
+    Treap *tree = null;
+    while (scanf("%s", buffer) != EOF) {
+        switch (buffer[0]) {
+            case 'A': {
+                int key, value;
+                scanf("%d%d", &key, &value);
 
-                break;
-            case 'D':
-                cin >> key;
-                tree = remove(tree, key);
+                tree = tree->insert(key, value);
+            } break;
+            case 'D': {
+                int key;
+                scanf("%d", &key);
 
-                break;
-            case 'Q':
-                cin >> key;
-                cout << query(tree, key) << "\n";
+                tree = tree->remove(key);
+            } break;
+            case 'Q': {
+                int x, y;
+                scanf("%d%d", &x, &y);
 
-                break;
+                TreapPair a = split(tree, x - 1);
+                TreapPair b = split(a.second, y - x + 1);
 
-            case 'N':
-                cin >> key;
+                printf("%lld\n", b.first->get_sum());
+                tree = merge(a.first, merge(b.first, b.second));
+            } break;
+            case 'C': {
+                int x, y, value;
+                scanf("%d%d%d", &x, &y, &value);
 
-                NodePair result = nearest(tree, key);
-                Node *a = result.first, *b = result.second;
+                TreapPair a = split(tree, x - 1);
+                TreapPair b = split(a.second, y - x + 1);
+                b.first->mark.sum += value;
 
-                if (a == nullptr) {
-                    cout << b->key << "\n";
-                } else if (b == nullptr) {
-                    cout << a->key << "\n";
-                } else {
-                    cout << min(a->key, b->key,
-                                [key](const int &_a, const int &_b) {
-                                    return abs(key - _a) < abs(key - _b);
-                                }) << "\n";
-                }
+                tree = merge(a.first, merge(b.first, b.second));
+            } break;
+        }  // switch to buffer[0]
+    }      // while
 
-                break;
-        }  // switch to command
-
-#ifndef NDEBUG
-        // if (command == 'A') {
-        //     cout << "A " << key << " " << value << endl;
-        // }
-        // if (command == 'D') {
-        //     cout << "D " << key << endl;
-        // }
-
-        if (command == 'P') {
-            print_tree(tree);
-        }
-#endif  // IFNDEF NDEBUG
-    }   // while
-
-#ifndef NDEBUG
-    cout << static_cast<double>(max(tree->left->size, tree->right->size)) /
-                tree->size << endl;
-#endif  // IFNDEF NDEBUG
-
+    shutdown();
     return 0;
 }  // function main
-
-void print_tree(Node *node) {
-    std::string data;
-    data = "digraph{\nnode [shape=circle];";
-
-    print_tree(node, data);
-
-    data += "}";
-    ofstream file("/tmp/tree.tmp.dot");
-    file << data;
-    file.close();
-    system("showdot /tmp/tree.tmp.dot");
-}
-
-void print_tree(Node *node, std::string &data) {
-    if (node == nullptr)
-        return;
-
-    data += node->print_node();
-    print_tree(node->left, data);
-    print_tree(node->right, data);
-}
-
-Node *insert(Node *h, int key, int value) {
-    if (h == nullptr)
-        return new Node(key, value, randint());
-
-    if (key < h->key) {
-        h->left = insert(h->left, key, value);
-
-        if (h->left->weight < h->weight)
-            h = right_rotate(h);
-    } else if (key > h->key) {
-        h->right = insert(h->right, key, value);
-
-        if (h->right->weight < h->weight)
-            h = left_rotate(h);
-    } else
-        h->value = value;
-
-    h->update();
-    return h;
-}
-
-static Node *remove(Node *h) {
-    if (h->left != nullptr and h->right != nullptr) {
-        if (h->left->weight >= h->right->weight) {
-            h = right_rotate(h);
-
-            h->right = remove(h->right);
-        } else {
-            h = left_rotate(h);
-
-            h->left = remove(h->left);
-        }
-    } else {
-        Node *next = nullptr;
-
-        if (h->left != nullptr) {
-            next = h->left;
-        } else {
-            next = h->right;
-        }
-
-        delete h;
-        return next;
-    }
-
-    h->update();
-    return h;
-}
-
-Node *remove(Node *h, int key) {
-    assert(h != nullptr);
-
-    if (key < h->key)
-        h->left = remove(h->left, key);
-    else if (key > h->key)
-        h->right = remove(h->right, key);
-    else
-        return remove(h);
-
-    h->update();
-    return h;
-}
-
-int query(Node *h, int key) {
-    Node *current = h;
-    while (current != nullptr and current->key != key) {
-        if (key < current->key)
-            current = current->left;
-        else
-            current = current->right;
-    }
-
-    return current != nullptr ? current->value : -1;
-}
-
-NodePair nearest(Node *h, int target) {
-    Node *current = h;
-    Node *left = nullptr;
-    Node *right = nullptr;
-
-    while (current != nullptr and target != current->key) {
-        if (target < current->key) {
-            right = current;
-            current = current->left;
-        } else if (target > current->key) {
-            left = current;
-            current = current->right;
-        }
-    }
-
-    if (current != nullptr and target == current->key) {
-        left = right = current;
-    }
-
-    return NodePair(left, right);
-}
-
-Node *right_rotate(Node *h) {
-    assert(h != nullptr);
-    assert(h->left != nullptr);
-
-    Node *x = h->left;
-    h->left = x->right;
-    x->right = h;
-
-    return x;
-}
-
-Node *left_rotate(Node *h) {
-    assert(h != nullptr);
-    assert(h->right != nullptr);
-
-    Node *x = h->right;
-    h->right = x->left;
-    x->left = h;
-
-    return x;
-}

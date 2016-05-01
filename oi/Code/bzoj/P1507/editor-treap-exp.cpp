@@ -1,84 +1,42 @@
 #include <cstdio>
 #include <cstring>
 #include <climits>
+#include <cstdlib>
 #include <algorithm>
-// #include <fstream>
-// #include <sstream>
 
 using namespace std;
 
 static void initialize() {}
 
+struct MyRandom {
+    MyRandom() {
+        srand(233);
+    }
+
+    int operator()() const {
+        return rand();
+    }
+};  // struct MyRandom
+
+static MyRandom randint;
+
 struct Node;
-int rank_of(Node *h);
 int size_of(Node *h);
 
 struct Node {
-    Node(char _c) : c(_c), rank(1), size(1), left(NULL), right(NULL) {}
+    Node(char _c)
+            : c(_c), size(1), weight(randint()), left(NULL), right(NULL) {}
 
     char c;
-    int rank;
     int size;
+    int weight;
     Node *left;
     Node *right;
 
     void update() {
-        rank = max(rank_of(left), rank_of(right)) + 1;
         size = size_of(left) + size_of(right) + 1;
     }
-
-    // std::string to_dot_code() {
-    //     stringstream buffer;
-
-    //     buffer << reinterpret_cast<long long>(this);
-    //     buffer << "[label=\"";
-    //     if (c == '\\')
-    //         buffer << "_1";
-    //     else if (c == '/')
-    //         buffer << "_2";
-    //     else
-    //         buffer << c;
-    //     buffer << "\"];\n";
-
-    //     if (left != nullptr) {
-    //         buffer << reinterpret_cast<long long>(this) << ":sw -> "
-    //                << reinterpret_cast<long long>(left) << ";\n";
-    //     }
-
-    //     if (right != nullptr) {
-    //         buffer << reinterpret_cast<long long>(this) << ":se -> "
-    //                << reinterpret_cast<long long>(right) << ";\n";
-    //     }
-
-    //     return buffer.str();
-    // }
 };  // struct Node
-
-// static void _show(Node *h, stringstream &buffer) {
-//     if (!h)
-//         return;
-
-//     buffer << h->to_dot_code();
-//     _show(h->left, buffer);
-//     _show(h->right, buffer);
-// }
-
-// static void show(Node *h) {
-//     stringstream buffer;
-
-//     buffer << "digraph{node[shape=circle];";
-//     _show(h, buffer);
-//     buffer << "}";
-
-//     fstream file("/tmp/tree.tmp.dot", ios::trunc | ios::out);
-//     file << buffer.str();
-//     file.close();
-//     system("showdot /tmp/tree.tmp.dot");
-// }
-
-int rank_of(Node *h) {
-    return h ? h->rank : 0;
-}
 
 int size_of(Node *h) {
     return h ? h->size : 0;
@@ -105,33 +63,51 @@ static NodePair split(Node *h, int k) {
     }
 }
 
-static int ap, bp;
-static Node *_merge(Node *a, Node *b) {
+static Node *merge(Node *a, Node *b) {
     if (!a)
         return b;
     if (!b)
         return a;
 
-    int sit1 = rank_of(a->right) + b->rank;
-    int sit2 = rank_of(b->left) + a->rank;
-    if (sit1 < sit2 || (sit1 == sit2 && ap < bp)) {
-        ap++;
-        a->right = _merge(a->right, b);
-        a->update();
-
-        return a;
-    } else {
-        bp++;
-        b->left = _merge(a, b->left);
+    if (a->weight > b->weight) {
+        b->left = merge(a, b->left);
         b->update();
 
+        // return balance(b);
         return b;
+    } else {
+        a->right = merge(a->right, b);
+        a->update();
+
+        // return balance(a);
+        return a;
     }
 }
 
-static Node *merge(Node *a, Node *b) {
-    ap = bp = 0;
-    return _merge(a, b);
+inline Node *right_rotate(Node *h) {
+    Node *x = h->right;
+    h->right = x->left;
+    x->left = h;
+
+    h->update();
+    x->update();
+
+    return x;
+}
+
+static Node *insert_back(Node *h, char c) {
+    if (h == NULL) {
+        return new Node(c);
+    }
+
+    h->right = insert_back(h->right, c);
+
+    if (h->right->weight < h->weight) {
+        return right_rotate(h);
+    }
+
+    h->update();
+    return h;
 }
 
 static void print(Node *h) {
@@ -144,7 +120,6 @@ static void print(Node *h) {
 }
 
 static Node *tree;
-static char buf[1000000];
 
 int main() {
     initialize();
@@ -191,14 +166,13 @@ int main() {
                 if (c == '\n')
                     continue;
 
-                para = merge(para, new Node(c));
+                para = insert_back(para, c);
 
                 n--;
             }
 
             NodePair a = split(tree, k);
             tree = merge(merge(a.first, para), a.second);
-            // show(tree);
         }
 
         t--;
