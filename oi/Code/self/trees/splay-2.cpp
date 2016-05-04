@@ -87,16 +87,19 @@ int main() {
     while (cin >> command) {
         switch (command) {
             case 'A':
+                // puts("A");
                 cin >> key >> value;
                 tree = insert(tree, key, value);
 
                 break;
             case 'D':
+                // puts("D");
                 cin >> key;
                 // tree = remove(tree, key);
 
                 break;
             case 'Q':
+                // puts("Q");
                 cin >> key;
                 cout << query(tree, key) << "\n";
 
