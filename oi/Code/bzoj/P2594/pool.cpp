@@ -232,23 +232,7 @@ static void link(int x, int y) {
     connect(x, y);
 }
 
-inline int father(int x) {
-    splay(x);
-    if (left[x] > 0) {
-        int f = left[x];
-        while (right[f] > 0) {
-            f = right[f];
-        }  // while
-
-        splay(f);
-        return f;
-    } else {
-        return -parent[x];
-    }
-}
-
-static void cut(int x) {
-    int f = father(x);
+static void cut(int x, int f) {
     assert(f != 0);
 
     access(f);
@@ -418,8 +402,8 @@ int main() {
                 int b = edges[target].v;
 
                 make_root(mid);
-                cut(a);
-                cut(b);
+                cut(a, mid);
+                cut(b, mid);
 
                 make_root(v);
                 link(u, e + n);
