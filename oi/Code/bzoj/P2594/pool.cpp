@@ -148,6 +148,7 @@ static void clear_marks(int x) {
     pushdown(x);
 }
 
+static int temp[NMAX + MMAX + 10];
 static void splay(int x) {
     clear_marks(x);
 
