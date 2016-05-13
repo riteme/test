@@ -34,12 +34,24 @@ using namespace std;
 
 static int n, m, q;
 
+#define BUFFER_SIZE 1024
+static unsigned _i = BUFFER_SIZE;
+static char buffer[BUFFER_SIZE];
+inline char get_char() {
+    if (_i == BUFFER_SIZE) {
+        _i = 0;
+        fread(buffer, 1, BUFFER_SIZE, stdin);
+    }
+
+    return buffer[_i++];
+}
+
 inline int readint() {
-    char ch = getchar();
-    for (; ch > '9' || ch < '0'; ch = getchar())
+    char ch = get_char();
+    for (; ch > '9' || ch < '0'; ch = get_char())
         ;
     int tmp = 0;
-    for (; '0' <= ch && ch <= '9'; ch = getchar())
+    for (; '0' <= ch && ch <= '9'; ch = get_char())
         tmp = tmp * 10 + int(ch) - 48;
     return tmp;
 }
@@ -58,11 +70,11 @@ static bool reversed[NMAX + MMAX + 10];
 static int maxedge[NMAX + MMAX + 10];
 
 static void initialize_lct() {
-    memset(parent, 0, sizeof(parent));
-    memset(left, 0, sizeof(left));
-    memset(right, 0, sizeof(right));
-    memset(reversed, false, sizeof(reversed));
-    memset(maxedge, 0, sizeof(maxedge));
+    // memset(parent, 0, sizeof(parent));
+    // memset(left, 0, sizeof(left));
+    // memset(right, 0, sizeof(right));
+    // memset(reversed, false, sizeof(reversed));
+    // memset(maxedge, 0, sizeof(maxedge));
 }
 
 inline void pushdown(int x) {
@@ -101,7 +113,7 @@ inline void update(int x) {
     if (x > n) {
         int e = x - n;
 
-        if (edges[e].w > edges[maxedge[x]].w || maxedge[x] == 0) {
+        if (edges[e].w > edges[maxedge[x]].w /*|| maxedge[x] == 0*/) {
             maxedge[x] = e;
         }
     }
@@ -129,8 +141,8 @@ static void left_rotate(int x) {
     parent[y] = parent[x];
     parent[x] = y;
 
-    update(x);
-    update(y);
+    // update(x);
+    // update(y);
 }
 
 static void right_rotate(int x) {
@@ -155,8 +167,8 @@ static void right_rotate(int x) {
     parent[y] = parent[x];
     parent[x] = y;
 
-    update(x);
-    update(y);
+    // update(x);
+    // update(y);
 }
 
 static void clear_marks(int x) {
@@ -167,7 +179,6 @@ static void clear_marks(int x) {
     pushdown(x);
 }
 
-static int temp[NMAX + MMAX + 10];
 static void splay(int x) {
     clear_marks(x);
 
@@ -181,6 +192,8 @@ static void splay(int x) {
             } else {
                 right_rotate(p1);
             }
+
+            update(p1);
         } else {
             if (left[p1] == x) {
                 if (left[p2] == p1) {
@@ -199,46 +212,31 @@ static void splay(int x) {
                     right_rotate(p1);
                 }
             }
+
+            update(p2);
+            update(p1);
         }
     }  // while
-}
 
-inline void connect(int x, int y) {
-    assert(x > 0);
-    assert(y > 0);
-    assert(right[x] == 0);
-    assert(parent[y] <= 0);
-    assert(!reversed[x]);
-
-    right[x] = y;
-    parent[y] = x;
     update(x);
-}
-
-inline void disconnect(int x) {
-    assert(x > 0);
-    assert(parent[x] <= 0);  // Splayed
-    assert(!reversed[x]);
-
-    if (right[x] > 0) {
-        parent[right[x]] = -x;
-        right[x] = 0;
-        update(x);
-    }
 }
 
 static void access(int x) {
     assert(x > 0);
 
     splay(x);
-    disconnect(x);
+    parent[right[x]] = -x;
+    right[x] = 0;
+    update(x);
     while (parent[x] != 0) {
         int top = -parent[x];
 
         assert(top > 0);
         splay(top);
-        disconnect(top);
-        connect(top, x);
+        parent[right[top]] = -top;
+        parent[x] = top;
+        right[top] = x;
+        update(top);
 
         x = top;
     }  // while
@@ -249,7 +247,10 @@ static void link(int x, int y) {
 
     access(x);
     splay(y);
-    connect(x, y);
+    // connect(x, y);
+    right[x] = y;
+    parent[y] = x;
+    update(x);
 }
 
 static void cut(int x, int f) {
@@ -278,10 +279,10 @@ static vector<IntPair> hb[MMAX + 10];
 
 inline void set_id(int x, int y, int id) {
     if (x > y) {
-        swap(x, y);
+        hb[y].push_back(IntPair(x, id));
+    } else {
+        hb[x].push_back(IntPair(y, id));
     }
-
-    hb[x].push_back(make_pair(y, id));
 }
 
 inline int find_id(int x, int y) {
@@ -289,7 +290,7 @@ inline int find_id(int x, int y) {
         swap(x, y);
     }
 
-    for (unsigned i = 0; i < hb[x].size(); i++) {
+    for (int i = 0; i < hb[x].size(); i++) {
         if (hb[x][i].first == y) {
             return hb[x][i].second;
         }
@@ -323,7 +324,7 @@ static void read_graph() {
 }
 
 static void read_operations() {
-    memset(disabled, false, sizeof(disabled));
+    // memset(disabled, false, sizeof(disabled));
     for (int i = 1; i <= q; i++) {
         op[i].id = readint();
         op[i].a = readint();
@@ -383,7 +384,7 @@ static void initialize() {
 }
 
 static int stack[QMAX + 10];
-static int stacksize = 0;
+static int stacksize = 1;
 
 inline void push(int x) {
     stack[stacksize++] = x;
@@ -433,7 +434,7 @@ int main() {
         // print();
     }  // for
 
-    while (stacksize > 0) {
+    while (stacksize > 1) {
         printf("%d\n", pop());
     }  // while
 

@@ -8,8 +8,8 @@
 
 using namespace std;
 
-#define NMAX 200
-#define MMAX 1000
+#define NMAX 1000
+#define MMAX 10000
 
 struct Edge {
     int u;
@@ -103,9 +103,9 @@ void dinic() {
 }
 
 void initialize() {
-    for (int i = 1; i <= n; i++) {
-        G[i].clear();
-    }  // for
+    // for (int i = 1; i <= n; i++) {
+    //     G[i].clear();
+    // }  // for
 
     for (int i = 1; i <= m; i++) {
         int u, v;
@@ -132,16 +132,15 @@ void initialize() {
 }
 
 int main() {
-    freopen("dinic.in", "r", stdin);
-    freopen("dinic.out", "w", stdout);
+    freopen("networkflow.in", "r", stdin);
+    freopen("networkflow.out", "w", stdout);
 
-    while (scanf("%d%d", &n, &m) != EOF) {
-        initialize();
+    scanf("%d%d", &n, &m);
+    initialize();
 
-        dinic();
+    dinic();
 
-        printf("%d\n", answer);
-    }  // while
+    printf("%d\n", answer);
 
     fclose(stdin);
     fclose(stdout);
