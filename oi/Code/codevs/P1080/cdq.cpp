@@ -12,17 +12,15 @@ using namespace std;
 #define OP_ADD 1
 #define OP_QUERY 2
 
-typedef long long ntype;
-
 struct Operation {
     int type;
     int a;
-    ntype b;
-    ntype result;
+    int b;
+    int result;
 };  // struct Operation
 
 static int n, q;
-static ntype sum[NMAX + 10];
+static int sum[NMAX + 10];
 static Operation op[QMAX + 10];
 static Operation *a[QMAX + 10];
 static Operation *s[QMAX + 10];
@@ -30,23 +28,22 @@ static Operation *s[QMAX + 10];
 static void initialize() {
     scanf("%d", &n);
     for (int i = 1; i <= n; i++) {
-        scanf("%lld", sum + i);
+        scanf("%d", sum + i);
         sum[i] += sum[i - 1];
     }  // for
 
     scanf("%d", &q);
     for (int i = 1; i <= q; i++) {
         scanf("%d", &op[i].type);
-        scanf("%d%lld", &op[i].a, &op[i].b);
+        scanf("%d%d", &op[i].a, &op[i].b);
 
         a[i] = &op[i];
     }  // for
 }
 
 static void solve(int left, int right) {
-    if (right <= left) {
+    if (right <= left)
         return;
-    }
 
     int mid = (left + right) / 2;
     solve(left, mid);
@@ -80,15 +77,14 @@ static void solve(int left, int right) {
     j = mid + 1;
     int k = left;
     while (k <= right) {
-        if (i > mid) {
+        if (i > mid)
             a[k++] = s[j++];
-        } else if (j > right) {
+        else if (j > right)
             a[k++] = s[i++];
-        } else if (s[i]->type < s[j]->type) {
+        else if (s[i]->type < s[j]->type)
             a[k++] = s[i++];
-        } else {
+        else
             a[k++] = s[j++];
-        }
     }  // while
 }
 
@@ -98,7 +94,7 @@ int main() {
     solve(1, q);
     for (int i = 1; i <= q; i++) {
         if (op[i].type == OP_QUERY) {
-            printf("%lld\n", op[i].result + sum[op[i].b] - sum[op[i].a - 1]);
+            printf("%d\n", op[i].result + sum[op[i].b] - sum[op[i].a - 1]);
         }
     }  // for
 
