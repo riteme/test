@@ -10,8 +10,6 @@ using namespace std;
 #define NMAX 100000
 #define LOGN 20
 
-#define INVALID_SAY "They have disappeared."
-
 struct Edge {
     int u;
     int v;
@@ -304,10 +302,10 @@ inline void add_edge(int u, int v, int w) {
 
 static void read_graph() {
     for (int i = 0; i < n - 1; i++) {
-        int u, v, c;
-        scanf("%d%d%d", &u, &v, &c);
+        int u, v;
+        scanf("%d%d", &u, &v);
 
-        add_edge(u, v, c);
+        add_edge(u, v, 1);
     }  // for
 }
 
@@ -404,12 +402,8 @@ int main() {
         scanf("%s", command);
 
         switch (command[0]) {
-            case 'A': {
-                if (answer < 0) {
-                    puts(INVALID_SAY);
-                } else {
-                    printf("%d\n", answer);
-                }
+            case 'G': {
+                printf("%d\n", answer);
             } break;
             case 'C': {
                 int u;
