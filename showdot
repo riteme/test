@@ -8,7 +8,11 @@ if __name__ == "__main__":
         print("Usage: {} [DOT FILE]".format(sys.argv[0]))
         exit(1)
 
-    status = os.system("dot -Tsvg {} -o /tmp/showdot.tmp.svg".format(sys.argv[1]))
+    compiler = "dot"
+    if len(sys.argv) > 2:
+        compiler = sys.argv[2][1:]
+
+    status = os.system("{} -Tsvg {} -o /tmp/showdot.tmp.svg".format(compiler, sys.argv[1]))
 
     if not os.path.exists("/tmp/showdot.tmp.svg"):
         print("Can't process dot script.")
