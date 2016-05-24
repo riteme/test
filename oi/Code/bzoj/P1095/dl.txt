@@ -1,0 +1,27 @@
+<dl class="problem">
+<p>
+这是一个经典的入门问题，通过此问题，你可以学会如何使用该评测系统。
+</p>
+<h3>
+【问题描述】
+</h3>
+现在有两个实数，分别是A和B。请你从<span style="background-color:#CCCCCC;">文件</span>中读取A和B，计算它们的和A+B，并把它输出到文件中。（保留到整数）<br/>
+<h3>
+【输入格式】
+</h3>
+第一行：一个<strong>实数</strong>A<br/>
+第二行：一个<strong>实数</strong>B<br/>
+<h3>
+【输出格式】
+</h3>
+第一行：一个<strong>整数</strong>C = A+B<br/>
+<h3>
+【输入样例】
+</h3>
+<pre>1
+2</pre>
+<h3>
+【输出样例】
+</h3>
+<pre>3
+</pre></dl>
