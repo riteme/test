@@ -41,12 +41,12 @@ static void set_root(int x) {
 }
 
 static int cnt;
-static int seq[NMAX * 3];
-static int depth[NMAX * 3];
+static int seq[NMAX * 2];
+static int depth[NMAX * 2];
 static int pos[NMAX + 10];
 
-#define LOGN 15
-static int st[NMAX * 3][LOGN + 1];
+#define LOGN 14
+static int st[NMAX * 2][LOGN + 1];
 
 static bool cmp(const int a, const int b) {
     return depth[a] < depth[b];

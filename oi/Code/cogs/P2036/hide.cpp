@@ -83,6 +83,77 @@ static int size[NMAX + 10];
 static int maxsize[NMAX + 10];
 static bool marked[NMAX + 10];
 
+#define LOGN 21
+static int cnt;
+static int seq[NMAX * 2];
+static int depth[NMAX * 2];
+static int pos[NMAX + 10];
+static int dist[NMAX + 10];
+static int st[NMAX + 10][LOGN + 1];
+
+static void travel(int x, int d) {
+    marked[x] = true;
+    seq[++cnt] = x;
+    depth[cnt] = dist[x] = d;
+    if (pos[x] == 0)
+        pos[x] = cnt;
+
+    for (unsigned i = 0; i < G[x].size(); i++) {
+        int v = G[x].size();
+
+        if (not marked[v]) {
+            travel(v, d + 1);
+            seq[cnt] = x;
+            depth[cnt] = d;
+        }
+    }  // for
+
+    marked[x] = false;
+}
+
+static bool cmp(const int a, const int b) {
+    return depth[a] < depth[b];
+}
+
+static void initialize_st() {
+    for (int i = 1; i <= cnt; i++) {
+        st[i][0] = i;
+    }  // for
+
+    for (int j = 1; j <= LOGN; j++) {
+        for (int i = 1; i <= cnt; i++) {
+            int next = i + (1 << (j - 1));
+            if (next <= cnt) {
+                st[i][j] = min(st[i][j - 1], st[next][j - 1], cmp);
+            }
+        }  // for
+    }      // for
+}
+
+static int query_min(int left, int right) {
+    if (left == right) {
+        return depth[left];
+    } else {
+        int len = right - left + 1;
+        int k = 0;
+        while (len >> (k + 1) > 0)
+            k++;
+        return min(st[left][k], st[right - (1 << k) + 1][k], cmp);
+    }
+}
+
+static int lca(int u, int v) {
+    if (depth[u] < depth[v]) {
+        swap(u, v);
+    }
+
+    return seq[query_min(pos[u], pos[v])];
+}
+
+static int get_distance(int u, int v) {
+    return dist[u] + dist[v] - 2 * dist[lca(u, v)];
+}
+
 static void update_size(int x) {
     marked[x] = true;
     size[x] = 1;
@@ -169,11 +240,11 @@ static int setup(int x) {
 static void turn_on(int x) {
     blackcnt--;
 
+    int ox = x;
     heap1[x].pop(0);
-
-    int d = 1;
     while (father[x]) {
         int f = father[x];
+        int d = get_distance(ox, f);
 
         heap1[f].pop(d);
         if (heap2[f].top() == d) {
@@ -181,12 +252,23 @@ static void turn_on(int x) {
         }
 
         x = f;
-        d++;
     }  // while
 }
 
 static void turn_off(int x) {
     blackcnt++;
+
+    heap1[x].push(0);
+    while (father[x]) {
+        int f = father[x];
+        int d = get_distance(f, x);
+
+        heap1[f].push(d);
+        if (heap1[f].top() < d) {
+        }
+
+        x = f;
+    }  // while
 }
 
 inline void add_edge(int u, int v) {
@@ -208,6 +290,9 @@ static void initialize() {
 
 int main() {
     initialize();
+    travel(1, 0);
+    initialize_st();
+    setup(1);
 
     scanf("%d", &m);
     char buffer[10];
