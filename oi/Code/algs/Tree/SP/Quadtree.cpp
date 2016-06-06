@@ -44,7 +44,6 @@ struct Node {
 static int n;
 static int maxheight;
 static Point points[1000100];
-static Point *a[1000100];
 static Point *aux[1000100];
 static Point *q1[1000100], *q2[1000100], *q3[1000100], *q4[1000100];
 
@@ -56,7 +55,7 @@ static Node *build(int left, int right, int depth) {
         maxheight = max(maxheight, depth);
 
         Node *x = new Node;
-        Point *p = a[left];
+        Point *p = aux[left];
 
         x->point = p;
         x->space = { p->x, p->x, p->y, p->y };
@@ -64,9 +63,6 @@ static Node *build(int left, int right, int depth) {
 
         return x;
     }
-
-    for (int i = left; i <= right; i++)
-        aux[i] = a[i];
 
     int current = (left + right) / 2;
     int minx = INT_MAX, maxx = INT_MIN, miny = INT_MAX, maxy = INT_MIN;
@@ -101,13 +97,13 @@ static Node *build(int left, int right, int depth) {
 
     int pos = left;
     for (int i = 1; i <= c1; i++, pos++)
-        a[pos] = q1[i];
+        aux[pos] = q1[i];
     for (int i = 1; i <= c2; i++, pos++)
-        a[pos] = q2[i];
+        aux[pos] = q2[i];
     for (int i = 1; i <= c3; i++, pos++)
-        a[pos] = q3[i];
+        aux[pos] = q3[i];
     for (int i = 1; i <= c4; i++, pos++)
-        a[pos] = q4[i];
+        aux[pos] = q4[i];
 
     x->NE = build(left, left + c1 - 1, depth + 1);
     x->NW = build(left + c1, left + c1 + c2 - 1, depth + 1);
@@ -144,10 +140,10 @@ int main() {
 
         points[i].x = x;
         points[i].y = y;
-        a[i] = points + i;
+        aux[i] = points + i;
     }  // for
 
-    sort(a + 1, a + n + 1);
+    sort(aux + 1, aux + n + 1);
     Node *tree = build(1, n, 1);
     puts("Construction completed.");
     printf("maxheight = %d\n", maxheight);

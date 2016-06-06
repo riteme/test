@@ -66,7 +66,7 @@ static int opcnt;
 static Operation op[NMAX];
 static int n;
 static Point points[NMAX];
-static Point *aux[NMAX], *q1[NMAX], *q2[NMAX], *q3[NMAX], *q4[NMAX];
+static Point *a[NMAX], *aux[NMAX], *q1[NMAX], *q2[NMAX], *q3[NMAX], *q4[NMAX];
 static Node *tree;
 
 static Node *build(int left, int right) {
@@ -76,11 +76,14 @@ static Node *build(int left, int right) {
     Node *x = new Node;
 
     if (left == right) {
-        x->point = aux[left];
+        x->point = a[left];
         x->space.set(x->point->x, x->point->x, x->point->y, x->point->y);
 
         return x;
     }
+
+    for (int i = left; i <= right; i++)
+        aux[i] = a[i];
 
     int current = (left + right) / 2;
     int midx = aux[current]->x, midy = aux[current]->y;
@@ -110,13 +113,13 @@ static Node *build(int left, int right) {
 
     int pos = left;
     for (int i = 1; i <= c1; i++, pos++)
-        aux[pos] = q1[i];
+        a[pos] = q1[i];
     for (int i = 1; i <= c2; i++, pos++)
-        aux[pos] = q2[i];
+        a[pos] = q2[i];
     for (int i = 1; i <= c3; i++, pos++)
-        aux[pos] = q3[i];
+        a[pos] = q3[i];
     for (int i = 1; i <= c4; i++, pos++)
-        aux[pos] = q4[i];
+        a[pos] = q4[i];
 
     x->NE = build(left, left + c1 - 1);
     x->NW = build(left + c1, left + c1 + c2 - 1);
@@ -174,10 +177,6 @@ inline Space make_space(int x1, int y1, int x2, int y2) {
     return sp;
 }
 
-static bool cmp(const Point *a, const Point *b) {
-    return *a == *b;
-}
-
 static void initialize() {
     int _;
     scanf("%d%d", &_, &_);
@@ -196,7 +195,7 @@ static void initialize() {
 
             points[++n].x = x;
             points[n].y = y;
-            aux[n] = &points[n];
+            a[n] = &points[n];
         } else {
             int x1, y1, x2, y2;
             scanf("%d%d%d%d", &x1, &y1, &x2, &y2);
@@ -210,8 +209,19 @@ static void initialize() {
         }
     }  // while
 
-    sort(aux + 1, aux + n + 1);
-    n = unique(aux + 1, aux + n + 1, cmp) - aux - 1;
+    sort(a + 1, a + n + 1);
+    int i = 2, j = 2;
+    while (j <= n) {
+        if (*a[j] == *a[j - 1]) {
+            n--;
+        } else {
+            a[i] = a[j];
+            i++;
+        }
+
+        j++;
+    }  // while
+
     tree = build(1, n);
 }
 
