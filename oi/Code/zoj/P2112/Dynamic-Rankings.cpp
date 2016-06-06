@@ -186,8 +186,8 @@ static void initialize() {
 }
 
 int main() {
-    freopen("dynrank.in", "r", stdin);
-    freopen("dynrank.out", "w", stdout);
+    // freopen("dynrank.in", "r", stdin);
+    // freopen("dynrank.out", "w", stdout);
     int t;
     scanf("%d", &t);
 

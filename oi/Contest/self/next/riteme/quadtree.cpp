@@ -6,21 +6,32 @@
 
 using namespace std;
 
-// #define QMAX 200000
-#define QMAX 30
+#define QMAX 200000
+// #define QMAX 30
 #define POINTS_MAX (QMAX * 4)
 
 typedef long long ntype;
 
 struct Point {
+    Point() {}
+    Point(int _x, int _y) : x(_x), y(_y) {}
+
     int x, y;
 
     bool operator<(const Point &p) const {
         return x < p.x || (x == p.x && y <= p.y);
     }
+
+    bool operator==(const Point &p) const {
+        return x == p.x && y == p.y;
+    }
 };  // struct Point
 
 struct Space {
+    Space() {}
+    Space(int _x1, int _x2, int _y1, int _y2)
+            : x1(_x1), x2(_x2), y1(_y1), y2(_y2) {}
+
     int x1, x2, y1, y2;
 
     void set(int _x1, int _x2, int _y1, int _y2) {
@@ -43,22 +54,52 @@ struct Space {
     }
 };  // struct Space
 
+struct Sum {
+    Sum() : xyw(0), xw(0), yw(0), w(0) {}
+    Sum(ntype _xyw, ntype _xw, ntype _yw, ntype _w)
+            : xyw(_xyw), xw(_xw), yw(_yw), w(_w) {}
+
+    ntype xyw, xw, yw, w;
+};  // struct Sum
+
 struct Node {
-    struct Sum {
-        Sum() {}
-
-        ntype xyw, yw, xw, w;
-    };  // struct Sum
-
     Node() : NE(NULL), NW(NULL), SW(NULL), SE(NULL) {}
 
     Space space;
     Point *point;
+    ntype w;
     Sum sum;
 
     Node *NE, *NW, *SW, *SE;
 };  // struct Node
 
+inline ntype sum_xyw(Node *x) {
+    return x ? x->sum.xyw : 0;
+}
+
+inline ntype sum_xw(Node *x) {
+    return x ? x->sum.xw : 0;
+}
+
+inline ntype sum_yw(Node *x) {
+    return x ? x->sum.yw : 0;
+}
+
+inline ntype sum_w(Node *x) {
+    return x ? x->sum.w : 0;
+}
+
+inline void update(Node *x) {
+    x->sum.w = sum_w(x->NE) + sum_w(x->NW) + sum_w(x->SW) + sum_w(x->SE) + x->w;
+    x->sum.xw = sum_xw(x->NE) + sum_xw(x->NW) + sum_xw(x->SW) + sum_xw(x->SE) +
+                x->point->x * x->w;
+    x->sum.yw = sum_yw(x->NE) + sum_yw(x->NW) + sum_yw(x->SW) + sum_yw(x->SE) +
+                x->point->y * x->w;
+    x->sum.xyw = sum_xyw(x->NE) + sum_xyw(x->NW) + sum_xyw(x->SW) +
+                 sum_xyw(x->SE) + x->point->x * x->point->y * x->w;
+}
+
+static int cnt;
 static Point points[POINTS_MAX + 10];
 static Point *aux[POINTS_MAX + 10];
 static Point *q1[POINTS_MAX + 10], *q2[POINTS_MAX + 10], *q3[POINTS_MAX + 10],
@@ -121,3 +162,127 @@ static Node *build(int left, int right) {
 
     return x;
 }
+
+static void modify(Node *x, const Point &p, ntype delta) {
+    if (!x || !x->space.contain(p))
+        return;
+
+    if (*x->point == p)
+        x->w += delta;
+    else {
+        modify(x->NE, p, delta);
+        modify(x->NW, p, delta);
+        modify(x->SW, p, delta);
+        modify(x->SE, p, delta);
+    }
+
+    update(x);
+}
+
+static Sum query(Node *x, const Point &p) {
+    if (!x || (x->space.x2 < p.x && x->space.y2 < p.y))
+        return Sum(0, 0, 0, 0);
+    if (p.x <= x->space.x1 && p.y <= x->space.y1)
+        return x->sum;
+
+    Sum s1 = query(x->NE, p);
+    Sum s2 = query(x->NW, p);
+    Sum s3 = query(x->SW, p);
+    Sum s4 = query(x->SE, p);
+    Sum s;
+    s.xyw = s1.xyw + s2.xyw + s3.xyw + s4.xyw;
+    s.xw = s1.xw + s2.xw + s3.xw + s4.xw;
+    s.yw = s1.yw + s2.yw + s3.yw + s4.yw;
+    s.w = s1.w + s2.w + s3.w + s4.w;
+
+    if (p.x <= x->point->x && p.y <= x->point->y) {
+        s.w += x->w;
+        s.xw += x->point->x * x->w;
+        s.yw += x->point->y * x->w;
+        s.xyw += x->point->x * x->point->y * x->w;
+    }
+
+    return s;
+}
+
+enum CommandType { COMM_ADD = 1, COMM_QUERY = 2 };  // enum CommandType
+
+struct Command {
+    CommandType type;
+    int x1, x2, y1, y2;
+    ntype v;
+};  // struct Command
+
+static int q;
+static Command ops[QMAX + 10];
+static Node *tree;
+
+static void initialize() {
+    int _;
+    scanf("%d%d", &_, &_);
+
+    while (true) {
+        int command;
+        scanf("%d", &command);
+
+        if (command == 3)
+            break;
+
+        q++;
+        scanf("%d%d%d%d", &ops[q].x1, &ops[q].y1, &ops[q].x2, &ops[q].y2);
+        if (command == 1) {
+            scanf("%lld", &ops[q].v);
+            ops[q].type = COMM_ADD;
+
+            points[++cnt] = Point(ops[q].x1 - 1, ops[q].y1 - 1);
+            points[++cnt] = Point(ops[q].x1 - 1, ops[q].y2);
+            points[++cnt] = Point(ops[q].x2, ops[q].y1 - 1);
+            points[++cnt] = Point(ops[q].x2, ops[q].y2);
+        } else {
+            ops[q].type = COMM_QUERY;
+        }
+    }  // while
+
+    sort(points + 1, points + cnt + 1);
+    cnt = unique(points + 1, points + cnt + 1) - points - 1;
+    for (int i = 1; i <= cnt; i++) {
+        aux[i] = points + i;
+    }  // for
+
+    tree = build(1, cnt);
+}
+
+inline ntype evaluate(const Point &p) {
+    Sum s = query(tree, p);
+
+    return s.xyw - (p.x - 1) * s.yw - (p.y - 1) * s.xw +
+           (p.x - 1) * (p.y - 1) * s.w;
+}
+
+int main() {
+    freopen("data.in", "r", stdin);
+    freopen("quadtree.out", "w", stdout);
+    initialize();
+
+    for (int i = 1; i <= q; i++) {
+        Command &op = ops[i];
+
+        if (op.type == COMM_ADD) {
+            modify(tree, Point(op.x1 - 1, op.y1 - 1), op.v);
+            modify(tree, Point(op.x1 - 1, op.y2), -op.v);
+            modify(tree, Point(op.x2, op.y1 - 1), -op.v);
+            modify(tree, Point(op.x2, op.y2), op.v);
+        } else {
+            ntype answer = evaluate(Point(op.x1, op.y1)) -
+                           evaluate(Point(op.x2 + 1, op.y1)) -
+                           evaluate(Point(op.x1, op.y2 + 1)) +
+                           evaluate(Point(op.x2 + 1, op.y2 + 1));
+
+            printf("%lld\n", answer);
+        }
+    }  // for
+
+    fclose(stdin);
+    fclose(stdout);
+    return 0;
+}  // function main
