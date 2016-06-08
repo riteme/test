@@ -7,13 +7,10 @@
 using namespace std;
 
 #define NMAX 200000
+// #define NMAX 30
 
 struct Point {
     int x, y;
-
-    bool operator<(const Point &p) const {
-        return x < p.x || (x == p.x && y <= p.y);
-    }
 
     bool operator==(const Point &p) const {
         return x == p.x && y == p.y;
@@ -47,6 +44,7 @@ struct Node {
     int id;
     Space space;
     Point *point;
+    int value;
     int sum;
 
     Node *left, *right;
@@ -64,7 +62,7 @@ static int opcnt;
 static Operation op[NMAX];
 static int n;
 static Point points[NMAX];
-static Point *aux[NMAX], *q1[NMAX], *q2[NMAX], *q3[NMAX], *q4[NMAX];
+static Point *aux[NMAX];
 static Node *tree;
 
 #define AXIS_X 1
@@ -74,11 +72,11 @@ inline int next_axis(int id) {
 }
 
 static bool cmp_x(const Point *a, const Point *b) {
-    return a->x < b->x;
+    return a->x < b->x || (a->x == b->x && a->y < b->y);
 }
 
 static bool cmp_y(const Point *a, const Point *b) {
-    return a->y < b->y;
+    return a->y < b->y || (a->y == b->y && a->x < b->x);
 }
 
 static Node *build(int left, int right, int axis) {
@@ -86,14 +84,68 @@ static Node *build(int left, int right, int axis) {
         return NULL;
 
     int mid = (left + right) / 2;
+    Node *x = new Node;
+    x->id = axis;
+
     if (axis == AXIS_X) {
         sort(aux + left, aux + right + 1, cmp_x);
+    } else {
+        sort(aux + left, aux + right + 1, cmp_y);
     }
+
+    int minx = INT_MAX, maxx = INT_MIN, miny = INT_MAX, maxy = INT_MIN;
+    for (int i = left; i <= right; i++) {
+        minx = min(minx, aux[i]->x);
+        maxx = max(maxx, aux[i]->x);
+        miny = min(miny, aux[i]->y);
+        maxy = max(maxy, aux[i]->y);
+    }  // for
+    x->space.set(minx, maxx, miny, maxy);
+
+    x->point = aux[mid];
+    x->sum = x->value = 0;
+    x->left = build(left, mid - 1, next_axis(axis));
+    x->right = build(mid + 1, right, next_axis(axis));
+
+    return x;
 }
 
-static void modify(Node *x, const Point &p, int v) {}
+static void modify(Node *x, const Point &p, int v) {
+    if (!x)
+        return;
+    if (*x->point == p) {
+        x->value += v;
+        x->sum += v;
 
-static int query(Node *x, const Space &sp) {}
+        return;
+    }
+
+    if (x->id == AXIS_X) {
+        if (cmp_x(&p, x->point)) {
+            modify(x->left, p, v);
+        } else {
+            modify(x->right, p, v);
+        }
+    } else {
+        if (cmp_y(&p, x->point)) {
+            modify(x->left, p, v);
+        } else {
+            modify(x->right, p, v);
+        }
+    }
+
+    x->sum += v;
+}
+
+static int query(Node *x, const Space &sp) {
+    if (!x || x->space.out(sp))
+        return 0;
+    if (x->space.in(sp))
+        return x->sum;
+
+    return query(x->left, sp) + query(x->right, sp) +
+           (sp.contain(*x->point) ? x->value : 0);
+}
 
 inline Point make_point(int x, int y) {
     Point p;
@@ -148,7 +200,7 @@ static void initialize() {
 
     sort(aux + 1, aux + n + 1);
     n = unique(aux + 1, aux + n + 1, cmp) - aux - 1;
-    tree = build(1, n);
+    tree = build(1, n, 1);
 }
 
 int main() {
