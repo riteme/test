@@ -1,8 +1,4 @@
-#
-## 刷题
-Mokia(COGS P1752): [Quadtree]
-Dynamic Rankings(ZOJ P2112): [Segment] [Divide]
+### 2016-6-9
+#### 刷题
 
-## 算法
-Quadtree
-Range Quadtree
+#### 算法
