@@ -13,6 +13,9 @@ using namespace std;
 
 static int n, L;
 static vector<int> G[NMAX + LMAX + 10];
+static int matched[NMAX + LMAX + 10];
+static bool marked[NMAX + LMAX + 10];
+static int cnt;
 
 inline void add_edge(int u, int v) {
     G[u].push_back(v);
@@ -32,9 +35,6 @@ static void initialize() {
             add_edge(i, n + b);
     }  // for
 }
-
-static int matched[NMAX + LMAX + 10];
-static bool marked[NMAX + LMAX + 10];
 
 static bool dfs(int u) {
     marked[u] = true;
@@ -62,7 +62,7 @@ static bool dfs(int u) {
 }
 
 static int match() {
-    int answer = 0;
+    int answer = cnt;
 
     for (int i = 1; i <= n; i++) {
         if (matched[i] == 0) {
