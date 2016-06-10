@@ -18,6 +18,7 @@ struct Node {
         memset(children, NULL, sizeof(children));
     }
 
+    char c;
     int count;
     int id;
     Node *children[CMAX];
@@ -30,27 +31,28 @@ static int answer[NMAX + 10];
 static char buffer[NMAX + 10][BUFFERSIZE];
 
 static void insert(const char *buffer) {
-    unsigned pos = 0;
     Node *current = trie;
-    while (buffer[pos] != '\0') {
-        unsigned i = buffer[pos++] - 'a';
-
-        if (!current->children[i])
+    for (unsigned pos = 0; buffer[pos] != '\0'; pos++) {
+        unsigned i = buffer[pos] - 'a';
+        if (!current->children[i]) {
             current->children[i] = new Node;
+            current->children[i]->c = buffer[pos];
+        }
 
         current = current->children[i];
-    }  // while
+    }  // for
 
     current->id = ansid;
 }
 
 static void construct_automaton() {
+    trie->fail = trie;
     queue<Node *> q;
 
     for (unsigned i = 0; i < CMAX; i++) {
         if (trie->children[i]) {
-            q.push(trie->children[i]);
             trie->children[i]->fail = trie;
+            q.push(trie->children[i]);
         }
     }
 
@@ -59,30 +61,34 @@ static void construct_automaton() {
         q.pop();
 
         for (unsigned i = 0; i < CMAX; i++) {
-            if (!x->children[i])
-                continue;
+            if (x->children[i]) {
+                Node *v = x->children[i];
+                Node *y = x->fail;
+                while (y != trie) {
+                    if (y->children[i]) {
+                        v->fail = y->children[i];
+                        break;
+                    }
+                    y = y->fail;
+                }
 
-            Node *next = x->children[i];
-            Node *p = x->fail;
-            do {
-                if (p->children[i]) {
-                    p = p->children[i];
-                    break;
-                } else
-                    p = p->fail;
-            } while (p != trie);
+                if (v->fail == NULL) {
+                    if (trie->children[i])
+                        v->fail = trie->children[i];
+                    else
+                        v->fail = trie;
+                }
 
-            next->fail = p;
-            q.push(next);
+                q.push(v);
+            }
         }
-    }
+    }  // while
 }
 
 static void initialize() {
     scanf("%d", &n);
 
     trie = new Node;
-    trie->fail = trie;
 
     for (int i = 0; i < n; i++) {
         scanf("%s", &buffer[++ansid][0]);
@@ -105,8 +111,8 @@ static void dfs(Node *x) {
 }
 
 int main() {
-    // freopen("ACautomata.in", "r", stdin);
-    // freopen("ACautomata.out", "w", stdout);
+    freopen("ACautomata.in", "r", stdin);
+    freopen("ACautomata.out", "w", stdout);
     initialize();
 
     char c = getchar();
@@ -116,7 +122,6 @@ int main() {
     Node *x = trie;
     while ('a' <= c && c <= 'z') {
         unsigned i = c - 'a';
-        c = getchar();
 
         while (x != trie && !x->children[i])
             x = x->fail;
@@ -126,9 +131,12 @@ int main() {
 
         Node *y = x;
         while (y != trie) {
-            y->count++;
+            if (y->id > 0)
+                y->count++;
             y = y->fail;
         }
+
+        c = getchar();
     }
 
     dfs(trie);

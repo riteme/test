@@ -40,9 +40,8 @@ static void insert(const char *buffer) {
     Node *current = trie;
     for (unsigned pos = 0; buffer[pos] != '\0'; pos++) {
         unsigned i = buffer[pos] - 'a';
-        if (!current->children[i]) {
+        if (!current->children[i])
             current->children[i] = allocate();
-        }
 
         current = current->children[i];
     }  // for
@@ -69,12 +68,14 @@ static void build_automaton() {
             if (x->children[i]) {
                 Node *v = x->children[i];
 
-                for (Node *y = x->fail; y != trie; y = y->fail) {
+                Node *y = x->fail;
+                do {
                     if (y->children[i]) {
                         v->fail = y->children[i];
                         break;
                     }
-                }  // for
+                    y = y->fail;
+                } while (y != trie);  // do ... while
 
                 if (v->fail == NULL)
                     v->fail = trie;
@@ -122,12 +123,9 @@ int main() {
                 x = x->children[i];
 
             Node *y = x;
-            while (y != trie) {
-                if (y->count > 0) {
-                    answer += y->count;
-                    y->count = 0;
-                }
-
+            while (y->count > 0) {
+                answer += y->count;
+                y->count = 0;
                 y = y->fail;
             }
         }  // for
