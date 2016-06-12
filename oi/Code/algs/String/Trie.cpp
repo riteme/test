@@ -45,7 +45,7 @@ static void print(Node *x, stringstream &buffer) {
     buffer << x->id << "[label=\"" << x->c << "\"];";
     for (unsigned i = 0; i < CMAX; i++) {
         if (x->next[i]) {
-            buffer << x->id << "->" << x->next[i]->id << ";";
+            buffer << x->id << "->" << x->next[i]->id << "[rank=0];";
             print(x->next[i], buffer);
         }
     }  // for
