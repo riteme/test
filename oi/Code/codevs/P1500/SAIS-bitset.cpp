@@ -4,6 +4,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <climits>
+#include <bitset>
 #include <algorithm>
 
 using namespace std;
@@ -30,28 +31,18 @@ inline unsigned long read_string(char *dest) {
     return read;
 }
 
-#define MEMORYSIZE 20000000
-static int _memory[MEMORYSIZE];
-static size_t _memcnt = 0;
-void *operator new(std::size_t size) {
-    int *mem = _memory + _memcnt;
-    _memcnt += size;
-    return mem;
-}
+#define BUFFERSIZE 100010
 
-#define BUFFERSIZE 150000
-
+typedef bitset<BUFFERSIZE> BitsetType;
 static char buffer[BUFFERSIZE];
 static int str[BUFFERSIZE];
 
-#define L_TYPE 0
-#define S_TYPE 1
-
-inline bool is_lms_char(int *type, int x) {
-    return x > 0 && type[x] == S_TYPE && type[x - 1] == L_TYPE;
+inline bool is_lms_char(BitsetType *type, int x) {
+    // return x > 0 && type[x] == S_TYPE && type[x - 1] == L_TYPE;
+    return x > 0 && (*type)[x] && !(*type)[x - 1];
 }
 
-inline bool equal_substring(int *S, int x, int y, int *type) {
+inline bool equal_substring(int *S, int x, int y, BitsetType *type) {
     do {
         if (S[x] != S[y])
             return false;
@@ -61,21 +52,23 @@ inline bool equal_substring(int *S, int x, int y, int *type) {
     return S[x] == S[y];
 }
 
-inline void induced_sort(int *S, int *SA, int *type, int *bucket, int *lbucket,
-                         int *sbucket, int n, int SIGMA) {
+inline void induced_sort(int *S, int *SA, BitsetType *type, int *bucket,
+                         int *lbucket, int *sbucket, int n, int SIGMA) {
     for (int i = 0; i <= n; i++)
-        if (SA[i] > 0 && type[SA[i] - 1] == L_TYPE)
+        // if (SA[i] > 0 && type[SA[i] - 1] == L_TYPE)
+        if (SA[i] > 0 && !(*type)[SA[i] - 1])
             SA[lbucket[S[SA[i] - 1]]++] = SA[i] - 1;
     for (int i = 1; i <= SIGMA; i++)  // Reset S-type bucket
         sbucket[i] = bucket[i] - 1;
     for (int i = n; i >= 0; i--)
-        if (SA[i] > 0 && type[SA[i] - 1] == S_TYPE)
+        // if (SA[i] > 0 && type[SA[i] - 1] == S_TYPE)
+        if (SA[i] > 0 && (*type)[SA[i] - 1])
             SA[sbucket[S[SA[i] - 1]]--] = SA[i] - 1;
 }
 
 static int *sort_suffix(int *S, int length, int SIGMA) {
     int n = length - 1;
-    int *type = new int[n + 1];
+    BitsetType *type = new BitsetType;
     int *position = new int[n + 1];
     int *name = new int[n + 1];
     int *SA = new int[n + 1];
@@ -92,19 +85,16 @@ static int *sort_suffix(int *S, int length, int SIGMA) {
         sbucket[i] = bucket[i] - 1;
     }
 
-    type[n] = S_TYPE;
+    type->set(n);
     for (int i = n - 1; i >= 0; i--) {
-        if (S[i] < S[i + 1])
-            type[i] = S_TYPE;
-        else if (S[i] > S[i + 1])
-            type[i] = L_TYPE;
-        else
-            type[i] = type[i + 1];
+        if (S[i] < S[i + 1] || (S[i] == S[i + 1] && (*type)[i + 1]))
+            type->set(i);
     }
 
     int cnt = 0;
     for (int i = 1; i <= n; i++)
-        if (type[i] == S_TYPE && type[i - 1] == L_TYPE)
+        // if (type[i] == S_TYPE && type[i - 1] == L_TYPE)
+        if ((*type)[i] && !(*type)[i - 1])
             position[cnt++] = i;
 
     fill(SA, SA + n + 1, -1);

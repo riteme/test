@@ -128,15 +128,15 @@ static int *sort_suffix(int *S, int length, int SIGMA) {
 }
 
 int main() {
-    int length;
-    scanf("%d%s", &length, buffer);
+    scanf("%s", buffer);
+    int length = strlen(buffer);
     buffer[length] = '$';
 
     for (int i = 0; i <= length; i++)
         str[i] = buffer[i];
     int *SA = sort_suffix(str, length + 1, 256);
     for (int i = 1; i <= length; i++)
-        printf("%d\n", SA[i] + 1);
+        printf("%d ", SA[i]);
 
     return 0;
 }  // function main
