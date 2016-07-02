@@ -6,7 +6,7 @@
 using namespace std;
 using namespace ri;
 
-FormatConfig logConfig;
+// FormatConfig logConfig;
 DefaultFormatter logFormatter;
 DefaultWriter logWriter;
 Logger logger;
@@ -17,8 +17,8 @@ SDL_GLContext context;
 bool flag = true;
 
 void initialize() {
-    logConfig.SetThreadName("Main Thread");
-    logFormatter.SetConfig(logConfig);
+    // logConfig.SetThreadName("Main Thread");
+    logFormatter.SetCurrentThreadName("Main Thread");
     logger.AttachFormatter(&logFormatter);
     logger.AttachWriter(&logWriter);
 

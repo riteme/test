@@ -13,7 +13,7 @@ using std::ofstream;
 
 typedef long long longint;
 
-#define BUFFER_MAXSIZE 2048
+#define BUFFER_MAXSIZE 1000000
 #define LEXEME_SIZE 4
 #define MOD 1000000007
 
@@ -76,8 +76,8 @@ void write_to(const ExpNode *tree, stringstream &buffer);
 void show(const ExpNode *tree);
 
 int main() {
-    // freopen("expression.in", "r", stdin);
-    // freopen("expression.out", "w", stdout);
+    freopen("expression.in", "r", stdin);
+    freopen("expression.out", "w", stdout);
     static char buffer[BUFFER_MAXSIZE];
 
     while (scanf("%s", buffer) != EOF) {
