@@ -76,8 +76,10 @@ void write_to(const ExpNode *tree, stringstream &buffer);
 void show(const ExpNode *tree);
 
 int main() {
+#ifndef NO_FILE_IO
     freopen("expression.in", "r", stdin);
     freopen("expression.out", "w", stdout);
+#endif  // IFNDEF NO_FILE_IO
     static char buffer[BUFFER_MAXSIZE];
 
     while (scanf("%s", buffer) != EOF) {
@@ -88,8 +90,10 @@ int main() {
         printf("%lld\n", tree->true_count);
     }  // while
 
+#ifndef NO_FILE_IO
     fclose(stdin);
     fclose(stdout);
+#endif  // IFNDEF NO_FILE_IO
     return 0;
 }  // function main
 
@@ -119,10 +123,10 @@ void dp(ExpNode *x) {
             x->false_count = x->left->false_count * x->right->false_count;
             break;
         case EXP_XOR:
-            x->true_count = x->left->true_count * x->right->true_count +
-                            x->left->false_count * x->right->false_count;
-            x->false_count = x->left->true_count * x->right->false_count +
-                             x->left->false_count * x->right->true_count;
+            x->true_count = x->left->true_count * x->right->false_count +
+                            x->left->false_count * x->right->true_count;
+            x->false_count = x->left->true_count * x->right->true_count +
+                             x->left->false_count * x->right->false_count;
             break;
     }  // switch to x->type
 
