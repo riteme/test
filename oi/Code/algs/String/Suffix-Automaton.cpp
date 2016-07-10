@@ -13,19 +13,18 @@ using namespace std;
 #define SIGMA 256
 
 struct State {
-    State() : id(0), main_transition('\0'), suffix_link(this) {
+    State() : id(0), length(0), suffix_link(NULL) {
         memset(transitions, NULL, sizeof(transitions));
     }
 
     int id;
-    char main_transition;
+    int length;
     State *suffix_link;
     State *transitions[SIGMA];
 };  // struct State
 
 static State *build_suffix_automaton(const char *buffer) {
     static int idcnt = 0;
-    static int subidcnt = 99;
     State *first = new State;  // empty string suffix automaton
     State *last = first;
 
@@ -33,42 +32,53 @@ static State *build_suffix_automaton(const char *buffer) {
         char chr = buffer[p];
         printf("Constructing %c...\n", chr);
 
-        // Construct main chain
+        // Construct new state
         State *nxt = new State;
 
-        // Setup suffix link
         // Add transitions for each acceptable states
-        // at the same time
+        // Find the first one who has transition on `chr`
         State *x = last;
-        do {
+        while (x && x->transitions[chr] == NULL) {
+            x->transitions[chr] = nxt;
             x = x->suffix_link;
-            if (x->transitions[chr] != NULL) {
-                x = x->transitions[chr];
-                break;
-            } else {
-                // Determine whether to split state
-                if (x->suffix_link->transitions[x->main_transition] == x &&
-                    x->id - 1 != x->suffix_link->id) {
-                    printf("%d, %d\n", x->id, x->suffix_link->id);
-                    State *newstate = new State;
-                    *newstate = *x;
-                    x->suffix_link->transitions[x->main_transition] = newstate;
-                    x->suffix_link = newstate;
-                    newstate->transitions[chr] = nxt;
-                    newstate->id = ++subidcnt;
-                    x = newstate;
-                } else
-                    x->transitions[chr] = nxt;
-            }
-        } while (x != first);  // do ... while
-        nxt->suffix_link = x;
+        }  // while
 
-        // Add transition
-        last->transitions[chr] = nxt;
-        nxt->main_transition = chr;
+        // When x is nullptr, we reached the head of automaton
+        if (!x)
+            nxt->suffix_link = first;
+        else {
+            // x now point to the last one who has the `chr` transition
+            if (x->length + 1 != x->transitions[chr]->length) {
+                puts("233");
+                State *target = x->transitions[chr];
+                State *newstate = new State;
+
+                // Setup next's suffix link
+                nxt->suffix_link = newstate;
+
+                // Copy the target state
+                *newstate = *target;
+                newstate->id = ++idcnt;
+
+                // Reset suffix links
+                newstate->suffix_link = target->suffix_link;
+                target->suffix_link = newstate;
+
+                // `newstate` is `x`'s neighbor
+                newstate->length = x->length + 1;
+
+                // Reset transitions
+                while (x && x->transitions[chr] == target) {
+                    x->transitions[chr] = newstate;
+                    x = x->suffix_link;
+                }  // while
+            } else
+                nxt->suffix_link = x->transitions[chr];
+        }
 
         // Reset last state
         nxt->id = ++idcnt;
+        nxt->length = last->length + 1;
         last = nxt;
     }  // for
 
@@ -84,12 +94,16 @@ static void print(State *x, stringstream &buffer) {
         return;
     marked[x->id] = true;
 
+    buffer << x->id << "[label=\"" << x->length << "\"];";
     for (unsigned c = 0; c < SIGMA; c++) {
         if (x->transitions[c] != NULL)
             buffer << x->id << "->" << x->transitions[c]->id << "[label=\""
                    << char(c) << "\" style=bold];";
     }  // for
-    // buffer << x->id << "->" << x->suffix_link->id << "[style=dashed];";
+    // if (x->suffix_link)
+    //     buffer << x->id << "->" << x->suffix_link->id << "[style=dashed];";
+    // else
+    //     buffer << x->id << "->" << x->id << "[style=dashed];";
 
     for (unsigned c = 0; c < SIGMA; c++) {
         if (x->transitions[c] != NULL)
@@ -99,16 +113,16 @@ static void print(State *x, stringstream &buffer) {
 
 static void show(State *x) {
     stringstream buffer;
-    buffer << "digraph{node[shape=circle];";
+    buffer << "digraph{ordering=out;node[shape=circle];";
 
-    // State *y = x;
-    // buffer << "{rank=same;";
-    // buffer << y->id << ";";
-    // for (unsigned p = 0; data[p] != '\0'; p++) {
-    //     y = y->transitions[data[p]];
-    //     buffer << y->id << ";";
-    // }  // for
-    // buffer << "}";
+    State *y = x;
+    buffer << "{rank=same;";
+    buffer << y->id << ";";
+    for (unsigned p = 0; data[p] != '\0'; p++) {
+        y = y->transitions[data[p]];
+        buffer << y->id << ";";
+    }  // for
+    buffer << "}";
 
     memset(marked, false, sizeof(marked));
     print(x, buffer);
@@ -118,7 +132,7 @@ static void show(State *x) {
     ofstream file("/tmp/suffixautomata.tmp.dot");
     file << buffer.str();
     file.close();
-    system("showdot /tmp/suffixautomata.tmp.dot =dot &");
+    system("showdot /tmp/suffixautomata.tmp.dot -dot &");
 }
 
 int main() {
