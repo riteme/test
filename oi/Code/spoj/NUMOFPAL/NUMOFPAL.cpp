@@ -1,6 +1,8 @@
 /**
  * Palindrome Tree
  * Accepted
+ * NOTICE!: Counting occurance here is wrong
+ *     See UOJ P103 instead
  */
 
 #define NDEBUG
