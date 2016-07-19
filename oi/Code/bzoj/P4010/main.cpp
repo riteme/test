@@ -75,7 +75,7 @@ int main() {
     while (d > 0) {
 	initialize();
 	topological_sort();
-
+    
         if (!flag) {
             printf("Impossible!\n");
         } else {
