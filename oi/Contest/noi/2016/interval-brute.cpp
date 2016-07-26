@@ -35,6 +35,7 @@ struct Interval {
 
 #define NMAX 500000
 #define MMAX 200000
+#define AMAX 1000000
 
 static int n, m;
 static Interval interval[NMAX + 10];
@@ -52,11 +53,42 @@ static void initialize() {
     }  // for
 }
 
+static int answer = INT_MAX;
+static int cnt[AMAX + 10];
+
+static void dfs(int x, int maxl, int minl) {
+    if (x > n) {
+        if (minl < 0)
+            return;
+        if (any_of(cnt, cnt + AMAX + 1, [](const int a) { return a >= m; })) {
+            answer = min(answer, maxl - minl);
+        }
+        return;
+    }
+
+    dfs(x + 1, maxl, minl);
+
+    for (int i = interval[x].left; i <= interval[x].right; i++)
+        cnt[i]++;
+
+    dfs(x + 1, max(maxl, interval[x].length), min(minl, interval[x].length));
+
+    for (int i = interval[x].left; i <= interval[x].right; i++)
+        cnt[i]--;
+}
+
 int main() {
     // freopen("interval.in", "r", stdin);
     // freopen("interval.out", "w", stdout);
     initialize();
     TRACE
+
+    dfs(1, INT_MIN, INT_MAX);
+
+    if (answer == INT_MAX)
+        puts("-1");
+    else
+        printf("%d\n", answer);
 
     fclose(stdin);
     fclose(stdout);

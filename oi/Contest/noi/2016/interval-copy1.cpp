@@ -24,7 +24,7 @@ using namespace std;
 typedef long long int64;
 typedef long double float128;
 
-#define BUFFERSIZE 25565
+#define BUFFERSIZE 4096
 static size_t _pos = BUFFERSIZE;
 static char _buffer[BUFFERSIZE];
 
@@ -43,7 +43,7 @@ inline int readint() {
 
     while (c < '0' || c > '9')
         c = _getchar();
-    while ('0' <= c && c <= '9') {
+    while ('0' <= c && c <= '9a') {
         x = x * 10 + (c - '0');
         c = _getchar();
     }
@@ -61,9 +61,9 @@ struct Interval {
 };  // struct Interval
 
 struct Node {
-    Node()
-            : left(0)
-            , right(0)
+    Node(int _left, int _right)
+            : left(_left)
+            , right(_right)
             , value(0)
             , mark(0)
             , leftchild(NULL)
@@ -75,14 +75,6 @@ struct Node {
     int mark;
     Node *leftchild, *rightchild;
 };  // struct Node
-
-#define MEMSIZE 2000000
-static Node memory[MEMSIZE];
-static size_t memcnt = 0;
-
-inline Node *allocate() {
-    return &memory[memcnt++];
-}
 
 #define NMAX 500000
 #define MMAX 200000
@@ -96,7 +88,11 @@ static Node *tree;
 
 inline int value_of(Node *x) {
     assert(x);
-    return x->value + x->mark;
+
+    if (x->mark == 0)
+        return x->value;
+    else
+        return x->value + x->mark;
 }
 
 inline void pushdown(Node *x) {
@@ -125,14 +121,11 @@ inline void update(Node *x) {
 static Node *build(int left, int right) {
     assert(left <= right);
 
-    Node *x = allocate();
-    x->left = left;
-    x->right = right;
-    if (left == right) {
-        // return new Node(left, left);
-        return x;
-    } else {
+    if (left == right)
+        return new Node(left, left);
+    else {
         int mid = (left + right) / 2;
+        Node *x = new Node(left, right);
         x->leftchild = build(left, mid);
         x->rightchild = build(mid + 1, right);
         return x;
@@ -218,11 +211,8 @@ static bool test(int ans) {
         if (value_of(tree) >= m)
             return true;
 
-        int stdlen = interval[i].length;
-        while (interval[i].length == stdlen) {
-            modify(tree, interval[i].left, interval[i].right, -1);
-            i++;
-        }
+        modify(tree, interval[i].left, interval[i].right, -1);
+        i++;
     } while (j < n);  // do ... while
 
     return false;
