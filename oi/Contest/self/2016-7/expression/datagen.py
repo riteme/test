@@ -5,6 +5,8 @@ import sys
 from random import *
 
 N = 100000
+T = 3
+NOTN = 2
 no_not = False
 no_brackets = False
 only_or = False
@@ -17,13 +19,17 @@ if "--only-or" in sys.argv:
     only_or = True
 if "-n100" in sys.argv:
     N = 100
+if "-t5" in sys.argv:
+    T = 5
+if "-not1" in sys.argv:
+    NOTN = 1
 
 def random_name():
     rlen = randint(1, 4)
     return "".join([chr(randint(ord("a"), ord("z"))) for i in range(0, rlen)])
 
 def random_not():
-    return "!" * randint(0, 2)
+    return "!" * randint(0, NOTN)
 
 def random_op():
     global only_or
@@ -81,6 +87,5 @@ def generate():
 
     print("".join(S))
 
-generate()
-generate()
-generate()
+for i in range(0, T):
+    generate()
