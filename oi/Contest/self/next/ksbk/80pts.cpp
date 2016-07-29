@@ -7,15 +7,44 @@
 
 using namespace std;
 
-#define NMAX 1000000
-#define KMAX LLONG_MAX
+#define INPUT_BUFFERSIZE 4096
+static size_t _pos = INPUT_BUFFERSIZE;
+static char _buffer[INPUT_BUFFERSIZE];
 
-typedef long long int64;
+inline char _getchar() {
+    if (_pos == INPUT_BUFFERSIZE) {
+        _pos = 0;
+        fread(_buffer, 1, INPUT_BUFFERSIZE, stdin);
+    }
+
+    return _buffer[_pos++];
+}
+
+template <typename T>
+inline T read() {
+    T x = 0;
+    char c = _getchar();
+
+    while (c < '0' || c > '9')
+        c = _getchar();
+    while ('0' <= c && c <= '9') {
+        x = x * 10 + (c - '0');
+        c = _getchar();
+    }
+
+    return x;
+}
+
+#define NMAX 10000000
+
+typedef unsigned long long uint64;
 
 static int n;
-static int64 k;
+static uint64 k;
 static int a[NMAX + 10];
 static int b[NMAX + 10];
+static bool marked[NMAX + 10];
+static uint64 length = 1;
 
 static int top_distance[NMAX + 10];
 static int top_pos[NMAX + 10];
@@ -35,14 +64,12 @@ struct Matrix {
 
         return *this;
     }
-
-    void print() {
-        for (int i = 1; i <= n; i++)
-            printf("%d\n", left_distance[i]);
-    }
 };  // struct Matrix
 
-static void quick_pow(Matrix &a, int64 b, Matrix &output) {
+static Matrix p;
+static Matrix pk;
+
+static void quick_pow(Matrix &a, uint64 b, Matrix &output) {
     while (b > 0) {
         if (b % 2 == 1)
             output *= a;
@@ -51,29 +78,32 @@ static void quick_pow(Matrix &a, int64 b, Matrix &output) {
     }  // while
 }
 
-static void generate(Matrix &a) {
+inline void generate(Matrix &a) {
     for (int i = 1; i <= n; i++)
         a.left_distance[i] = i;
 }
 
 int main() {
-    scanf("%d%lld", &n, &k);
-    for (int i = 1; i <= n; i++)
-        scanf("%d", a + i);
-    for (int i = 1; i <= n; i++)
-        scanf("%d", b + i);
-    k %= n;
+    freopen("ksbk.in", "r", stdin);
+    freopen("ksbk.out", "w", stdout);
 
-    Matrix p;
+    n = read<int>();
+    k = read<uint64>();
+    for (int i = 1; i <= n; i++)
+        a[i] = read<int>();
+    for (int i = 1; i <= n; i++)
+        b[i] = read<int>();
+
     for (int i = 1; i <= n; i++)
         p.left_distance[b[i]] = i;
 
-    Matrix pk;
     generate(pk);
     quick_pow(p, k, pk);
 
     for (int i = 1; i <= n; i++)
         printf("%d ", a[pk.left_distance[i]]);
 
+    fclose(stdin);
+    fclose(stdout);
     return 0;
 }  // function main

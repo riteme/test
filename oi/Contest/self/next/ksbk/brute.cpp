@@ -19,6 +19,9 @@ static int b[NMAX + 10];
 static int p[NMAX + 10];
 
 int main() {
+    freopen("ksbk.in", "r", stdin);
+    freopen("ksbk-brute.out", "w", stdout);
+
     scanf("%d%lld", &n, &k);
     for (int i = 1; i <= n; i++)
         scanf("%d", a + i);
@@ -28,7 +31,7 @@ int main() {
     int *current = b, *last = a;
     for (int64 j = 1; j <= k; j++) {
         for (int i = 1; i <= n; i++)
-            current[i] = last[p[i]];
+            current[p[i]] = last[i];
 
         swap(current, last);
     }  // for
@@ -36,5 +39,7 @@ int main() {
     for (int i = 1; i <= n; i++)
         printf("%d ", last[i]);
 
+    fclose(stdin);
+    fclose(stdout);
     return 0;
 }  // function main

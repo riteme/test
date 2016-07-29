@@ -130,7 +130,8 @@ static void correct(int left, int right, const Vector2 &u, const Vector2 &v) {
         if (Y1[i] <= y && y <= Y2[i]) {
             P[i] = y;
         } else if (y < Y1[i]) {
-            if (!marked[i + 1] && almost_equal(Y1[i], Y1[i + 1]))
+            if (!marked[i + 1] && u.y >= Y1[i] &&
+                almost_equal(Y1[i], Y1[i + 1]))
                 i++;
 
             P[i] = Y1[i];
@@ -140,7 +141,8 @@ static void correct(int left, int right, const Vector2 &u, const Vector2 &v) {
             correct(i + 1, right, Vector2(X[i], Y1[i]), v);
             return;
         } else {  // y > Y2[i]
-            if (!marked[i + 1] && almost_equal(Y2[i], Y2[i + 1]))
+            if (!marked[i + 1] && u.y <= Y2[i] &&
+                almost_equal(Y2[i], Y2[i + 1]))
                 i++;
 
             P[i] = Y2[i];
@@ -156,17 +158,20 @@ static void correct(int left, int right, const Vector2 &u, const Vector2 &v) {
 int main() {
     initialize();
 
+    if (s.x > t.x)
+        swap(s, t);
+
     int i = 1, j = n - 1;
     while (X[i] < s.x)
         i++;
     while (X[j] > t.x)
         j--;
 
-    if (i < j)
-        i++, j--;
-
     // DEBUG("i = %d, j = %d\n", i, j);
     correct(i, j, s, t);
+
+    // for (int k = i; k <= j; k++)
+    // printf("(%lf, %lf)\n", X[k], P[k]);
 
     double dist = 0.0;
     for (int k = i; k < j; k++)
