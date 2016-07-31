@@ -1,14 +1,6 @@
-// #define NDEBUG
+#define NDEBUG
 
-#include <cassert>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <climits>
-#include <cmath>
-#include <cctype>
-#include <vector>
-#include <algorithm>
+#include <bits/stdc++.h>
 
 using namespace std;
 
@@ -65,11 +57,7 @@ struct Vector2 {
     friend Vector2 operator*(const Vector2 &a, const double &b);
 
     bool operator<(const Vector2 &b) const {
-        return x < b.x;
-    }
-
-    bool operator==(const Vector2 &b) const {
-        return x == b.x && y == b.y;
+        return x < b.x || (x == b.x && y < b.y);
     }
 };  // struct Vector2
 
@@ -129,12 +117,6 @@ static struct MyRandom {
 } randint;
 
 struct Treap {
-    Treap()
-            : left(NULL)
-            , right(NULL)
-            , prev(this)
-            , next(this)
-            , weight(randint()) {}
     Treap(const Vector2 &p)
             : vec(p)
             , left(NULL)
@@ -171,14 +153,12 @@ inline Treap *right_rotate(Treap *x) {
     return y;
 }
 
-template <typename TCompare = std::less<Vector2>>
-static Treap *insert(Treap *x, const Vector2 &p,
-                     const TCompare &cmp = TCompare()) {
+static Treap *insert(Treap *x, const Vector2 &p) {
     if (!x)
         return new Treap(p);
 
-    if (cmp(p, x->vec)) {
-        x->left = insert(x->left, p, cmp);
+    if (p.x < x->vec.x) {
+        x->left = insert(x->left, p);
 
         if (x->left->prev == x->left) {
             x->prev->next = x->left;
@@ -190,7 +170,7 @@ static Treap *insert(Treap *x, const Vector2 &p,
         if (x->left->weight < x->weight)
             return left_rotate(x);
     } else {
-        x->right = insert(x->right, p, cmp);
+        x->right = insert(x->right, p);
 
         if (x->right->prev == x->right) {
             x->right->next = x->next;
@@ -221,7 +201,7 @@ static Treap *remove(Treap *x) {
             return y;
         }
     } else {
-        printf("remove: Removed (%lf, %lf)\n", x->vec.x, x->vec.y);
+        // printf("remove: Removed (%lf, %lf)\n", x->vec.x, x->vec.y);
 
         Treap *y = x->left ? x->left : x->right;
         x->prev->next = x->next;
@@ -233,34 +213,30 @@ static Treap *remove(Treap *x) {
     }
 }
 
-template <typename TCompare = std::less<Vector2>>
-static Treap *remove(Treap *x, const Vector2 &p,
-                     const TCompare &cmp = TCompare()) {
+static Treap *remove(Treap *x, const Vector2 &p) {
     if (!x)
         return NULL;
 
-    if (p == x->vec)
-        return remove(x);
-    else if (cmp(p, x->vec))
-        x->left = remove(x->left, p, cmp);
+    else if (p.x < x->vec.x)
+        x->left = remove(x->left, p);
+    else if (p.x > x->vec.x)
+        x->right = remove(x->right, p);
     else
-        x->right = remove(x->right, p, cmp);
+        return remove(x);
 
     return x;
 }
 
-template <typename TCompare = std::less<Vector2>>
-static Treap *query(Treap *x, const Vector2 &p,
-                    const TCompare &cmp = TCompare()) {
+static Treap *query(Treap *x, const Vector2 &p) {
     if (!x)
         return NULL;
 
-    if (p == x->vec)
-        return x;
-    if (cmp(p, x->vec))
-        return query(x->left, p, cmp);
+    if (p.x < x->vec.x)
+        return query(x->left, p);
+    else if (p.x > x->vec.x)
+        return query(x->right, p);
     else
-        return query(x->right, p, cmp);
+        return x;
 }
 
 static Treap *lowerbound(Treap *x, const Vector2 &p) {
@@ -294,33 +270,22 @@ static Treap *max_node(Treap *x) {
 // Convex Hull //
 /////////////////
 
-static auto incy = [](const Vector2 &a, const Vector2 &b) {
-    return a.x < b.x || (a.x == b.x && a.y < b.y);
-};
-
-static auto decy = [](const Vector2 &a, const Vector2 &b) {
-    return a.x < b.x || (a.x == b.x && a.y > b.y);
-};
-
 class ConvexHull {
  public:
     /**
      * Must initialize with a non-degerative triangle.
      */
-    ConvexHull(const Vector2 &p1, const Vector2 &p2, const Vector2 &p3) {
+    ConvexHull(const Vector2 &p1, const Vector2 &p2, const Vector2 &p3)
+            : up(NULL), down(NULL) {
         Vector2 sorted[] = { p1, p2, p3 };
-        sort(begin(sorted), end(sorted), incy);
+        sort(sorted, sorted + 3);
 
-        left = sorted[0];
-        right = sorted[2];
-
-        up = insert(up, left);
-        up = insert(up, right);
-        down = insert(down, left);
-        down = insert(down, right);
-
-        right_maxy = right_miny = right.y;
-
+        left = sorted[0].x;
+        right = sorted[2].x;
+        up = insert(up, sorted[0]);
+        up = insert(up, sorted[2]);
+        down = insert(down, sorted[0]);
+        down = insert(down, sorted[2]);
         insert_point(sorted[1]);
     }
 
@@ -328,81 +293,91 @@ class ConvexHull {
         if (contain(p))
             return;
 
-        if (p.x < left.x) {
-            up = insert(up, p);
-            down = insert(down, p);
-
-            Treap *x = query(up, p);
-            while (turn(p, x->next->vec, x->next->next->vec) & (CCW | PARALLEL))
-                up = remove(up, x->next->vec);
-            x = query(down, p);
-            while (turn(p, x->next->vec, x->next->next->vec) & (CW | PARALLEL))
-                down = remove(down, x->next->vec);
-
-            left = p;
-        } else if (p.x > right.x) {
-            up = insert(up, p);
-            down = insert(down, p);
-
-            Treap *x = query(up, p);
-            while (turn(p, x->prev->vec, x->prev->prev->vec) & (CW | PARALLEL))
-                up = remove(up, x->prev->vec);
-            x = query(down, p);
-            while (turn(p, x->prev->vec, x->prev->prev->vec) & (CCW | PARALLEL))
-                down = remove(down, x->prev->vec);
-
-            right_maxy = right_miny = p.y;
-            right = p;
-        } else
-            _insert_point(p);
+        Vector2 &p1 = min_node(down)->vec;
+        Vector2 &p2 = max_node(down)->vec;
+        if (p.x < left || p.x > right) {
+            left = min(left, p.x);
+            right = max(right, p.x);
+            _insert_point_to_up(p);
+            _insert_point_to_down(p);
+        } else if (turn(p1, p2, p) == CCW)
+            _insert_point_to_up(p);
+        else
+            _insert_point_to_down(p);
     }
 
     bool contain(const Vector2 &p) {
-        if (p.x < left.x || p.x > right.x)
+        if (p.x < left || p.x > right)
             return false;
-        else if (almost_equal(p.x, right.x))
-            return right_miny <= p.y && p.y <= right_maxy;
-        else
+        else if (p.x == left) {
+            Treap *a = min_node(up);
+            Treap *b = min_node(down);
+
+            return b->vec.y <= p.y && p.y <= a->vec.y;
+        } else if (p.x == right) {
+            Treap *a = max_node(up);
+            Treap *b = max_node(down);
+
+            return b->vec.y <= p.y && p.y <= a->vec.y;
+        } else
             return _contain(p);
     }
 
  private:
     void _insert_point_to_up(const Vector2 &p) {
-        if (almost_equal(p.x, left.x))
-            up = insert(up, p, incy);
-        else
-            up = insert(up, p, decy);
+        // puts("insert: up");
 
         Treap *x = query(up, p);
-        while (turn(p, x->prev->vec, x->prev->prev->vec) & (CW | PARALLEL))
-            up = remove(up, x->prev->vec);
-        while (turn(p, x->next->vec, x->next->next->vec) & (CCW | PARALLEL))
-            up = remove(up, x->next->vec);
+        if (x)
+            x->vec = p;
+        else {
+            up = insert(up, p);
+            x = query(up, p);
+        }
+
+        assert(x);
+        assert(x != x->next);
+        assert(x != x->prev);
+
+        if (p.x > left) {
+            while (x != x->prev->prev &&
+                   turn(p, x->prev->vec, x->prev->prev->vec) & (CW | PARALLEL))
+                up = remove(up, x->prev->vec);
+        }
+
+        if (p.x < right) {
+            while (x != x->next->next &&
+                   turn(p, x->next->vec, x->next->next->vec) & (CCW | PARALLEL))
+                up = remove(up, x->next->vec);
+        }
     }
 
     void _insert_point_to_down(const Vector2 &p) {
-        if (almost_equal(p.x, left.x))
-            down = insert(down, p, decy);
-        else
-            down = insert(down, p, incy);
+        // puts("insert: down");
 
         Treap *x = query(down, p);
-        while (turn(p, x->prev->vec, x->prev->prev->vec) & (CCW | PARALLEL))
-            down = remove(down, x->prev->vec);
-        while (turn(p, x->next->vec, x->next->next->vec) & (CW | PARALLEL))
-            down = remove(down, x->next->vec);
-    }
-
-    void _insert_point(const Vector2 &p) {
-        if (almost_equal(p.x, right.x)) {
-            right_maxy = max(right_maxy, p.y);
-            right_miny = min(right_miny, p.y);
+        if (x)
+            x->vec = p;
+        else {
+            down = insert(down, p);
+            x = query(down, p);
         }
 
-        if (turn(left, right, p) == CCW)
-            _insert_point_to_up(p);
-        else
-            _insert_point_to_down(p);
+        assert(x);
+        assert(x != x->next);
+        assert(x != x->prev);
+
+        if (p.x > left) {
+            while (x != x->prev->prev &&
+                   turn(p, x->prev->vec, x->prev->prev->vec) & (CCW | PARALLEL))
+                down = remove(down, x->prev->vec);
+        }
+
+        if (p.x < right) {
+            while (x != x->next->next &&
+                   turn(p, x->next->vec, x->next->next->vec) & (CW | PARALLEL))
+                down = remove(down, x->next->vec);
+        }
     }
 
     bool _contain_test_up(const Vector2 &p) {
@@ -424,13 +399,14 @@ class ConvexHull {
     }
 
     bool _contain(const Vector2 &p) {
-        return turn(left, right, p) == CCW ? _contain_test_up(p)
-                                           : _contain_test_down(p);
+        Vector2 &p1 = min_node(down)->vec;
+        Vector2 &p2 = max_node(down)->vec;
+        return turn(p1, p2, p) == CCW ? _contain_test_up(p)
+                                      : _contain_test_down(p);
     }
 
     Treap *up, *down;
-    Vector2 left, right;
-    double right_maxy, right_miny;
+    double left, right;
 };  // class ConvexHull
 
 static int q;
@@ -461,7 +437,7 @@ int main() {
         else
             puts(convex->contain(Vector2(x, y)) ? "YES" : "NO");
 
-        printf("Completed %d %d %d.\n", type, x, y);
+        // printf("Completed %d %d %d.\n", type, x, y);
     }  // while
 
     return 0;
