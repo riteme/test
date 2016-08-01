@@ -100,8 +100,6 @@ inline Clockwise turn(const Vector2 &u, const Vector2 &v, const Vector2 &p) {
         return CW;
 }
 
-static Vector2 origin;
-
 ///////////
 // Treap //
 ///////////
