@@ -78,8 +78,8 @@ static void dfs(int x, int maxl, int minl) {
 }
 
 int main() {
-    // freopen("interval.in", "r", stdin);
-    // freopen("interval.out", "w", stdout);
+    freopen("interval.in", "r", stdin);
+    freopen("interval-brute.out", "w", stdout);
     initialize();
     TRACE
 

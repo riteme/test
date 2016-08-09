@@ -2,9 +2,9 @@
 
 from random import *
 
-NMAX = 200000
-MMAX = 20000
-AMAX = 1000000000
+NMAX = 1000
+MMAX = 1000
+AMAX = 1000
 
 
 def random_interval(left, right):

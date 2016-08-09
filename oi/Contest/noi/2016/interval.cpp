@@ -205,53 +205,29 @@ static void initialize() {
     tree = build(0, pcnt - 1);
 }
 
-static bool test(int ans) {
-    clear(tree);
-
-    int i = 1, j = 0;
-    do {
-        while (j < n && interval[j + 1].length - interval[i].length <= ans) {
-            j++;
-            modify(tree, interval[j].left, interval[j].right, 1);
-        }  // while
-
-        if (value_of(tree) >= m)
-            return true;
-
-        int stdlen = interval[i].length;
-        while (interval[i].length == stdlen) {
-            modify(tree, interval[i].left, interval[i].right, -1);
-            i++;
-        }
-    } while (j < n);  // do ... while
-
-    return false;
-}
-
 int main() {
     freopen("interval.in", "r", stdin);
     freopen("interval.out", "w", stdout);
     initialize();
     TRACE
 
-    int left = 0;
-    int right = maxlength + 1;
-    while (left + 1 < right) {
-        int mid = (left + right) / 2;
+    int answer = INT_MAX;
+    for (int i = 1, j = 0; i <= n; i++) {
+        while (j < n && value_of(tree) < m) {
+            j++;
+            modify(tree, interval[j].left, interval[j].right, 1);
+        }  // while
 
-        if (!test(mid))
-            left = mid;
-        else
-            right = mid;
-    }  // while
+        if (value_of(tree) >= m)
+            answer = min(answer, interval[j].length - interval[i].length);
 
-    if (left != right && !test(left))
-        left = right;
+        modify(tree, interval[i].left, interval[i].right, -1);
+    }  // for
 
-    if (left > maxlength)
+    if (answer >= INT_MAX)
         puts("-1");
     else
-        printf("%d\n", left);
+        printf("%d\n", answer);
 
     fclose(stdin);
     fclose(stdout);
