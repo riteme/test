@@ -1,10 +1,9 @@
-### 2016-6-19
+### 2016-8-11
 #### 刷题
-Milk Patterns(POJ 3261)
-Musical Theme(POJ 1743)
-Distinct Substrings(SPOJ)
-Palindrome(Ural 1297)
-Power Strings(POJ 2406)
+Division Expression (BZOJ P1385)
+同余方程 (Vijos P1781)
+Professor's task (Codeforces 70D) [scanline] [graham]
 
 #### 算法
-LCP Array
+扩展GCD
+数论基础（骆轩源）
