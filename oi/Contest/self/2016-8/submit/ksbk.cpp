@@ -1,9 +1,7 @@
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
-#include <climits>
-#include <vector>
-#include <algorithm>
+#define NDEBUG
+#pragma GCC optimize(3)
+
+#include <bits/stdc++.h>
 
 using namespace std;
 
@@ -35,7 +33,7 @@ inline T read() {
     return x;
 }
 
-#define NMAX 2000000
+#define NMAX 2500000
 
 typedef unsigned long long int64;
 
@@ -57,17 +55,14 @@ inline size_t mod(int a, int b) {
 }
 
 int main() {
-    freopen("ksbk.in", "r", stdin);
-    freopen("ksbk.out", "w", stdout);
+    // freopen("ksbk.in", "r", stdin);
+    // freopen("ksbk.out", "w", stdout);
 
-    // scanf("%d%lld", &n, &k);
     n = read<int>();
     k = read<int64>();
     for (int i = 1; i <= n; i++)
-        // scanf("%d", a + i);
         a[i] = read<int>();
     for (int i = 1; i <= n; i++)
-        // scanf("%d", p + i);
         p[i] = read<int>();
 
     for (int i = 1; i <= n; i++) {
