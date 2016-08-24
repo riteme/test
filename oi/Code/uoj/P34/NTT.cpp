@@ -131,8 +131,9 @@ int main() {
         // bout[i] %= MOD;
     }  // for
     ntt(bout, a, true);
+    int64 invn = inv(n, MOD);
     for (int i = 0; i < length; i++) {
-        a[i] *= inv(n, MOD);
+        a[i] *= invn;
         a[i] %= MOD;
     }  // for
     for (int i = 0; i < length; i++) {
