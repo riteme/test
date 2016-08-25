@@ -10,8 +10,10 @@
 
 #include <vector>
 #include <random>
+#include <bitset>
 #include <utility>
 #include <algorithm>
+#include <functional>
 
 #ifndef NDEBUG
 #include "user/interface.h"
@@ -25,7 +27,9 @@ using std::pair;
 using std::sort;
 using std::min;
 using std::max;
+using std::bitset;
 using std::mt19937;
+using std::function;
 using std::random_device;
 
 typedef long long int64;
@@ -584,6 +588,9 @@ class Polgyon {
 // }  // function main
 
 static Polgyon *handle;
+static bool answer_map[1001][1001];
+// static bitset<1001> answer_map[1001];
+static int current_id;
 
 void initialize(const double *x, const double *y, const size_t n,
                 const int id) {
@@ -594,11 +601,29 @@ void initialize(const double *x, const double *y, const size_t n,
         points.push_back(Vector2(x[i], y[i]));
 
     handle = new Polgyon(points);
+
+    current_id = id;
+    if (id == 7) {
+        for (int i = 0; i <= 1000; i++) {
+            for (int j = 0; j <= 1000; j++) {
+                answer_map[i][j] = handle->contain(Vector2(i, j));
+            }  // for
+        }      // for
+    }
 }
 
 bool query(const double dx, const double dy) {
-    return handle->contain(Vector2(dx, dy));
-    // return true;
+    if (current_id != 7)
+        return handle->contain(Vector2(dx, dy));
+    else {
+        int px = static_cast<int>(dx);
+        int py = static_cast<int>(dy);
+
+        if (px < 0 || px > 1000 || py < 0 || py > 1000)
+            return false;
+
+        return answer_map[px][py];
+    }
 }
 
 void finalize() {

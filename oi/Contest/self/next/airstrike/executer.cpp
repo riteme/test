@@ -12,6 +12,8 @@
 #include <chrono>
 #include <random>
 #include <bitset>
+#include <thread>
+#include <atomic>
 #include <utility>
 #include <algorithm>
 
@@ -21,19 +23,23 @@ using std::min;
 using std::max;
 using std::bitset;
 using std::vector;
+using std::thread;
+using std::atomic;
 using std::mt19937;
 using std::random_device;
 using std::random_device;
 using std::chrono::milliseconds;
+using std::chrono::microseconds;
 using std::chrono::duration_cast;
 using std::chrono::high_resolution_clock;
 
 #define INITIALIZE_TIMELIMIE 5000
 #define FINALIZE_TIMELIMIT 5000
-#define WRONG_SCORE 4
-#define BLOCKSIZE 500000
+#define WRONG_SCORE 1
+#define BLOCKSIZE 1000000
 
-#define DEBUG(message, ...) printf(message, __VA_ARGS__);
+// #define DEBUG(message, ...) printf(message, __VA_ARGS__);
+#define DEBUG
 
 typedef long long int64;
 
@@ -533,6 +539,16 @@ struct {
         double *y;
     } polygon;
 
+    struct {
+        int64 s1;
+        int64 s2;
+        int64 s3;
+        int64 s4;
+        int64 s5;
+    } level;
+
+    int64 fullscore;
+
     int64 timelimit;
 
     int64 passed_time = 0;
@@ -548,6 +564,9 @@ static void executer_initialize() {
     scanf("%d%d%d%d", &config.margin.left, &config.margin.right,
           &config.margin.top, &config.margin.bottom);
     scanf("%lld", &config.timelimit);
+    scanf("%lld%lld%lld%lld%lld", &config.level.s1, &config.level.s2,
+          &config.level.s3, &config.level.s4, &config.level.s5);
+    scanf("%lld", &config.fullscore);
 
     config.polygon.x = new double[config.n];
     config.polygon.y = new double[config.n];
@@ -579,7 +598,7 @@ static void executer_initialize() {
 
     Timer::tick();
     initialize(config.polygon.x, config.polygon.y, config.n, config.id);
-    if (Timer::elapsed()) {
+    if (Timer::elapsed() > INITIALIZE_TIMELIMIE) {
         printf("0 Initialization time limit exceeded.");
         exit(233);
     }
@@ -588,20 +607,41 @@ static void executer_initialize() {
 static void executer_finalize() {
     Timer::tick();
     finalize();
-    if (Timer::elapsed()) {
+    if (Timer::elapsed() > FINALIZE_TIMELIMIT) {
         printf("0 Finalization time limit exceeded.");
         exit(233);
     }
 
     delete[] config.polygon.x;
     delete[] config.polygon.y;
+
+    double ratio[] = { 0.2, 0.4, 0.6, 0.8, 1.0 };
+    double r = 0.0;
+    if (config.processed >= config.level.s1)
+        r = ratio[0];
+    if (config.processed >= config.level.s2)
+        r = ratio[1];
+    if (config.processed >= config.level.s3)
+        r = ratio[2];
+    if (config.processed >= config.level.s4)
+        r = ratio[3];
+    if (config.processed >= config.level.s5)
+        r = ratio[4];
+
+    int64 score =
+        max(0, static_cast<int>(static_cast<int64>(config.fullscore * r) -
+                                WRONG_SCORE * config.wrong));
+
+    printf("%lld processed = %lld, r = %.2lf, wrong = %lld\n", score,
+           config.processed, r, config.wrong);
 }
 
 static double qx[BLOCKSIZE];
 static double qy[BLOCKSIZE];
 static bitset<BLOCKSIZE> answer;
 static bitset<BLOCKSIZE> user;
-static int processed;
+static atomic<int64> processed;
+static atomic<bool> flag;
 
 static int executer_randint(int left, int right) {
     static random_device rd;
@@ -610,7 +650,15 @@ static int executer_randint(int left, int right) {
 }
 
 static void generate_querys() {
-    for (size_t i = 0; i < BLOCKSIZE; i++) {
+    for (size_t i = 0; i < 1000; i++) {
+        size_t p = executer_randint(0, config.n - 1);
+        int offest_x = executer_randint(-15, 15);
+        int offest_y = executer_randint(-15, 15);
+        qx[i] = config.polygon.x[p] + offest_x;
+        qy[i] = config.polygon.y[p] + offest_y;
+    }
+
+    for (size_t i = 1000; i < BLOCKSIZE; i++) {
         qx[i] = executer_randint(config.rect.left, config.rect.right);
         qy[i] = executer_randint(config.rect.bottom, config.rect.top);
     }  // for
@@ -627,17 +675,36 @@ static void query_standard() {
 static void query_user() {
     user.reset();
 
-    size_t pos = 0;
     int64 passed = config.passed_time;
+    atomic<size_t> pos(0);
     processed = 0;
+    flag = true;
+
+    thread runner = thread([&pos]() {
+        while (flag && pos < BLOCKSIZE) {
+            user[pos] = query(qx[pos], qy[pos]);
+
+            // int s = answer[pos];
+            // int u = user[pos];
+            // if (s != u)
+            //     printf("(%lf, %lf): answer = %d, user = %d\n", qx[pos],
+            //     qy[pos],
+            //            s, u);
+
+            pos++;
+        }
+    });
 
     Timer::tick();
     while (passed + Timer::elapsed() < config.timelimit && pos < BLOCKSIZE) {
-        user[pos] = query(qx[pos], qy[pos]);
-        pos++;
-        processed++;
+        // std::this_thread::sleep_for(microseconds(1));
     }  // while
     config.passed_time += Timer::elapsed();
+
+    processed.store(pos);
+    flag = false;
+
+    runner.join();
 }
 
 static void check() {
@@ -652,12 +719,13 @@ static void check() {
 
     config.wrong += answer.count();
     config.processed += processed;
-    DEBUG("config.processed = %lld\n", config.processed);
-    DEBUG("config.passed_time = %lld\n", config.passed_time);
+    // DEBUG("config.processed = %lld\n", config.processed);
+    // DEBUG("config.passed_time = %lld\n", config.passed_time);
 }
 
 int main() {
     executer_initialize();
+    atexit(executer_finalize);
 
     while (config.passed_time < config.timelimit) {
         generate_querys();
@@ -670,6 +738,5 @@ int main() {
     DEBUG("processed = %lld\n", config.processed);
     DEBUG("wrong = %lld\n", config.wrong);
 
-    executer_finalize();
     return 0;
 }  // function main
