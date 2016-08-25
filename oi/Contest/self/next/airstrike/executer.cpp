@@ -591,8 +591,9 @@ static void executer_initialize() {
     vector<Vector2> points;
     points.reserve(config.n);
 
-    for (size_t i = 0; i < config.n; i++)
+    for (size_t i = 0; i < config.n; i++) {
         points.push_back(Vector2(config.polygon.x[i], config.polygon.y[i]));
+    }
 
     standard = new Polgyon(points);
 
