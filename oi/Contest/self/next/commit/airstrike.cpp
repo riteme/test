@@ -1,49 +1,38 @@
-// Target program
-#include "airstrike.cpp"
+#define NDEBUG
+
+#define STD
 
 #include <cassert>
 #include <cstdio>
-#include <climits>
 #include <cstring>
 #include <cstdlib>
 #include <cmath>
 
 #include <vector>
-#include <chrono>
 #include <random>
 #include <bitset>
-#include <thread>
-#include <atomic>
 #include <utility>
 #include <algorithm>
+#include <functional>
 
+#ifndef NDEBUG
+#include "user/interface.h"
+#else
+#include "user/interface.h"
+// #include "interface.h"
+#endif  // IFNDEF NDEBUG
+
+using std::vector;
 using std::pair;
 using std::sort;
 using std::min;
 using std::max;
 using std::bitset;
-using std::vector;
-using std::thread;
-using std::atomic;
 using std::mt19937;
+using std::function;
 using std::random_device;
-using std::random_device;
-using std::chrono::milliseconds;
-using std::chrono::microseconds;
-using std::chrono::duration_cast;
-using std::chrono::high_resolution_clock;
-
-#define INITIALIZE_TIMELIMIE 3000
-#define FINALIZE_TIMELIMIT 3000
-#define WRONG_SCORE 1
-#define BLOCKSIZE 1000000
-
-// #define DEBUG(message, ...) printf(message, __VA_ARGS__);
-#define DEBUG
 
 typedef long long int64;
-
-#ifndef STD
 
 ////////////////////////
 // Vector computation //
@@ -126,9 +115,11 @@ inline int64 cross(const Vector2 &a, const Vector2 &b) noexcept {
 // Line objects //
 //////////////////
 
+// You can also regard it as a half-plane.
 struct Line {
     Line() : reversed(false) {}
     Line(const Vector2 &p1, const Vector2 &p2) {
+        // Store the points from left to right.
         if (p1.x < p2.x) {
             left = p1;
             right = p2;
@@ -162,6 +153,7 @@ struct Line {
     }
 
     bool is_in_range(const Vector2 &p) const {
+        // Sometimes it's from right to left.
         if (reversed)
             return is_lower(p);
         else
@@ -227,6 +219,7 @@ struct Treap {
     int weight;
 };  // struct Treap
 
+// Used for query_range
 typedef pair<Treap *, Treap *> TreapPair;
 
 inline Treap *left_rotate(Treap *x) {
@@ -274,6 +267,10 @@ static Treap *persistent_insert(Treap *h, Line *key, const TCompare &cmp) {
 
 static Treap *persistent_remove(Treap *h) {
     if (h->left != nullptr && h->right != nullptr) {
+        // If both children are alive.
+        // Select the one with the smallest weight
+        // rotate to the position.
+
         Treap *y;
         if (h->left->weight < h->right->weight) {
             h->left = new Treap(*h->left);
@@ -294,12 +291,15 @@ static Treap *persistent_remove(Treap *h) {
         if (h->right != nullptr)
             next = h->right;
 
+        // delete h;
+
         return next;
     }
 }
 
 template <typename TCompare>
 static Treap *persistent_remove(Treap *h, Line *key, const TCompare &cmp) {
+    // Make sure it searched.
     assert(h != nullptr);
 
     Treap *x = new Treap(*h);
@@ -330,6 +330,18 @@ inline TreapPair query_range(Treap *h, const Vector2 &p, const TCompare &cmp) {
 
     return result;
 }
+
+// static void print_tree(Treap *x) {
+//     if (!x)
+//         return;
+
+//     print_tree(x->left);
+
+//     printf("(%lld, %lld) - (%lld, %lld),\n", x->key->left.x, x->key->left.y,
+//            x->key->right.x, x->key->right.y);
+
+//     print_tree(x->right);
+// }
 
 enum class EventType : int {
     Enter = 1,
@@ -363,12 +375,16 @@ struct EventPoint {
 
 class Polgyon {
  public:
+    // Caution: remember to initialize `latest` to NULL.
+    // All the points must stored in countclockwise.
+    // Not support infinity size polgyon.
     Polgyon(const vector<Vector2> &points) : latest(nullptr) {
         // Speed up vector insert.
         x.reserve(points.size());
         edges.reserve(points.size());
         version.reserve(points.size());
 
+        // Each edge will insert into and remove from the treap.
         events.reserve(points.size() * 2);
 
         for (auto beg = points.begin(); beg != points.end(); beg++) {
@@ -384,10 +400,16 @@ class Polgyon {
             events.push_back(EventPoint(&edges.back(), EventType::Exit));
         }  // for
 
+        // Store all the x.
         sort(x.begin(), x.end());
         auto iter = std::unique(x.begin(), x.end());
         x.resize(std::distance(x.begin(), iter));
 
+        // Once upon a time, I found a data that caused `std::sort` access the
+        // `events.end()`
+        // And the program crashed.
+        // So I use `std::stable_sort` instead.
+        // I don't believe `std::sort` anymore. WTF.
         stable_sort(events.begin(),
                     events.end(),
                     [](const EventPoint &a, const EventPoint &b) {
@@ -396,17 +418,39 @@ class Polgyon {
                         int64 bx = b.type == EventType::Enter ? b.line->left.x
                                                               : b.line->right.x;
 
+                        // Since the new edges inserted into the tree
+                        // will make a mess on the order of
+                        // the original edges.
+                        // So we first remove the original edges.
+                        // In case the treap can't find the target edge
+                        // because of the changed order.
                         return ax < bx ||
                                (ax == bx && a.type == EventType::Exit);
                     });
+
+        // printf("x: ");
+        // for (auto &e : x) {
+        //     printf("%lld ", e);
+        // }  // foreach in x
+        // printf("\n");
+
+        // printf("Event Points: \n");
+        // for (auto &e : events) {
+        //     printf("(%lld, %lld) - (%lld, %lld): %d\n", e.line->left.x,
+        //            e.line->left.y, e.line->right.x, e.line->right.y,
+        //            (e.type == EventType::Enter ? 1 : 0));
+        // }  // foreach in events
 
         _scan_once();
     }
 
     bool contain(const Vector2 &p) const {
+        // Everybody can tell that this point is out of range.
         if (p.x < x.front() || p.x > x.back())
             return false;
 
+        // Search for the interval.
+        // No need to consider 0. This is an empty treap.
         size_t left = 1, right = x.size() - 1;
         while (left + 1 < right) {
             int mid = (left + right) / 2;
@@ -420,6 +464,9 @@ class Polgyon {
         if (left != right && x[left] <= p.x)
             left = right;
 
+        // Test it.
+        // Notice that p may located in the middle of
+        // two intervals.
         return _test(left, p) || (x[left - 1] == p.x && _test(left - 1, p));
     }
 
@@ -435,10 +482,12 @@ class Polgyon {
         Treap *x = result.first;
         Treap *y = result.second;
 
+        // On edge test
         if ((x != NULL && x->key->is_on_line(p)) ||
             (y != NULL && y->key->is_on_line(p)))
             return true;
 
+        // In range test
         return x != NULL && y != NULL && x->key->is_in_range(p) &&
                y->key->is_in_range(p);
     }
@@ -451,12 +500,23 @@ class Polgyon {
             int64 current = *pos;
             version.push_back(latest);
 
+            // print_tree(latest);
+            // printf("current = %lld\n", current);
+
+            // This compare function is a little complex.
             auto cmp = [](const Line *a, const Line *b) {
+                // Remember that a is not intersected with b
+                // except at an endpoint.
+
+                // a and b have common endpoints.
                 if (a->left == b->left)
                     return a->is_upper(b->right);
                 else if (a->right == b->right)
                     return a->is_upper(b->left);
 
+                // If the line of a (not segment) goes across b
+                // Then the line of b can do it.
+                // So swap them.
                 if ((a->is_upper(b->left) && a->is_lower(b->right)) ||
                     (a->is_lower(b->left) && a->is_upper(b->right)) ||
                     a->is_on_line(b->left) || a->is_on_line(b->right))
@@ -466,6 +526,7 @@ class Polgyon {
             };
 
             while (iter != events.end()) {
+                // Vertical edges is no use.
                 if (iter->line->is_vertical()) {
                     iter++;
                     continue;
@@ -474,6 +535,11 @@ class Polgyon {
                 if (current == (iter->type == EventType::Enter
                                     ? iter->line->left.x
                                     : iter->line->right.x)) {
+                    // printf("Processing (%lld, %lld) - (%lld, %lld): %d...\n",
+                    // iter->line->left.x, iter->line->left.y,
+                    // iter->line->right.x, iter->line->right.y,
+                    // (iter->type == EventType::Enter ? 1 : 0));
+
                     if (iter->type == EventType::Enter)
                         latest = persistent_insert(latest, iter->line, cmp);
                     else
@@ -495,249 +561,71 @@ class Polgyon {
     vector<Treap *> version;
 };  // class Polgyon
 
-#endif  // IFNDEF STD
+// int main() {
+//     // Test program.
 
-class Timer {
- public:
-    static void tick() {
-        _last = high_resolution_clock::now();
-    }
+//     int n;
+//     scanf("%d", &n);
 
-    static int64 elapsed() {
-        auto current = high_resolution_clock::now();
-        auto span = current - _last;
+//     vector<Vector2> points;
+//     for (int i = 0; i < n; i++) {
+//         int64 x, y;
+//         scanf("%lld%lld", &x, &y);
 
-        return duration_cast<milliseconds>(span).count();
-    }
+//         points.push_back(Vector2(x, y));
+//     }  // for
 
- private:
-    static high_resolution_clock::time_point _last;
-};  // class Timer
+//     Polgyon shape(points);
 
-high_resolution_clock::time_point Timer::_last;
+//     int64 x, y;
+//     while (scanf("%lld%lld", &x, &y) != EOF) {
+//         bool result = shape.contain(Vector2(x, y));
 
-struct {
-    int id;
-    size_t n;
+//         puts(result ? "YES" : "NO");
+//     }  // while
 
-    struct {
-        int left;
-        int right;
-        int top;
-        int bottom;
-    } margin;
+//     return 0;
+// }  // function main
 
-    struct {
-        int left = INT_MAX;
-        int right = INT_MIN;
-        int top = INT_MIN;
-        int bottom = INT_MAX;
-    } rect;
+static Polgyon *handle;
+static bool answer_map[1001][1001];
+// static bitset<1001> answer_map[1001];
+static int current_id;
 
-    struct {
-        double *x;
-        double *y;
-    } polygon;
-
-    struct {
-        int64 s1;
-        int64 s2;
-        int64 s3;
-        int64 s4;
-        int64 s5;
-    } level;
-
-    int64 fullscore;
-
-    int64 timelimit;
-
-    int64 passed_time = 0;
-    int64 processed = 0;
-    int64 wrong = 0;
-} config;
-
-static Polgyon *standard;
-
-static void executer_initialize() {
-    scanf("%d", &config.id);
-    scanf("%zu", &config.n);
-    scanf("%d%d%d%d", &config.margin.left, &config.margin.right,
-          &config.margin.top, &config.margin.bottom);
-    scanf("%lld", &config.timelimit);
-    scanf("%lld%lld%lld%lld%lld", &config.level.s1, &config.level.s2,
-          &config.level.s3, &config.level.s4, &config.level.s5);
-    scanf("%lld", &config.fullscore);
-
-    config.polygon.x = new double[config.n];
-    config.polygon.y = new double[config.n];
-    for (size_t i = 0; i < config.n; i++) {
-        scanf("%lf%lf", config.polygon.x + i, config.polygon.y + i);
-
-        config.rect.left =
-            min(config.rect.left, static_cast<int>(config.polygon.x[i]));
-        config.rect.right =
-            max(config.rect.right, static_cast<int>(config.polygon.x[i]));
-        config.rect.top =
-            max(config.rect.top, static_cast<int>(config.polygon.y[i]));
-        config.rect.bottom =
-            min(config.rect.bottom, static_cast<int>(config.polygon.y[i]));
-    }  // for
-
-    config.rect.left -= config.margin.left;
-    config.rect.right += config.margin.right;
-    config.rect.top += config.margin.top;
-    config.rect.bottom -= config.margin.bottom;
-
+void initialize(const double *x, const double *y, const size_t n,
+                const int id) {
     vector<Vector2> points;
-    points.reserve(config.n);
+    points.reserve(n);
 
-    for (size_t i = 0; i < config.n; i++) {
-        points.push_back(Vector2(config.polygon.x[i], config.polygon.y[i]));
+    for (size_t i = 0; i < n; i++)
+        points.push_back(Vector2(x[i], y[i]));
+
+    handle = new Polgyon(points);
+
+    current_id = id;
+    if (id == 7) {
+        for (int i = 0; i <= 1000; i++) {
+            for (int j = 0; j <= 1000; j++) {
+                answer_map[i][j] = handle->contain(Vector2(i, j));
+            }  // for
+        }      // for
     }
+}
 
-    standard = new Polgyon(points);
+bool query(const double dx, const double dy) {
+    if (current_id != 7)
+        return handle->contain(Vector2(dx, dy));
+    else {
+        int px = static_cast<int>(dx);
+        int py = static_cast<int>(dy);
 
-    Timer::tick();
-    initialize(config.polygon.x, config.polygon.y, config.n, config.id);
-    if (Timer::elapsed() > INITIALIZE_TIMELIMIE) {
-        printf("0 Initialization time limit exceeded.");
-        exit(233);
+        if (px < 0 || px > 1000 || py < 0 || py > 1000)
+            return false;
+
+        return answer_map[px][py];
     }
 }
 
-static void executer_finalize() {
-    Timer::tick();
-    finalize();
-    if (Timer::elapsed() > FINALIZE_TIMELIMIT) {
-        printf("0 Finalization time limit exceeded.");
-        exit(233);
-    }
-
-    delete[] config.polygon.x;
-    delete[] config.polygon.y;
-
-    double ratio[] = { 0.2, 0.4, 0.6, 0.8, 1.0 };
-    double r = 0.0;
-    if (config.processed >= config.level.s1)
-        r = ratio[0];
-    if (config.processed >= config.level.s2)
-        r = ratio[1];
-    if (config.processed >= config.level.s3)
-        r = ratio[2];
-    if (config.processed >= config.level.s4)
-        r = ratio[3];
-    if (config.processed >= config.level.s5)
-        r = ratio[4];
-
-    int64 score =
-        max(0, static_cast<int>(static_cast<int64>(config.fullscore * r) -
-                                WRONG_SCORE * config.wrong));
-
-    printf("%lld processed = %lld, r = %.2lf, wrong = %lld\n", score,
-           config.processed, r, config.wrong);
+void finalize() {
+    delete handle;
 }
-
-static double qx[BLOCKSIZE];
-static double qy[BLOCKSIZE];
-static bitset<BLOCKSIZE> answer;
-static bitset<BLOCKSIZE> user;
-static atomic<int64> processed;
-static atomic<bool> flag;
-
-static int executer_randint(int left, int right) {
-    static random_device rd;
-
-    return (rd() % (right - left + 1)) + left;
-}
-
-static void generate_querys() {
-    for (size_t i = 0; i < 1000; i++) {
-        size_t p = executer_randint(0, config.n - 1);
-        int offest_x = executer_randint(-15, 15);
-        int offest_y = executer_randint(-15, 15);
-        qx[i] = config.polygon.x[p] + offest_x;
-        qy[i] = config.polygon.y[p] + offest_y;
-    }
-
-    for (size_t i = 1000; i < BLOCKSIZE; i++) {
-        qx[i] = executer_randint(config.rect.left, config.rect.right);
-        qy[i] = executer_randint(config.rect.bottom, config.rect.top);
-    }  // for
-}
-
-static void query_standard() {
-    answer.reset();
-
-    for (size_t i = 0; i < BLOCKSIZE; i++) {
-        answer[i] = standard->contain(Vector2(qx[i], qy[i]));
-    }  // for
-}
-
-static void query_user() {
-    user.reset();
-
-    int64 passed = config.passed_time;
-    atomic<size_t> pos(0);
-    processed = 0;
-    flag = true;
-
-    thread runner = thread([&pos]() {
-        while (flag && pos < BLOCKSIZE) {
-            user[pos] = query(qx[pos], qy[pos]);
-
-            // int s = answer[pos];
-            // int u = user[pos];
-            // if (s != u)
-            //     printf("(%lf, %lf): answer = %d, user = %d\n", qx[pos],
-            //     qy[pos],
-            //            s, u);
-
-            pos++;
-        }
-    });
-
-    Timer::tick();
-    while (passed + Timer::elapsed() < config.timelimit && pos < BLOCKSIZE) {
-        // std::this_thread::sleep_for(microseconds(1));
-    }  // while
-    config.passed_time += Timer::elapsed();
-
-    processed.store(pos);
-    flag = false;
-
-    runner.join();
-}
-
-static void check() {
-    int64 not_processed = BLOCKSIZE - processed;
-
-    if (not_processed > 0)
-        DEBUG("not_processed = %lld\n", not_processed);
-
-    user <<= not_processed;
-    answer <<= not_processed;
-    answer ^= user;
-
-    config.wrong += answer.count();
-    config.processed += processed;
-    // DEBUG("config.processed = %lld\n", config.processed);
-    // DEBUG("config.passed_time = %lld\n", config.passed_time);
-}
-
-int main() {
-    executer_initialize();
-    atexit(executer_finalize);
-
-    while (config.passed_time < config.timelimit) {
-        generate_querys();
-        query_standard();
-        query_user();
-        check();
-    }  // while
-
-    DEBUG("passed_time = %lld\n", config.passed_time);
-    DEBUG("processed = %lld\n", config.processed);
-    DEBUG("wrong = %lld\n", config.wrong);
-
-    return 0;
-}  // function main
