@@ -59,17 +59,17 @@ int main() {
 
     guass();
 
-    // for (int i = 1; i <= n; i++) {
-    //     for (int j = 1; j <= n; j++) {
-    //         printf("%lf ", A[i][j]);
-    //     }  // for
-    //     printf("%lf\n", x[i]);
-    // }  // for
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= n; j++) {
+            printf("%lf ", A[i][j]);
+        }  // for
+        printf("%lf\n", x[i]);
+    }  // for
 
     reverse_guass();
 
     for (int i = 1; i <= n; i++) {
-        printf("%d ", int(y[i] + 0.5));
+        printf("%lf ", y[i]);
     }  // for
 
     return 0;
