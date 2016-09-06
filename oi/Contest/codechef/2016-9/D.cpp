@@ -11,6 +11,7 @@ using namespace std;
 static int n, m;
 static bool G[NMAX + 10][NMAX + 10];
 static bool marked[NMAX + 10];
+static int degree[NMAX + 10];
 static vector<int> A, B;
 
 enum ConnectionType {
@@ -60,7 +61,6 @@ int main() {
         initialize();
 
         A.push_back(1);
-        marked[1] = true;
         for (int i = 2; i <= n; i++) {
             if (!G[1][i]) {
                 B.push_back(i);
@@ -77,28 +77,49 @@ int main() {
                 flag = true;
         }  // for
 
-        for (int i = 1; i <= n && !flag; i++) {
+        for (int i = 2; i <= n; i++) {
             if (marked[i])
                 continue;
 
-            ConnectionType ac = detect_connection(i, A);
-            ConnectionType bc = detect_connection(i, B);
-            if (ac == ALL && bc == NONE)
-                A.push_back(i);
-            else if (ac == NONE && bc == ALL)
-                B.push_back(i);
-            else if (ac == ALL && bc == ALL) {
-                if (A.size() < B.size())
-                    A.push_back(i);
-                else
-                    B.push_back(i);
-            } else if (ac == ALL && bc == PAR)
-                A.push_back(i);
-            else if (ac == PAR && bc == ALL)
-                B.push_back(i);
-            else
+            for (int j = 1; j <= n; j++) {
+                if (marked[j])
+                    continue;
+
+                if (G[i][j])
+                    degree[i]++;
+            }  // for
+        }      // for
+
+        marked[1] = true;
+        while (!flag) {
+            int pivot = 0;
+            for (int i = 1; i <= n; i++) {
+                if (marked[i])
+                    continue;
+
+                if (degree[i] > degree[pivot])
+                    pivot = i;
+            }  // for
+
+            if (pivot == 0)
+                break;
+
+            ConnectionType ac = detect_connection(pivot, A);
+            ConnectionType bc = detect_connection(pivot, B);
+            if ((ac == ALL && bc == NONE) || (ac == ALL && bc == ALL) ||
+                (ac == ALL && bc == PAR))
+                A.push_back(pivot);
+            else if ((ac == NONE && bc == ALL) || (ac == PAR && bc == ALL)) {
+                B.push_back(pivot);
+
+                for (int i = 1; i <= n; i++)
+                    if (G[i][pivot])
+                        degree[i]--;
+            } else
                 flag = true;
-        }  // for
+
+            marked[pivot] = true;
+        }  // while
 
         if (flag)
             puts("NO");
