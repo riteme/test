@@ -34,39 +34,8 @@ inline void putint(int x) {
 #define NMAX 40000
 // #define NMAX 100
 
-#define NOT_DETERMINED 0
-#define SELECTED 1
-#define NOT_SELECTED 2
-
-struct Queue {
-    int head, tail;
-    int items[NMAX + 10];
-
-    void reset() {
-        head = tail = 0;
-    }
-
-    int front() const {
-        return items[head];
-    }
-
-    bool empty() const {
-        return head == tail;
-    }
-
-    void push(int x) {
-        items[tail++] = x;
-    }
-
-    void pop() {
-        head++;
-    }
-};  // struct Queue
-
 static int n, m;
 static vector<int> G[NMAX + 10];
-static vector<int> RG[NMAX + 10];
-static char state[NMAX + 10];
 
 static void initialize() {
     // scanf("%d%d", &n, &m);
@@ -92,12 +61,6 @@ static void initialize() {
         G[u].push_back(v + n);
         G[v].push_back(u + n);
     }  // for
-
-    for (int i = 1; i <= n; i++) {
-        for (size_t pos = 0; pos < G[i].size(); pos++) {
-            RG[G[i][pos]].push_back(i);
-        }  // for
-    }      // for
 }
 
 inline int rev(int x) {
@@ -106,128 +69,150 @@ inline int rev(int x) {
     return x + n;
 }
 
-static bool try_select(int x) {
-    if (state[x] == NOT_SELECTED)
-        return false;
-    if (state[x] == SELECTED)
-        return true;
-    if (state[rev(x)] == SELECTED)
-        return false;
+static int cnt = 1;
+static int dfn[NMAX + 10];
+static int low[NMAX + 10];
+static int id[NMAX + 10];
+static bool marked[NMAX + 109];
+static stack<int> stk;
+static vector<int> block[NMAX + 10];
 
-    // Q1 and Q2
-    static bool in_q1[NMAX + 10], in_q2[NMAX + 10];
-    memset(in_q1, 0, sizeof(in_q1));
-    memset(in_q2, 0, sizeof(in_q2));
+static void tarjan(int x) {
+    dfn[x] = low[x] = cnt++;
+    stk.push(x);
 
-    // queue<int> q1, q2;
-    static Queue q1, q2;
-    q1.reset();
-    q2.reset();
+    for (size_t i = 0; i < G[x].size(); i++) {
+        int v = G[x][i];
 
-    // Push x to Q! and push rev(x) to Q2
-    // (Select x so we can't select rev(x))
-    in_q1[x] = true;
-    q1.push(x);
-    in_q2[rev(x)] = true;
-    q2.push(rev(x));
+        if (!dfn[v])
+            tarjan(v);
+        if (!marked[v])
+            low[x] = min(low[x], low[v]);
+    }  // for
 
-    // Spread the range of selection by x
-    // The edge u -> v means when I select u,
-    // v must be selected at the same time.
-    while (!q1.empty()) {
-        int u = q1.front();
-        q1.pop();
+    if (dfn[x] == low[x]) {
+        while (true) {
+            int v = stk.top();
+            stk.pop();
 
+            marked[v] = true;
+            id[v] = x;
+            block[x].push_back(v);
+
+            if (v == x)
+                break;
+        }  // while
+    }
+}
+
+static vector<int> R[NMAX + 10];
+static int degree[NMAX + 10];
+
+static void construct_graph() {
+    for (int u = 1; u <= n * 2; u++) {
         for (size_t i = 0; i < G[u].size(); i++) {
             int v = G[u][i];
 
-            // Already process, skip.
-            if (in_q1[v])
-                continue;
+            if (id[u] != id[v]) {
+                R[id[v]].push_back(id[u]);
+                degree[id[u]]++;
+            }
+        }  // for
+    }      // for
+}
 
-            // v should be selected, but the fact shows that it have been not
-            // selected.
-            if (state[v] == NOT_SELECTED)
-                return false;
-            if (state[v] == NOT_DETERMINED) {
-                // not determined? Select it!
-                // we should be careful that Q1 and Q2 is null.
-                if (in_q2[v])
-                    return false;
-                in_q1[v] = true;
-                q1.push(v);
+static queue<int> vertex_queue;
+static int topo_cnt = 0;
+static int topo[NMAX + 10];
 
-                // Validate the state of rev(v).
-                int rv = rev(v);
-                if (state[rv] == SELECTED)
-                    return false;
-                else if (state[rv] == NOT_DETERMINED) {
-                    // rev(v) is not selected.
-                    if (in_q1[rv])
-                        return false;
-                    if (!in_q2[rv]) {
-                        in_q2[rv] = true;
-                        q2.push(rv);
-                    }
-                }
+static void topological_sort() {
+    for (int i = 1; i <= n * 2; i++)
+        if (degree[i] == 0)
+            vertex_queue.push(i);
+
+    while (!vertex_queue.empty()) {
+        int u = vertex_queue.front();
+        vertex_queue.pop();
+
+        topo[++topo_cnt] = u;
+
+        for (size_t i = 0; i < R[u].size(); i++) {
+            int v = R[u][i];
+
+            if (degree[v] > 0) {
+                degree[v]--;
+
+                if (degree[v] == 0)
+                    vertex_queue.push(v);
             }
         }  // for
     }      // while
+}
 
-    // Almost the same procedure as above.
-    while (!q2.empty()) {
-        int u = q2.front();
-        q2.pop();
+#define NOT_DETERMINED 0
+#define SELECTED 1
+#define NOT_SELECTED 2
 
-        for (size_t i = 0; i < RG[u].size(); i++) {
-            int v = RG[u][i];
+static char state[NMAX + 10];
 
-            if (in_q2[v])
+static bool solve() {
+    for (int i = 1; i <= n; i++)
+        if (!dfn[i])
+            tarjan(i);
+
+    for (int i = 1; i <= n; i++)
+        if (id[i] == id[rev(i)])
+            return false;
+
+    construct_graph();
+    topological_sort();
+
+    for (int i = 1; i <= topo_cnt; i++) {
+        int x = topo[i];
+        if (state[x])
+            continue;
+
+        state[x] = SELECTED;
+
+        queue<int> q;
+        for (size_t pos = 0; pos < block[x].size(); pos++) {
+            int v = block[x][pos];
+            q.push(id[rev(v)]);
+        }  // for
+
+        while (!q.empty()) {
+            int u = q.front();
+            q.pop();
+
+            if (state[u])
                 continue;
 
-            // It seems that no more ifs are needed.
-            if (in_q1[v])
-                return false;
-            in_q2[v] = true;
-            q2.push(v);
-        }  // for
-    }      // while
+            state[u] = NOT_SELECTED;
 
-    // If no error reported in the process, then we can save our work.
-    for (int i = 1; i <= n * 2; i++) {
-        if (in_q1[i])
-            state[i] = SELECTED;
-        else if (in_q2[i])
-            state[i] = NOT_SELECTED;
-    }  // for
+            for (size_t pos = 0; pos < R[u].size(); pos++) {
+                int v = R[u][pos];
 
-    // OK
+                if (state[v] == NOT_DETERMINED)
+                    q.push(v);
+            }  // for
+        }      // while
+    }          // for
+
     return true;
 }
 
 int main() {
-    // freopen("spo.in", "r", stdin);
-    // freopen("spo.out", "w", stdout);
+    freopen("spo.in", "r", stdin);
+    freopen("spo.out", "w", stdout);
     initialize();
 
-    for (int i = 1; i <= n; i++) {
-        // i must be true of false, instead of not determined.
-        if (!state[i] && !state[rev(i)]) {
-            if (!try_select(i)) {
-                if (!try_select(rev(i))) {
-                    puts("NIE");
-                    return 0;
-                }
-            }
-        }
-    }  // for
-
-    for (int i = 1; i <= n; i++) {
-        if (state[i] == SELECTED) {
-            // printf("%d\n", i);
-            putint(i);
-        }
-    }  // for
+    if (!solve())
+        puts("NIE");
+    else {
+        for (int i = 1; i <= n; i++)
+            if (state[id[i]] == SELECTED)
+                putint(i);
+    }
 
     fwrite(_buffer, 1, _pos, stdout);
 
