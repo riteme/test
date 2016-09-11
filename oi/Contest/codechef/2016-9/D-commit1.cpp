@@ -40,6 +40,7 @@ static void initialize() {
     B.clear();
     memset(marked, 0, sizeof(marked));
     memset(G, 0, sizeof(G));
+    memset(degree, 0, sizeof(degree));
 
     scanf("%d%d", &n, &m);
     for (int i = 0; i < m; i++) {
@@ -106,10 +107,9 @@ int main() {
 
             ConnectionType ac = detect_connection(pivot, A);
             ConnectionType bc = detect_connection(pivot, B);
-            if ((ac == ALL && bc == NONE) || (ac == ALL && bc == ALL) ||
-                (ac == ALL && bc == PAR))
+            if (ac == ALL)
                 A.push_back(pivot);
-            else if ((ac == NONE && bc == ALL) || (ac == PAR && bc == ALL)) {
+            else if (bc == ALL) {
                 B.push_back(pivot);
 
                 for (int i = 1; i <= n; i++)
