@@ -456,6 +456,8 @@ static void initialize() {
 
 static Treap *tree[NMAX + 10];
 
+static void process(int x) {}
+
 int main() {
     // freopen("social.in", "r", stdin);
     // freopen("social.out", "w", stdout);

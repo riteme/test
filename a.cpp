@@ -1,20 +1,14 @@
 #include <cstdio>
+#include <cstdlib>
+#include <ctime>
 
-int main () {
-    int n;
-    scanf("%d", &n);
+int main() {
+    srand(time(0));
+    printf("%d\n", rand()%2);
 
-    int array[n];
-    for (int i = 0; i < n; i++) {
-	array[i] = i;
+    for (int i = 0; i < 200000000; i++) {
+	double a = 2314.32142*(4213213.321/32186.321);
     }
-
-    int sum = 0;
-    for (int i = 0; i < n; i++) {
-	sum += array[i];
-    }
-
-    printf("%d", sum);
 
     return 0;
 }

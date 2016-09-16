@@ -1,3 +1,10 @@
-extern int printf(const char *, ...);
+#include <cstdio>
+#include <cstdlib>
+#include <ctime>
 
-int main() { printf("Hello, World!"); }
+int main() {
+    srand(time(0));
+    printf("%d\n", rand());
+    
+    return 0;
+}
