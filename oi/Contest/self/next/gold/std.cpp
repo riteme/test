@@ -62,8 +62,8 @@ inline int count_bit(size_t x) {
 }
 
 int main() {
-    // freopen("gold.in", "r", stdin);
-    // freopen("gold.out", "w", stdout);
+    freopen("gold.in", "r", stdin);
+    freopen("gold.out", "w", stdout);
     scanf("%lld%lld%lld", &T, &K, &C);
 
     size_t size = 1 << K;
