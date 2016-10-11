@@ -1,4 +1,4 @@
-#define USE_FILE_IO
+// #define USE_FILE_IO
 #define NDEBUG
 
 #include <cassert>
