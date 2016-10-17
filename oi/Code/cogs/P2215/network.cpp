@@ -1,12 +1,18 @@
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
-#include <vector>
+/**
+ * 整体二分
+ * 二分答案后只用判定断点是否经过了所有的长路经
+ * 动态路径交使用线段树分治的思想
+ */
+
 #include <algorithm>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <vector>
 
 using namespace std;
 
-#define NMAX 100000
+#define NMAX 200000
 
 enum CommandType : int {
     ADD = 0,
@@ -22,10 +28,12 @@ struct AddCommand {
 struct EndCommand {
     int id;
     int t;
+    AddCommand *ref;
 };  // struct EndCommand
 
 struct QueryCommand {
     int x;
+    int t;
     int answer;
 };  // struct QueryCommand
 
@@ -50,6 +58,9 @@ static int top[NMAX + 10];
 static int in[NMAX + 10];
 static int out[NMAX + 10];
 
+static int vcnt;
+static int values[NMAX + 10];
+
 static Command commands[NMAX + 10];
 
 static bool marked[NMAX + 10];
@@ -67,7 +78,7 @@ static void build(int x) {
             father[v] = x;
             depth[v] = depth[x] + 1;
 
-            dfs(v);
+            build(v);
 
             size[x] += size[v];
         }
@@ -122,6 +133,11 @@ inline bool is_father(int x, int p) {
 
 // O(log n) (LCA)
 inline bool is_on_path(int x, int u, int v) {
+    if (u == -1 && v == -1)
+        return true;
+    if (u == 0 && v == 0)
+        return false;
+
     int lca = evaluate_lca(u, v);
 
     return is_father(x, lca) && (is_father(u, x) || is_father(v, x));
@@ -140,11 +156,15 @@ inline void two_sort(int x, int &first, int &second) {
 inline void path_intersect(int u1, int v1, int u2, int v2, int &ou, int &ov) {
     // assert that two paths has intersection.
 
-    int nu, nv;
-    two_sort(evaluate_lca(u1, u2), nu, nv);
-    two_sort(evaluate_lca(u1, v2), nu, nv);
-    two_sort(evaluate_lca(v1, u2), nu, nv);
-    two_sort(evaluate_lca(v1, v2), nu, nv);
+    int nu = 0, nv = 0;
+    if (is_on_path(evaluate_lca(u1, v1), u2, v2) ||
+        is_on_path(evaluate_lca(u2, v2), u1, v1)) {
+        two_sort(evaluate_lca(u1, u2), nu, nv);
+        two_sort(evaluate_lca(u1, v2), nu, nv);
+        two_sort(evaluate_lca(v1, u2), nu, nv);
+        two_sort(evaluate_lca(v1, v2), nu, nv);
+    }
+
     ou = nu;
     ov = nv;
 }
@@ -153,8 +173,8 @@ struct Node {
     Node(int _left, int _right)
             : left(_left)
             , right(_right)
-            , u(0)
-            , v(0)
+            , u(-1)
+            , v(-1)
             , leftchild(NULL)
             , rightchild(NULL) {}
 
@@ -185,8 +205,11 @@ static void gc(Node *x) {
 }
 
 static void insert(Node *x, int u, int v, int s, int t) {
+    if (!x)
+        return;
+
     if (s <= x->left && x->right <= t) {
-        if (x->u == 0) {
+        if (x->u == -1) {
             x->u = u;
             x->v = v;
         } else
@@ -205,15 +228,15 @@ static void insert(Node *x, int u, int v, int s, int t) {
     }
 }
 
-static bool query(Node *x, int t, int x) {
+static bool query(Node *x, int t, int p) {
     if (!x)
         return true;
 
     int mid = (x->left + x->right) / 2;
     if (t <= mid)
-        return is_on_path(x, x->u, x->v) && query(x->leftchild, t, x);
+        return is_on_path(p, x->u, x->v) && query(x->leftchild, t, p);
     else
-        return is_on_path(x, x->u, x->v) && query(x->rightchild, t, x);
+        return is_on_path(p, x->u, x->v) && query(x->rightchild, t, p);
 }
 
 static void initialize() {
@@ -231,6 +254,7 @@ static void initialize() {
         int type;
         scanf("%d", &type);
 
+        commands[i].type = type;
         switch (type) {
             case ADD: {
                 int a, b, v;
@@ -241,6 +265,8 @@ static void initialize() {
                 commands[i].instance.add->v = b;
                 commands[i].instance.add->w = v;
                 commands[i].instance.add->id = i;
+
+                values[++vcnt] = v;
             } break;
 
             case END: {
@@ -250,6 +276,7 @@ static void initialize() {
                 commands[i].instance.end = new EndCommand;
                 commands[i].instance.end->t = t;
                 commands[i].instance.end->id = commands[t].instance.add->id;
+                commands[i].instance.end->ref = commands[t].instance.add;
             } break;
 
             case QUERY: {
@@ -267,24 +294,124 @@ static void initialize() {
 
     top[1] = 1;
     decompose(1);
+
+    sort(values + 1, values + vcnt + 1);
+    vcnt = unique(values + 1, values + vcnt + 1) - values - 1;
 }
 
+static int timestamp;
+static int intime[NMAX + 10];
+static int outtime[NMAX + 10];
 static Command *queue[NMAX + 10];
+static Command *lqueue[NMAX + 10];
+static Command *rqueue[NMAX + 10];
 
 static void solve(int left, int right, int head, int tail) {
+    if (tail < head)
+        return;
+
     if (left == right) {
         for (int i = head; i <= tail; i++)
             if (queue[i]->type == QUERY)
-                queue[i]->instance.query->answer = left;
+                queue[i]->instance.query->answer = values[left];
+
+        return;
     }
 
     int mid = (left + right) / 2;
+    int midv = values[mid];
+    timestamp = 0;
+    for (int i = head; i <= tail; i++) {
+        Command *q = queue[i];
+
+        switch (q->type) {
+            case ADD: {
+                intime[q->instance.add->id] = timestamp;
+                outtime[q->instance.add->id] = -1;
+            } break;
+
+            case END: {
+                outtime[q->instance.end->id] = timestamp;
+            } break;
+
+            case QUERY: {
+                timestamp++;
+                q->instance.query->t = timestamp;
+            } break;
+        }  // switch to q->type
+    }      // for
+
+    for (int i = head; i <= tail; i++) {
+        Command *q = queue[i];
+
+        if (q->type == ADD && outtime[q->instance.add->id] < 0)
+            outtime[q->instance.add->id] = timestamp;
+    }
+
+    Node *tree = create(0, timestamp);
+    int lpos = 0;
+    int rpos = 0;
+    for (int i = head; i <= tail; i++) {
+        Command *q = queue[i];
+
+        switch (q->type) {
+            case ADD: {
+                if (q->instance.add->w > midv) {
+                    insert(tree, q->instance.add->u, q->instance.add->v,
+                           intime[q->instance.add->id],
+                           outtime[q->instance.add->id]);
+                    rqueue[++rpos] = q;
+                } else
+                    lqueue[++lpos] = q;
+            } break;
+
+            case END: {
+                if (q->instance.end->ref->w > midv)
+                    rqueue[++rpos] = q;
+                else
+                    lqueue[++lpos] = q;
+            } break;
+
+            case QUERY: {
+                if (query(tree, q->instance.query->t, q->instance.query->x))
+                    lqueue[++lpos] = q;
+                else
+                    rqueue[++rpos] = q;
+            } break;
+        }  // switch to q->type
+    }      // for
+
+    gc(tree);
+
+    int pos = head;
+    for (int i = 1; i <= lpos; i++)
+        queue[pos++] = lqueue[i];
+    for (int i = 1; i <= rpos; i++)
+        queue[pos++] = rqueue[i];
+
+    solve(left, mid, head, head + lpos - 1);
+    solve(mid + 1, right, head + lpos, head + lpos + rpos - 1);
 }
 
 int main() {
-    // freopen("network_tenderRun.in", "r", stdin);
-    // freopen("network_tenderRun.out", "w", stdout);
+    // freopen("network.in", "r", stdin);
+    // freopen("network.out", "w", stdout);
+    freopen("network_tenderRun.in", "r", stdin);
+    freopen("network_tenderRun.out", "w", stdout);
     initialize();
+
+    for (int i = 1; i <= m; i++)
+        queue[i] = commands + i;
+
+    values[0] = -1;
+    solve(0, vcnt, 1, m);
+
+    for (int i = 1; i <= m; i++) {
+        Command &q = commands[i];
+
+        if (q.type == QUERY)
+            printf("%d\n", q.instance.query->answer);
+    }  // for
 
     fclose(stdin);
     fclose(stdout);
