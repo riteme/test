@@ -1,4 +1,4 @@
-#define USE_FILE_IO
+// #define USE_FILE_IO
 #define NDEBUG
 
 #include <cassert>
@@ -106,34 +106,33 @@ static int query(Segment *h, int key) {
 int main() {
     initialize();
 
-    char command;
-
+    char command[10];
     Segment *tree = NULL;
-    while (cin >> command) {
+    while (scanf("%s", command) != EOF) {
         if (!tree) {
             tree = new Segment;
             tree->left = 1;
             tree->right = 100000000;
         }
 
-        switch (command) {
+        switch (command[0]) {
             case 'A': {
                 int key, value;
-                cin >> key >> value;
+                scanf("%d%d", &key, &value);
 
                 insert(tree, key, value);
             } break;
             case 'D': {
                 int key;
-                cin >> key;
+                scanf("%d", &key);
 
                 tree = remove(tree, key);
             } break;
             case 'Q': {
                 int key;
-                cin >> key;
+                scanf("%d", &key);
 
-                cout << query(tree, key) << '\n';
+                printf("%d\n", query(tree, key));
             } break;
         }  // switch to command
     }      // while

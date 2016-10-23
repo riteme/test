@@ -1,4 +1,4 @@
-#define USE_FILE_IO
+// #define USE_FILE_IO
 #define NDEBUG
 
 #include <cassert>
@@ -128,10 +128,10 @@ int main() {
                 } else if (b == nullptr) {
                     cout << a->key << "\n";
                 } else {
-                    cout << min(a->key, b->key,
-                                [key](const int &_a, const int &_b) {
-                                    return abs(key - _a) < abs(key - _b);
-                                }) << "\n";
+                    cout << min(a->key, b->key, [key](const int &_a,
+                                                      const int &_b) {
+                        return abs(key - _a) < abs(key - _b);
+                    }) << "\n";
                 }
 
                 break;
@@ -153,7 +153,8 @@ int main() {
 
 #ifndef NDEBUG
     cout << static_cast<double>(max(tree->left->size, tree->right->size)) /
-                tree->size << endl;
+                tree->size
+         << endl;
 #endif  // IFNDEF NDEBUG
 
     return 0;
