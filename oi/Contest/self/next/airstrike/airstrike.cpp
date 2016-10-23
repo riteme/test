@@ -3,17 +3,17 @@
 #define STD
 
 #include <cassert>
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
 #include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
-#include <vector>
-#include <random>
-#include <bitset>
-#include <utility>
 #include <algorithm>
+#include <bitset>
 #include <functional>
+#include <random>
+#include <utility>
+#include <vector>
 
 #ifndef NDEBUG
 #include "user/interface.h"
@@ -121,20 +121,20 @@ struct Line {
     Line(const Vector2 &p1, const Vector2 &p2) {
         // Store the points from left to right.
         if (p1.x < p2.x) {
-            left = p1;
-            right = p2;
+            left     = p1;
+            right    = p2;
             reversed = false;
         } else {
-            left = p2;
-            right = p1;
+            left     = p2;
+            right    = p1;
             reversed = true;
         }
     }
 
     Line(const Line &lhs)
-            : left(lhs.left), right(lhs.right), reversed(lhs.reversed) {}
+        : left(lhs.left), right(lhs.right), reversed(lhs.reversed) {}
     Line(Line &&rhs)
-            : left(rhs.left), right(rhs.right), reversed(rhs.reversed) {}
+        : left(rhs.left), right(rhs.right), reversed(rhs.reversed) {}
 
     bool operator==(const Line &lhs) const {
         return left == lhs.left && right == lhs.right;
@@ -160,21 +160,15 @@ struct Line {
             return is_upper(p);
     }
 
-    bool is_out_range(const Vector2 &p) const {
-        return !is_in_range(p);
-    }
+    bool is_out_range(const Vector2 &p) const { return !is_in_range(p); }
 
-    bool is_horizontal() const {
-        return left.y == right.y;
-    }
+    bool is_horizontal() const { return left.y == right.y; }
 
-    bool is_vertical() const {
-        return left.x == right.x;
-    }
+    bool is_vertical() const { return left.x == right.x; }
 
     Vector2 left;
     Vector2 right;
-    bool reversed;
+    bool    reversed;
 };  // struct Line
 
 //////////////////////
@@ -187,11 +181,9 @@ struct Random {
         randomer = mt19937(rd());
     }
 
-    int operator()() {
-        return randomer();
-    }
+    int operator()() { return randomer(); }
 
- private:
+   private:
     mt19937 randomer;
 };  // struct Random
 
@@ -200,23 +192,17 @@ static Random randint;
 struct Treap {
     Treap() : key(nullptr), left(nullptr), right(nullptr), weight(randint()) {}
     Treap(Line *line)
-            : key(line), left(nullptr), right(nullptr), weight(randint()) {}
+        : key(line), left(nullptr), right(nullptr), weight(randint()) {}
 
     Treap(const Treap &lhs)
-            : key(lhs.key)
-            , left(lhs.left)
-            , right(lhs.right)
-            , weight(lhs.weight) {}
+        : key(lhs.key), left(lhs.left), right(lhs.right), weight(lhs.weight) {}
     Treap(Treap &&lhs)
-            : key(lhs.key)
-            , left(lhs.left)
-            , right(lhs.right)
-            , weight(lhs.weight) {}
+        : key(lhs.key), left(lhs.left), right(lhs.right), weight(lhs.weight) {}
 
-    Line *key;
+    Line * key;
     Treap *left;
     Treap *right;
-    int weight;
+    int    weight;
 };  // struct Treap
 
 // Used for query_range
@@ -227,7 +213,7 @@ inline Treap *left_rotate(Treap *x) {
     assert(x->left);
 
     Treap *y = x->left;
-    x->left = y->right;
+    x->left  = y->right;
     y->right = x;
 
     return y;
@@ -239,27 +225,24 @@ inline Treap *right_rotate(Treap *x) {
 
     Treap *y = x->right;
     x->right = y->left;
-    y->left = x;
+    y->left  = x;
 
     return y;
 }
 
 template <typename TCompare>
 static Treap *persistent_insert(Treap *h, Line *key, const TCompare &cmp) {
-    if (!h)
-        return new Treap(key);
+    if (!h) return new Treap(key);
 
     Treap *x = new Treap(*h);
     if (cmp(key, x->key)) {
         x->left = persistent_insert(x->left, key, cmp);
 
-        if (x->left->weight < x->weight)
-            return left_rotate(x);
+        if (x->left->weight < x->weight) return left_rotate(x);
     } else {
         x->right = persistent_insert(x->right, key, cmp);
 
-        if (x->right->weight < x->weight)
-            return right_rotate(x);
+        if (x->right->weight < x->weight) return right_rotate(x);
     }
 
     return x;
@@ -274,12 +257,12 @@ static Treap *persistent_remove(Treap *h) {
         Treap *y;
         if (h->left->weight < h->right->weight) {
             h->left = new Treap(*h->left);
-            y = left_rotate(h);
+            y       = left_rotate(h);
 
             y->right = persistent_remove(h);
         } else {
             h->right = new Treap(*h->right);
-            y = right_rotate(h);
+            y        = right_rotate(h);
 
             y->left = persistent_remove(h);
         }
@@ -288,8 +271,7 @@ static Treap *persistent_remove(Treap *h) {
     } else {
         Treap *next = h->left;
 
-        if (h->right != nullptr)
-            next = h->right;
+        if (h->right != nullptr) next = h->right;
 
         // delete h;
 
@@ -315,16 +297,16 @@ static Treap *persistent_remove(Treap *h, Line *key, const TCompare &cmp) {
 
 template <typename TCompare>
 inline TreapPair query_range(Treap *h, const Vector2 &p, const TCompare &cmp) {
-    Treap *x = h;
+    Treap *   x = h;
     TreapPair result(nullptr, nullptr);
 
     while (x) {
         if (cmp(p, x->key)) {
             result.second = x;
-            x = x->left;
+            x             = x->left;
         } else {
             result.first = x;
-            x = x->right;
+            x            = x->right;
         }
     }  // while
 
@@ -345,7 +327,7 @@ inline TreapPair query_range(Treap *h, const Vector2 &p, const TCompare &cmp) {
 
 enum class EventType : int {
     Enter = 1,
-    Exit = 2,
+    Exit  = 2,
 };  // enum class EventType
 
 struct EventPoint {
@@ -369,12 +351,12 @@ struct EventPoint {
         return *this;
     }
 
-    Line *line;
+    Line *    line;
     EventType type;
 };  // struct EventPoint
 
 class Polgyon {
- public:
+   public:
     // Caution: remember to initialize `latest` to NULL.
     // All the points must stored in countclockwise.
     // Not support infinity size polgyon.
@@ -410,23 +392,21 @@ class Polgyon {
         // And the program crashed.
         // So I use `std::stable_sort` instead.
         // I don't believe `std::sort` anymore. WTF.
-        stable_sort(events.begin(),
-                    events.end(),
-                    [](const EventPoint &a, const EventPoint &b) {
-                        int64 ax = a.type == EventType::Enter ? a.line->left.x
-                                                              : a.line->right.x;
-                        int64 bx = b.type == EventType::Enter ? b.line->left.x
-                                                              : b.line->right.x;
+        stable_sort(events.begin(), events.end(), [](const EventPoint &a,
+                                                     const EventPoint &b) {
+            int64 ax =
+                a.type == EventType::Enter ? a.line->left.x : a.line->right.x;
+            int64 bx =
+                b.type == EventType::Enter ? b.line->left.x : b.line->right.x;
 
-                        // Since the new edges inserted into the tree
-                        // will make a mess on the order of
-                        // the original edges.
-                        // So we first remove the original edges.
-                        // In case the treap can't find the target edge
-                        // because of the changed order.
-                        return ax < bx ||
-                               (ax == bx && a.type == EventType::Exit);
-                    });
+            // Since the new edges inserted into the tree
+            // will make a mess on the order of
+            // the original edges.
+            // So we first remove the original edges.
+            // In case the treap can't find the target edge
+            // because of the changed order.
+            return ax < bx || (ax == bx && a.type == EventType::Exit);
+        });
 
         // printf("x: ");
         // for (auto &e : x) {
@@ -446,8 +426,7 @@ class Polgyon {
 
     bool contain(const Vector2 &p) const {
         // Everybody can tell that this point is out of range.
-        if (p.x < x.front() || p.x > x.back())
-            return false;
+        if (p.x < x.front() || p.x > x.back()) return false;
 
         // Search for the interval.
         // No need to consider 0. This is an empty treap.
@@ -461,8 +440,7 @@ class Polgyon {
                 right = mid;
         }  // while
 
-        if (left != right && x[left] <= p.x)
-            left = right;
+        if (left != right && x[left] <= p.x) left = right;
 
         // Test it.
         // Notice that p may located in the middle of
@@ -470,14 +448,13 @@ class Polgyon {
         return _test(left, p) || (x[left - 1] == p.x && _test(left - 1, p));
     }
 
- private:
+   private:
     bool _test(size_t i, const Vector2 &p) const {
-        Treap *tree = version[i];
-        TreapPair result = query_range(tree,
-                                       p,
-                                       [](const Vector2 &p, const Line *line) {
-                                           return line->is_lower(p);
-                                       });
+        Treap *   tree = version[i];
+        TreapPair result =
+            query_range(tree, p, [](const Vector2 &p, const Line *line) {
+                return line->is_lower(p);
+            });
 
         Treap *x = result.first;
         Treap *y = result.second;
@@ -493,7 +470,7 @@ class Polgyon {
     }
 
     void _scan_once() {
-        auto pos = x.begin();
+        auto pos  = x.begin();
         auto iter = events.begin();
 
         while (pos != x.end() && iter != events.end()) {
@@ -554,11 +531,11 @@ class Polgyon {
         }  // while
     }
 
-    vector<int64> x;
-    vector<Line> edges;
+    vector<int64>      x;
+    vector<Line>       edges;
     vector<EventPoint> events;
-    Treap *latest;
-    vector<Treap *> version;
+    Treap *            latest;
+    vector<Treap *>    version;
 };  // class Polgyon
 
 // int main() {
@@ -588,7 +565,7 @@ class Polgyon {
 // }  // function main
 
 static Polgyon *handle;
-static bool answer_map[1001][1001];
+static bool     answer_map[1001][1001];
 // static bitset<1001> answer_map[1001];
 static int current_id;
 
@@ -597,8 +574,7 @@ void initialize(const double *x, const double *y, const size_t n,
     vector<Vector2> points;
     points.reserve(n);
 
-    for (size_t i = 0; i < n; i++)
-        points.push_back(Vector2(x[i], y[i]));
+    for (size_t i = 0; i < n; i++) points.push_back(Vector2(x[i], y[i]));
 
     handle = new Polgyon(points);
 
@@ -619,13 +595,10 @@ bool query(const double dx, const double dy) {
         int px = static_cast<int>(dx);
         int py = static_cast<int>(dy);
 
-        if (px < 0 || px > 1000 || py < 0 || py > 1000)
-            return false;
+        if (px < 0 || px > 1000 || py < 0 || py > 1000) return false;
 
         return answer_map[px][py];
     }
 }
 
-void finalize() {
-    delete handle;
-}
+void finalize() { delete handle; }
