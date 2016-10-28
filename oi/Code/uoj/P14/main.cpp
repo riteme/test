@@ -1,147 +1,131 @@
+#include <cassert>
 #include <cstdio>
+#include <cstring>
+#include <climits>
 
-#include <map>
-#include <vector>
-#include <iterator>
+#include <stack>
+#include <algorithm>
 
 using namespace std;
 
 #define NMAX 300000
+#define MMAX 500000
 
 typedef long long int64;
 
-static int n, q;
+static int n, m;
+static stack<int> edges;
+static int father[NMAX + 10];
+static int size[NMAX + 10];
 static int ver;
-static int64 answer[NMAX + 10];
+static int64 answer[MMAX + 10];
+static bool avaliable[MMAX + 10];
 
-struct Modification {
-    int x;
-    map<int, int> *target;
-};
-
-static map<int, int> set[NMAX + 10];
-static map<int, int> size[NMAX + 10];
-static vector<Modification> record[NMAX + 10];
-
-inline void make_set() {
+inline void initialize() {
     for (int i = 1; i <= n; i++) {
-        set[i][0] = i;
-        size[i][0] = 1;
+        size[i] = 1;
     }
 }
 
-inline int query(int x, int ver, map<int, int> *target) {
-    auto iter = target[x].upper_bound(ver);
+inline int find_set(int x) {
+    while (father[x])
+        x = father[x];
 
-    if (iter == target[x].end())
-        return target[x].rbegin()->second;
-    else
-        return prev(iter)->second;
+    return x;
 }
 
-inline void modify(int x, int v, int ver, map<int, int> *target) {
-    target[x][ver] = v;
+inline void union_set(int x, int y) {
+    x = find_set(x);
+    y = find_set(y);
 
-    record[ver].push_back({x, target});
-}
-
-inline int find_set(int x, int ver) {
-    int v = query(x, ver, set);
-    while (x != v) {
-        x = v;
-        v = query(x, ver, set);
+    if (x == y) {
+        edges.push(0);
+        return;
     }
 
-    return v;
-}
-
-inline void refresh(int ver) {
-    for (auto &e : record[ver]) {
-        auto iter = e.target[e.x].find(ver);
-
-        if (iter != e.target[e.x].end())
-            e.target[e.x].erase(iter);
+    if (size[x] < size[y]) {
+        father[x] = y;
+        size[y] += size[x];
+        edges.push(x);
+    } else {
+        father[y] = x;
+        size[x] += size[y];
+        edges.push(y);
     }
-
-    record[ver].clear();
 }
 
-inline int direct_union_set(int x, int y, int ver) {
-    if (x != y) {
-        int xsize = query(x, ver, size);
-        int ysize = query(y, ver, size);
+inline void pop_edge() {
+    size[father[edges.top()]] -= size[edges.top()];
+    father[edges.top()] = 0;
+    edges.pop();
+}
 
-        ver++;
-        refresh(ver);
+static char command[MMAX + 10];
+static int x[MMAX + 10], y[MMAX + 10];
 
-        if (xsize < ysize) {
-            modify(x, y, ver, set);
-            modify(y, xsize + ysize, ver, size);
-        } else {
-            modify(y, x, ver, set);
-            modify(x, xsize + ysize, ver, size);
+int main() {
+    scanf("%d%d", &n, &m);
+    char buffer[10];
+
+    for (int i = 1; i <= m; i++) {
+        scanf("%s", buffer);
+
+        command[i] = buffer[0];
+        if (buffer[0] == 'A') {
+            scanf("%d%d", x + i, y + i);
+        } else if (buffer[0] == 'D') {
+            scanf("%d", x + i);
         }
     }
 
-    return ver;
-}
+    initialize();
+    for (int i = 1; i <= m; i++) {
+        bool fake = false;
 
-inline int union_set(int x, int y, int ver) {
-    x = find_set(x, ver);
-    y = find_set(y, ver);
-
-    return direct_union_set(x, y, ver);
-}
-
-static char lastc;
-static int x, y;
-static int k;
-
-int main() {
-    // freopen("graph.in", "r", stdin);
-
-    scanf("%d%d", &n, &q);
-    char command[10];
-
-    make_set();
-    for (int i = 1; i <= q; i++) {
-        scanf("%s", command);
-
-        switch (command[0]) {
+        switch (command[i]) {
             case 'A': {
-                scanf("%d%d", &x, &y);
-                x = find_set(x, ver);
-                y = find_set(y, ver);
+                union_set(x[i], y[i]);
+                ver++;
 
-                if (x != y) {
-                    answer[ver + 1] = answer[ver] + i;
-                    ver = direct_union_set(x, y, ver);
-                } else {
-                    answer[ver + 1] = answer[ver];
-                    ver++;
-                    refresh(ver);
-                }
+                if (edges.top() == 0)
+                    answer[ver] = answer[ver - 1];
+                else
+                    answer[ver] = answer[ver - 1] + i;
             } break;
-            
+
             case 'D': {
-                scanf("%d", &k);
-                ver -= k;
+                if (i < m && command[i + 1] == 'R') {
+                    ver -= x[i];
+                    fake = true;
+                } else {
+                    for (int j = 0; j < x[i]; j++) {
+                        pop_edge();
+                        ver--;
+                    }
+                }
             } break;
 
             case 'R': {
-                if (lastc == 'A')
+                if (command[i - 1] == 'A') {
+                    pop_edge();
                     ver--;
-                else
-                    ver += k;
+                } else {
+                    ver += x[i - 1];
+                    fake = true;
+                }
             } break;
         }
 
-        lastc = command[0];
-        if (query(find_set(1, ver), ver, size) == n)
+        if (!fake) {
+            if (size[find_set(1)] == n)
+                avaliable[ver] = true;
+            else
+                avaliable[ver] = false;
+        }
+
+        if (avaliable[ver])
             printf("%lld\n", answer[ver]);
         else
             puts("0");
     }
-
-    return 0;
 }
