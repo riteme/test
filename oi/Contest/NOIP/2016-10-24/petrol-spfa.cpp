@@ -76,45 +76,36 @@ static int64 dist[NMAX + 10];
 static int source[NMAX + 10];
 static bool marked[NMAX + 10];
 
-struct Compare {
-    bool operator()(const int a, const int b) const {
-        return dist[a] > dist[b];
-    }
-};
-
-typedef priority_queue<int, vector<int>, Compare> Heap;
-
 static void find_nearest() {
     memset(marked, 0, sizeof(marked));
-    Heap q;
+    queue<int> q;
     for (int i = 1; i <= n; i++) {
         if (is_petrol[i]) {
             dist[i] = 0;
             source[i] = i;
             q.push(i);
+            marked[i] = true;
         } else
             dist[i] = LLONG_MAX;   
     }
 
     while (!q.empty()) {
-        int u = q.top();
+        int u = q.front();
+        marked[u] = false;
         q.pop();
-
-        if (marked[u])
-            continue;
-        marked[u] = true;
 
         for (size_t i = 0; i < G[u].size(); i++) {
             Edge *e = G[u][i];
             int v = e->either(u);
 
-            if (marked[v])
-                continue;
-
             if (dist[u] + e->w < dist[v]) {
                 dist[v] = dist[u] + e->w;
                 source[v] = source[u];
-                q.push(v);
+
+                if (!marked[v]) {
+                    marked[v] = true;
+                    q.push(v);
+                }
             }
         }
     }
