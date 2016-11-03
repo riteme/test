@@ -1,9 +1,11 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
 using namespace std;
 
 int a, b, res1, res2, res3;
 
 int main(){
+        std::vector<int> cc;
 	cin >> a >> b;
 	res1 = a - (-b);
 	res2 = (a & b) + (a | b);
