@@ -134,12 +134,11 @@ struct int2048_t {
         else if (_num[INT_LENGTH - 1] == 0 && b._num[INT_LENGTH - 1] == 1)
             return false;
 
-        bool reversed = _num[INT_LENGTH - 1];
         for (int i = INT_LENGTH - 2; i >= 0; i--) {
             if (_num[i] == 0 && b._num[i] == 1)
-                return true ^ reversed;
+                return true;
             else if (_num == 1 && b._num[i] == 0)
-                return reversed;
+                return false;
         }
 
         return false;
@@ -153,12 +152,11 @@ struct int2048_t {
         else if (_num[INT_LENGTH - 1] == 0 && b._num[INT_LENGTH - 1] == 1)
             return true;
 
-        bool reversed = _num[INT_LENGTH - 1];
         for (int i = INT_LENGTH - 2; i >= 0; i--) {
             if (_num[i] == 0 && b._num[i] == 1)
-                return reversed;
+                return false;
             else if (_num == 1 && b._num[i] == 0)
-                return true ^ reversed;
+                return true;
         }
 
         return false;
