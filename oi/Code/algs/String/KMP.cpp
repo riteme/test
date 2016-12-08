@@ -1,66 +1,91 @@
-#include <iostream>
-#include <string>
+//
+// Copyright 2015 riteme
+//
+
+// Accepted
+
+#include <cassert>
 #include <vector>
+#include <random>
+#include <iostream>
+#include <algorithm>
+#include <iterator>
 
 using namespace std;
 
-void ComputePrefixArray(const string &pattern, vector<int> &prefix) {
-    prefix.resize(pattern.size() + 1);
-    prefix[0] = prefix[1] = 0;
+#define TESTCOUNT 100
+#define STRING_MAX_LENGTH 100
 
-    for (auto i = 1; i < pattern.size(); i++) {
-        int k = prefix[i];
-        while (k != 0 && pattern[k] != pattern[i]) {
-            k = prefix[k];
-        }  // while
-
-        if (pattern[k] == pattern[i]) {
-            k++;
-        }
-
-        prefix[i + 1] = k;
-    }
-}
-
-int KmpSearch(const string &pattern, const string &text) {
-    vector<int> prefix;
-    ComputePrefixArray(pattern, prefix);
-
-    for (auto i : prefix) {
-        cout << i << " ";
-    }  // foreach in prefix
-    cout << endl;
-
-    size_t j = 0;
-    for (auto i = 0; i < text.size(); i++) {
-        cout << "i = " << i << ", j = " << j << endl;
-        while (j != 0 && pattern[j] != text[i]) {
-            j = prefix[j];
-            cout << "j jumps to " << j << endl;
-        }  // while
-
-        if (pattern[j] == text[i]) {
-            cout << "matched at text[" << i << "] & pattern[" << j << "]"
-                 << endl;
-            j++;
-        }
-
-        if (j == pattern.size()) {
-            return i - j + 1;
-        }
-    }
-
-    return -1;
-}
+auto GenerateNextArray(const string &pattern) -> vector<int>;
+auto KmpSearch(const string &text, const string &pattern) -> int;
 
 int main() {
-    string pattern;
-    cin >> pattern;
+    random_device rd;
+    mt19937 random(rd());
 
-    string text;
-    while (cin >> text) {
-        cout << KmpSearch(pattern, text) << endl;
-    }  // while
+    for (int cnt = 0; cnt < TESTCOUNT; cnt++) {
+        string a, b;
+
+        a.resize(random() % (STRING_MAX_LENGTH + 1));
+        b.resize(random() % (STRING_MAX_LENGTH + 1));
+
+        for (auto &c : a) c = (random() % 26) + 65;
+        for (auto &c : b) c = (random() % 26) + 65;
+        a.insert(random() % a.size(), b);
+
+        // cout << "a: " << a << "\nb: " << b << "\n";
+
+        int std =
+            distance(a.begin(), search(a.begin(), a.end(), b.begin(), b.end()));
+        // cout << "STD OK" << endl;
+
+        int mine = KmpSearch(a, b);
+        // cout << "KMP OK" << endl;
+
+        if (std == a.size()) std = -1;
+        if (mine == a.size()) mine = -1;
+
+        if (std != mine) {
+            cout << "a: " << a << "\nb: " << b << "\n";
+            cout << "(error) std: " << std << ", mine: " << mine << endl;
+        }
+    }  // for
 
     return 0;
 }  // function main
+
+auto GenerateNextArray(const string &pattern) -> vector<int> {
+    vector<int> next(pattern.size() + 1);
+
+    for (int i = 1; i < pattern.size(); i++) {
+        int k = next[i];
+
+        while (k > 0 and pattern[k] != pattern[i]) k = next[k];
+
+        if (pattern[k] == pattern[i]) k++;
+
+        next[i + 1] = k;
+    }  // for
+
+    // cout << "Next array generated" << endl;
+
+    return next;
+}
+
+auto KmpSearch(const string &text, const string &pattern) -> int {
+    auto next = GenerateNextArray(pattern);
+
+    int i = 0, j = 0;
+    for (; i < text.size() and j < pattern.size(); i++) {
+        if (text[i] == pattern[j])
+            j++;
+        else
+            j = next[j];
+    }  // for
+
+    if (j == pattern.size())
+        return i - j;
+    else
+        // return -1;
+        return text.size();
+}
