@@ -67,6 +67,9 @@ int main() {
         int v = e.to;
         int w = e.w;
 
+        if (u == v)
+            continue;
+
         int lost = 0;
         int d1 = 0, d2 = 0, d3 = 0;
         if (nxt[u]) {
@@ -119,14 +122,20 @@ int main() {
                 }
             }  // for
 
-            marked[d1] = marked[d2] = marked[d3] = false;
             marked[id] = true;
+
+            if (d1)
+                q.push(d1);
+            if (d2)
+                q.push(d2);
+            if (d3)
+                q.push(d3);
         }
     }
 
     memset(marked, 0, sizeof(marked));
     printf("%d\n", answer);
-    /*
+    
     for (int i = 1; i <= n; i++) {
         if (marked[i])
             continue;
@@ -147,7 +156,7 @@ int main() {
 
         printf("\n");
     }  // for
-    */
+    
 
     return 0;
 }  // function main
