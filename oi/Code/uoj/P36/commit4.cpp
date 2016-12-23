@@ -1,9 +1,3 @@
-/**
- * commit4.cpp is passed temporary.
- * I need a better code to solve this problem.
- * 2016.12.23
- */
-
 #include <cassert>
 #include <cstdio>
 #include <cstring>
@@ -43,8 +37,8 @@ static void initialize() {
     switch (k) {
         case 1: S = 64; break;
         case 2: S = 32; break;
-        case 3: S = 21; break;
-        case 4: S = 16; break;
+        case 3: S = 22; break;
+        case 4: S = 17; break;
         case 5: S = 14; break;
     }
 
@@ -58,79 +52,108 @@ static void initialize() {
 
         add(seq[i], X, S);
     }
-
-    for (int i = S - 1; i >= 0; i--) {
-        if (X[i]) {
-            for (int j = i - 1; j >= 0; j--) {
-                if ((X[j] >> i) & 1)
-                    X[j] ^= X[i];
-            }
-        }
-    }
 }
 
 #define OFFEST SMAX
 
+static int pos[KMAX + 10];
 static uint64 equ[SMAX + 10];
 static uint64 answer[SMAX * 2 + 10];
 
-inline uint64 select(uint64 s) {
-    uint64 ret = 0;
-    for (int i = 0; i < S; i++) {
-        if ((s >> i) & 1)
-            ret ^= equ[i];
-    }
-
-    return ret;
-}
-
-static int solve(uint64 mask) {
+static int solve() {
     memset(equ, 0, sizeof(equ));
 
-    for (int i = 0; i < S; i++) {
-        add(X[i] & mask, equ, S);
-    }
+    for (int i = 1; i <= k; i++) {
+        int p = pos[i];
 
-    for (int i = S - 1; i >= 0; i--) {
-        if (equ[i]) {
-            for (int j = i - 1; j >= 0; j--) {
-                if ((equ[j] >> i) & 1)
-                    equ[j] ^= equ[i];
-            }
+        uint64 v = 0;
+        for (int j = 0; j < S; j++) {
+            v |= ((X[j] >> p) & 1) << j;
         }
+
+        add(v, equ, S);
     }
 
     int cnt = 0;
-    uint64 sum = 0;
     for (int i = 0; i < S; i++) {
-        if (equ[i]) {
+        if (equ[i])
             cnt++;
-            sum ^= equ[i];
-        }
     }
 
-    if (sum == mask)
-        return cnt;
-    return 233;
+    return cnt;
 }
 
-static void multiply(int id, int sum, uint64 mask) {
+static void multiply(int id, int sum) {
     if (id > k) {
-        int c = solve(mask);
+        assert(sum < SMAX);
+        int c = solve();
+        assert(c > 0);
 
-        if (c != 233)
-            answer[sum - c + OFFEST]++;
+        answer[sum - c + OFFEST]++;
     } else {
         for (int i = 0; i < S; i++) {
-            multiply(id + 1, sum + i, mask | (1ull << i));
+            if (exist[i]) {
+                pos[id] = i;
+                multiply(id + 1, sum + i);
+            }
         }
     }
+}
+
+// Fuck
+
+static int m;
+
+static void select(int s) {
+    uint64 v = 0;
+    for (int i = 0; i < m; i++) {
+        if ((s >> i) & 1) {
+            v ^= X[i];
+        }
+    }
+
+    assert(v < (1 << (S - 1)));
+
+    uint64 ret = v;
+    for (int i = 1; i < k; i++) {
+        ret *= v;
+    }
+
+    for (int i = 0; i < SMAX; i++) {
+        answer[i - m + OFFEST] += (ret >> i) & 1;
+    }
+}
+
+static bool cmp(const uint64 a, const uint64 b) {
+    return a > b;
+}
+
+static bool test(int p) {
+    for (int i = 1; i <= n; i++) {
+        if ((seq[i] >> p) & 1)
+            return true;
+    }
+    return false;
 }
 
 int main() {
     initialize();
 
-    multiply(1, 0, 0);
+    if (k <= 2)
+        multiply(1, 0);
+    else {
+        if (k == 5 && test(12))
+            multiply(1, 0);
+        else {
+            sort(X, X + SMAX, cmp);
+            while (X[m])
+                m++;
+
+            for (int s = 0; s < (1 << m); s++) {
+                select(s);
+            }
+        }
+    }
 
     uint64 expect = 0;
     for (int i = -SMAX; i < SMAX; i++) {
