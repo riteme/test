@@ -370,7 +370,7 @@ class LCT {
         sp.splay(x);
 
         if (sp.left[x])
-            return sp.left[x];
+            return sp.left[x];  // What?
         else
             return -sp.father[x];
     }

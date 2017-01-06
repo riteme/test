@@ -3,7 +3,7 @@
 from random import *
 
 N = 1000000
-M = 1200000
+M = 1500000
 OP = ["Q", "Q", "Q", "Q", "Q", "C", "C", "C", "C", "C", "A"]
 
 print("%s %s" % (N, M))
