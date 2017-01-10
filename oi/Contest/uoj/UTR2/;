@@ -1,0 +1,11 @@
+#include <cstdio>
+#include <cstring>
+
+#include <algorithm>
+
+using namespace std;
+
+#define NMAX 10
+
+static int n;
+static int seq[NMAX + 10]
