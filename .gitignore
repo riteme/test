@@ -137,6 +137,7 @@ target/
 *.in
 *.out
 *.ans
+*.exec
 
 # Binary data files
 *.profile

@@ -1,471 +1,312 @@
+/**
+ * 注意更新时的顺序，先要将链上的信息从根开始依次删掉
+ * 然后添加新的信息，顺序随意
+ * 最后从x开始更新信息
+ */
+
+#define NDEBUG
+
+#include <cassert>
 #include <cstdio>
+#include <cctype>
 #include <cstring>
-#include <cstdlib>
 #include <climits>
+
+#include <set>
+#include <map>
 #include <vector>
+#include <iterator>
 #include <algorithm>
 
 using namespace std;
 
 #define NMAX 100000
-#define LOGN 20
+#define LOGN 17
+#define BLACK true
+#define WHITE false
 
-#define INVALID_SAY "They have disappeared."
+struct Greater {
+    bool operator()(const int a, const int b) const {
+        return a > b;
+    }
+};
+
+class Heap {
+ public:
+    size_t size() const {
+        return _set.size();
+    }
+
+    bool empty() const {
+        return _set.empty();
+    }
+
+    void push(int x) {
+        _set.insert(x);
+    }
+
+    void pop(int x) {
+        multiset<int>::iterator iter = _set.find(x);
+        
+        assert(iter != _set.end());
+        _set.erase(iter);
+    }
+
+    int top() const {
+        assert(!empty());
+
+        return *_set.begin();
+    }
+
+    int second() const {
+        assert(size() >= 2);
+
+        return *(++_set.begin());
+    }
+
+ private:
+    multiset<int, Greater> _set;
+};
 
 struct Edge {
-    int u;
-    int v;
+    Edge (int v, int _w)
+        : to(v), w(_w) {}
+
+    int to;
     int w;
+};
 
-    int either(int x) {
-        return u == x ? v : u;
-    }
-};  // struct Edge
-
-static int n;
+static int n, q;
+static int whitecnt;
+static bool color[NMAX + 10];
 static vector<Edge *> G[NMAX + 10];
-
-namespace Splay {
-static int parent[NMAX + 10];
-static int left[NMAX + 10];
-static int right[NMAX + 10];
-
-static void left_rotate(int x) {
-    int y = left[x];
-    left[x] = right[y];
-    if (left[x]) {
-        parent[left[x]] = x;
-    }
-    right[y] = x;
-
-    if (parent[x]) {
-        if (left[parent[x]] == x) {
-            left[parent[x]] = y;
-        } else {
-            right[parent[x]] = y;
-        }
-    }
-
-    parent[y] = parent[x];
-    parent[x] = y;
-}
-
-static void right_rotate(int x) {
-    int y = right[x];
-    right[x] = left[y];
-    if (right[x]) {
-        parent[right[x]] = x;
-    }
-    left[y] = x;
-
-    if (parent[x]) {
-        if (left[parent[x]] == x) {
-            left[parent[x]] = y;
-        } else {
-            right[parent[x]] = y;
-        }
-    }
-
-    parent[y] = parent[x];
-    parent[x] = y;
-}
-
-static int splay(int x) {
-    while (parent[x]) {
-        int p1 = parent[x];
-        int p2 = parent[p1];
-
-        if (p2 == 0) {
-            if (left[p1] == x) {
-                left_rotate(p1);
-            } else {
-                right_rotate(p1);
-            }
-        } else {
-            if (left[p1] == x) {
-                if (left[p2] == p1) {
-                    left_rotate(p2);
-                    left_rotate(p1);
-                } else {
-                    left_rotate(p1);
-                    right_rotate(p2);
-                }
-            } else {
-                if (left[p2] == p1) {
-                    right_rotate(p1);
-                    left_rotate(p2);
-                } else {
-                    right_rotate(p2);
-                    right_rotate(p1);
-                }
-            }
-        }
-    }  // while
-
-    return x;
-}
-
-static int min_node(int x) {
-    while (left[x]) {
-        x = left[x];
-    }  // while
-
-    splay(x);
-    return x;
-}
-
-static int max_node(int x) {
-    while (right[x]) {
-        x = right[x];
-    }  // while
-
-    splay(x);
-    return x;
-}
-
-template <typename TCompare>
-static int _insert(int x, int v, TCompare &cmp) {
-    if (!x) {
-        return v;
-    }
-
-    if (cmp(v, x)) {
-        left[x] = _insert(left[x], v, cmp);
-        parent[left[x]] = x;
-    } else {
-        right[x] = _insert(right[x], v, cmp);
-        parent[right[x]] = x;
-    }
-
-    return x;
-}
-
-template <typename TCompare>
-static int insert(int x, int v, TCompare &cmp) {
-    _insert(x, v, cmp);
-    return splay(v);
-}
-
-static int remove(int x) {
-    splay(x);
-    int l = left[x];
-    int r = right[x];
-
-    parent[l] = parent[r] = left[x] = right[x] = 0;
-
-    if (!l) {
-        return r;
-    } else if (!r) {
-        return l;
-    } else {
-        int m = max_node(l);
-        // splay(m);
-        right[m] = r;
-        parent[r] = m;
-
-        return m;
-    }
-}
-
-}  // namespace Splay
-
+static int root;
+static int depth[NMAX + 10];
+static int father[NMAX + 10];
+static int id[NMAX + 10][LOGN + 1];
+static int dist[NMAX + 10][LOGN + 1];
+static map<int, Heap> maxdist[NMAX + 10];
+static Heap maxlen[NMAX + 10];
+static Heap length[NMAX + 10];
 static bool marked[NMAX + 10];
 static int size[NMAX + 10];
-static int depth[NMAX + 10];
-static int dist[NMAX + 10];
-static int f[NMAX + 10][LOGN + 1];
-static vector<int> children[NMAX + 10];
 
-static bool cmp(const int a, const int b) {
-    return depth[a] < depth[b];
-}
-
-static void make_root(int x) {
+static void evaluate_size(int x, int father = 0) {
     size[x] = 1;
 
-    for (unsigned i = 0; i < G[x].size(); i++) {
+    for (size_t i = 0; i < G[x].size(); i++) {
         Edge *e = G[x][i];
-        int v = e->either(x);
+        int v = e->to;
 
-        if (!marked[v]) {
-            marked[v] = true;
-            f[v][0] = x;
-            dist[v] = dist[x] + e->w;
-            depth[v] = depth[x] + 1;
+        if (marked[v] || v == father)
+            continue;
 
-            make_root(v);
-
-            children[x].push_back(v);
-            size[x] += size[v];
-        }
-    }  // for
+        evaluate_size(v, x);
+        size[x] += size[v];
+    }
 }
 
-static void make_root() {
-    f[1][0] = 0;
-    dist[1] = 0;
-    depth[1] = 0;
-    marked[1] = true;
-    make_root(1);
-}
+static int select_center(int x, int maxsize, int father = 0) {
+    for (size_t i = 0; i < G[x].size(); i++) {
+        Edge *e = G[x][i];
+        int v = e->to;
 
-static vector<int> roots;
-static int top[NMAX + 10];
-static int first[NMAX + 10];
-static int last[NMAX + 10];
-static int tree[NMAX + 10];
+        if (marked[v] || v == father)
+            continue;
 
-static void decompose(int x) {
-    int next = 0;
-    for (unsigned i = 0; i < children[x].size(); i++) {
-        int v = children[x][i];
-
-        if (size[v] > size[next]) {
-            next = v;
-        }
-    }  // for
-
-    if (next) {
-        top[next] = top[x];
-        last[top[x]] = next;
-        tree[top[x]] = Splay::insert(tree[top[x]], next, cmp);
-        decompose(next);
+        if (size[v] > maxsize)
+            return select_center(v, maxsize, x);
     }
 
-    for (unsigned i = 0; i < children[x].size(); i++) {
-        int v = children[x][i];
-
-        if (v != next) {
-            top[v] = v;
-            first[v] = v;
-            last[v] = v;
-            tree[v] = v;
-            roots.push_back(v);
-
-            decompose(v);
-        }
-    }  // for
+    return x;
 }
 
-static void decompose() {
-    top[1] = 1;
-    first[1] = 1;
-    last[1] = 1;
-    tree[1] = 1;
-    roots.push_back(1);
+static void evaluate_dist(int x, int c, int d, int father = 0) {
+    int dep = depth[c];
+    id[x][dep] = d;
 
-    decompose(1);
+    if (!maxdist[c].count(d))
+        maxdist[c][d] = Heap();
+    maxdist[c][d].push(dist[x][dep]);
+
+    for (size_t i = 0; i < G[x].size(); i++) {
+        Edge *e = G[x][i];
+        int v = e->to;
+
+        if (marked[v] || v == father)
+            continue;
+
+        dist[v][dep] = dist[x][dep] + e->w;
+
+        if (x == c)
+            evaluate_dist(v, c, v, x);
+        else
+            evaluate_dist(v, c, d, x);
+    }
 }
 
-static void initialize_lca() {
-    for (int j = 1; j <= LOGN; j++) {
-        for (int i = 1; i <= n; i++) {
-            f[i][j] = f[f[i][j - 1]][j - 1];
-        }  // for
-    }      // for
+inline int maxpath(int x) {
+    if (length[x].size() >= 2)
+        return length[x].top() + length[x].second();
+    return 0;
 }
 
-static int lca(int u, int v) {
-    if (depth[u] < depth[v]) {
-        swap(u, v);
+inline int ans(int x) {
+    assert(!maxlen[x].empty());
+
+    return maxlen[x].top();
+}
+
+static int build(int x, int dep = 0, int top = 0) {
+    evaluate_size(x);
+
+    int p = select_center(x, size[x] >> 1);
+    depth[p] = dep;
+    father[p] = top;
+
+    evaluate_dist(p, p, p);
+
+    for (map<int, Heap>::iterator beg = maxdist[p].begin();
+         beg != maxdist[p].end();
+         beg++) {
+        length[p].push(beg->second.top());
     }
 
-    int distance = depth[u] - depth[v];
-    for (int i = LOGN; i >= 0; i--) {
-        if (distance & (1 << i)) {
-            u = f[u][i];
-        }
-    }  // for
+    maxlen[p].push(maxpath(p));
 
-    if (u == v) {
-        return u;
+    marked[p] = true;
+    for (size_t i = 0; i < G[p].size(); i++) {
+        Edge *e = G[p][i];
+        int v = e->to;
+
+        if (marked[v])
+            continue;
+
+        maxlen[p].push(build(v, dep + 1, p));
     }
 
-    for (int i = LOGN; i >= 0; i--) {
-        if (f[u][i] != f[v][i]) {
-            u = f[u][i];
-            v = f[v][i];
-        }
-    }  // for
-
-    return f[u][0];
+    return ans(p);
 }
 
-inline void add_edge(int u, int v, int w) {
-    Edge *e = new Edge;
+static void pop_fathers(int x, int p) {
+    if (p) {
+        pop_fathers(x, father[p]);
 
-    e->u = u;
-    e->v = v;
-    e->w = w;
+        int dep = depth[p];
+        Heap &heap = maxdist[p][id[x][dep]];
 
-    G[u].push_back(e);
-    G[v].push_back(e);
+        if (father[p])
+            maxlen[father[p]].pop(ans(p));
+        maxlen[p].pop(maxpath(p));
+        if (!heap.empty())
+            length[p].pop(heap.top());
+    }
 }
 
-static void read_graph() {
-    for (int i = 0; i < n - 1; i++) {
-        int u, v, c;
-        scanf("%d%d%d", &u, &v, &c);
+static void push_fathers(int x, int p) {
+    if (p) {
+        int dep = depth[p];
+        Heap &heap = maxdist[p][id[x][dep]];
 
-        add_edge(u, v, c);
-    }  // for
+        if (!heap.empty())
+            length[p].push(heap.top());
+        maxlen[p].push(maxpath(p));
+        if (father[p])
+            maxlen[father[p]].push(ans(p));
+
+        push_fathers(x, father[p]);
+    }
+}
+
+static void add(int x) {
+    whitecnt++;
+    int p = x;
+
+    pop_fathers(x, x);
+    while (p) {
+        int dep = depth[p];
+        Heap &heap = maxdist[p][id[x][dep]];
+        heap.push(dist[x][dep]);
+
+        p = father[p];
+    }
+
+    push_fathers(x, x);
+}
+
+static void del(int x) {
+    whitecnt--;
+    int p = x;
+    
+    pop_fathers(x, x);
+    while (p) {
+        int dep = depth[p];
+        Heap &heap = maxdist[p][id[x][dep]];
+        heap.pop(dist[x][dep]);
+
+        p = father[p];
+    }
+
+    push_fathers(x, x);
 }
 
 static void initialize() {
     scanf("%d", &n);
+    whitecnt = n;
 
-    read_graph();
-    make_root();
-    decompose();
-    initialize_lca();
-}
+    for (int i = 0; i < n - 1; i++) {
+        int u, v, w;
+        scanf("%d%d%d", &u, &v, &w);
 
-inline int _distance(int a, int b) {
-    if (a == 0 || b == 0) {
-        return 0;
+        G[u].push_back(new Edge(v, w));
+        G[v].push_back(new Edge(u, w));
     }
-    return dist[a] + dist[b] - 2 * dist[lca(a, b)];
-}
 
-static int p1, p2;
+    build(1);
 
-static int compute_max() {
-    int answer = 0;
-    for (unsigned i = 0; i < roots.size(); i++) {
-        int c = roots[i];
-        if (dist[last[c]] - dist[first[c]] > answer) {
-            answer = dist[last[c]] - dist[first[c]];
-            p1 = last[c];
-            p2 = first[c];
+    for (int i = 1; i <= n; i++) {
+        if (depth[i] == 0) {
+            root = i;
+            break;
         }
-    }  // for
+    }
 
-    for (unsigned i = 0; i < roots.size(); i++) {
-        for (unsigned j = i + 1; j < roots.size(); j++) {
-            int a = roots[i];
-            int b = roots[j];
-
-            if (_distance(first[a], first[b]) > answer) {
-                answer = _distance(first[a], first[b]);
-                p1 = first[a];
-                p2 = first[b];
-            }
-            if (_distance(first[a], last[b]) > answer) {
-                answer = _distance(first[a], last[b]);
-                p1 = first[a];
-                p2 = last[b];
-            }
-            if (_distance(last[a], first[b]) > answer) {
-                answer = _distance(last[a], first[b]);
-                p1 = last[a];
-                p2 = first[b];
-            }
-            if (_distance(last[a], last[b]) > answer) {
-                answer = _distance(last[a], last[b]);
-                p1 = last[a];
-                p2 = last[b];
-            }
-        }  // for
-    }      // for
-
-    return answer;
+    scanf("%d", &q);
 }
 
-static int whitecnt;
-static bool is_white[NMAX + 10];
+inline char get_command() {
+    char c = getchar();
 
-static void print() {
-    printf("whitecnt = %d\n", whitecnt);
-    for (unsigned i = 0; i < roots.size(); i++) {
-        int c = roots[i];
-        printf("chain %d: first = %d, last = %d, tree = %d\n", c, first[c],
-               last[c], tree[c]);
-    }  // for
+    while (!isalpha(c)) {
+        c = getchar();
+    }
 
-    putchar('\n');
+    return c;
 }
 
 int main() {
     initialize();
-    // puts("Initialized.");
 
-    whitecnt = n;
-    for (int i = 1; i <= n; i++) {
-        is_white[i] = true;
-    }  // for
+    while (q--) {
+        char command = get_command();
 
-    int answer = compute_max();
+        if (command == 'A') {
+            if (whitecnt)
+                printf("%d\n", max(0, ans(root)));
+            else
+                puts("They have disappeared.");
+        } else {
+            int x;
+            scanf("%d", &x);
 
-    int q;
-    char command[2];
-    scanf("%d", &q);
-    while (q > 0) {
-        // print();
-        scanf("%s", command);
+            if (color[x] == BLACK)
+                add(x);
+            else
+                del(x);
 
-        switch (command[0]) {
-            case 'A': {
-                if (answer < 0) {
-                    puts(INVALID_SAY);
-                } else {
-                    printf("%d\n", answer);
-                }
-            } break;
-            case 'C': {
-                int u;
-                scanf("%d", &u);
-
-                if (!is_white[u]) {
-                    is_white[u] = true;
-                    whitecnt++;
-
-                    int t = top[u];
-                    tree[t] = Splay::insert(tree[t], u, cmp);
-
-                    // Update first & last
-                    if (Splay::left[u] == 0) {
-                        first[t] = u;
-                    }
-                    if (Splay::right[u] == 0) {
-                        last[t] = u;
-                    }
-
-                    for (unsigned i = 0; i < roots.size(); i++) {
-                        int c = roots[i];
-
-                        if (_distance(first[c], u) > answer) {
-                            answer = _distance(first[c], u);
-                            p1 = u;
-                            p2 = first[c];
-                        }
-                        if (_distance(last[c], u) > answer) {
-                            answer = _distance(last[c], u);
-                            p1 = u;
-                            p2 = last[c];
-                        }
-                    }  // for
-                } else {
-                    is_white[u] = false;
-                    whitecnt--;
-
-                    int t = top[u];
-                    tree[t] = Splay::remove(u);
-                    first[t] = Splay::min_node(tree[t]);
-                    last[t] = Splay::max_node(tree[t]);
-
-                    if (whitecnt == 0) {
-                        answer = -1;
-                    } else if (whitecnt == 1) {
-                        answer = 0;
-                    } else if (u == p1 || u == p2) {
-                        answer = compute_max();
-                    }
-                }
-            } break;
-        }  // switch to command[0]
-
-        q--;
-    }  // while
+            color[x] ^= true;
+        }
+    }
 
     return 0;
-}  // function main
+}

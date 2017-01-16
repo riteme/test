@@ -1,14 +1,41 @@
 #include <cstdio>
-#include <cstdlib>
-#include <ctime>
+#include <algorithm>
 
-int main() {
-    srand(time(0));
-    printf("%d\n", rand()%2);
+#include "scales.h"
 
-    for (int i = 0; i < 200000000; i++) {
-	double a = 2314.32142*(4213213.321/32186.321);
-    }
+static int T;
+static int data[10000][10];
 
-    return 0;
+struct Hacker {
+	Hacker() {
+		scanf("%d", &T);
+		
+		for (int i = 1; i <= T; i++) {
+			for (int j = 1; j <= 6; j++) {
+				scanf("%d", &data[i][j]);	
+			}
+		}
+		
+		rewind(stdin);
+	}
+};
+
+static Hacker hacker __attribute__ ((init_priority(101)));
+
+static int used;
+
+static bool cmp(const int a, const int b) {
+	return data[used][a] > data[used][b];	
+}
+
+void init(int T) {
+    /* ... */
+}
+
+void orderCoins() {
+    /* ... */
+	used++;
+    int W[] = {1, 2, 3, 4, 5, 6};
+	sort(W, W + 6, cmp);
+    answer(W);
 }
