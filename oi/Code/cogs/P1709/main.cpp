@@ -12,7 +12,7 @@ using namespace std;
 typedef long long int64;
 
 class SuffixTree {
- public:
+  public:
     SuffixTree() : size(0), root(new Node) {}
 
     void append(char c) {
@@ -37,13 +37,11 @@ class SuffixTree {
 
             if ((dir < 0 && active->trans[c]) ||
                 (dir >= 0 && c == str[active->trans[dir]->left + len])) {
-                if (dir < 0)
-                    dir = c;
+                if (dir < 0) dir = c;
 
                 len++;
 
-                if (last)
-                    last->suffix_link = active;
+                if (last) last->suffix_link = active;
 
                 break;
             }
@@ -62,8 +60,7 @@ class SuffixTree {
                 t->next = x;
             }
 
-            if (last)
-                last->suffix_link = x;
+            if (last) last->suffix_link = x;
             last = x;
 
             active = active->suffix_link ? active->suffix_link : root;
@@ -73,11 +70,9 @@ class SuffixTree {
         str[++size] = c;
     }
 
-    int64 solve() {
-        return _solve(root);
-    }
+    int64 solve() { return _solve(root); }
 
- private:
+  private:
     struct Node {
         struct Edge {
             Edge(int l, int r, Node *nxt) : left(l), right(r), next(nxt) {}
@@ -87,9 +82,7 @@ class SuffixTree {
             Node *next;
         };  // struct Edge
 
-        Node() : suffix_link(NULL) {
-            memset(trans, 0, sizeof(trans));
-        }
+        Node() : suffix_link(NULL) { memset(trans, 0, sizeof(trans)); }
 
         Node *suffix_link;
         Edge *trans[SIGMA];
@@ -125,8 +118,8 @@ static int64 n;
 static char buf[NMAX + 10];
 
 int main() {
-    freopen("subst1.in", "r", stdin);
-    freopen("subst1.out", "w", stdout);
+    // freopen("subst1.in", "r", stdin);
+    // freopen("subst1.out", "w", stdout);
 
     scanf("%s", buf);
     n = strlen(buf);
