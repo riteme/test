@@ -2,17 +2,57 @@
 #include <cstring>
 
 #include <algorithm>
-#include <vector>
 
 using namespace std;
 
 #define NMAX 100000
 #define KMAX 200
 
-#define LAST(stk) stk[stk.size() - 1]
-#define SECOND(stk) stk[stk.size() - 2]
-
 typedef long long int64;
+
+template <typename T>
+struct Queue {
+    Queue() : head(0), tail(0) {}
+
+    void push_back(const T &v) {
+        data[tail++] = v;
+    }
+
+    void pop_front() {
+        head++;
+    }
+
+    void pop_back() {
+        tail--;
+    }
+
+    void clear() {
+        head = tail = 0;
+    }
+
+    size_t size() const {
+        return tail - head;
+    }
+
+    bool empty() const {
+        return head == tail;
+    }
+
+    T &operator[](const size_t i) {
+        return data[i + head];
+    }
+
+    T &last() {
+        return data[tail - 1];
+    }
+
+    T &second() {
+        return data[tail - 2];
+    }
+
+    size_t head, tail;
+    T data[NMAX + 10];
+};  // struct Queue
 
 struct Vector {
     Vector() : index(0), x(0.0L), y(0.0L) {}
@@ -21,6 +61,10 @@ struct Vector {
 
     int index;
     int64 x, y;
+
+    int64 eval(const int64 pn) const {
+        return y + x * pn;
+    }
 
     Vector operator-(const Vector &b) const {
         return Vector(0, x - b.x, y - b.y);
@@ -34,8 +78,8 @@ inline int64 cross(const Vector &a, const Vector &b) {
 static int n, K;
 static int64 seq[NMAX + 10];
 static int64 pre[NMAX + 10];
-static int64 f[NMAX + 10][KMAX + 10];
-static int maxp[NMAX + 10][KMAX + 10];
+static int64 f[KMAX + 10][NMAX + 10];
+static int maxp[KMAX + 10][NMAX + 10];
 static int op[KMAX + 10];
 
 static void initialize() {
@@ -50,49 +94,38 @@ static void initialize() {
 int main() {
     initialize();
 
-    vector<Vector> stk;
-    stk.reserve(n);
+    Queue<Vector> q;
     for (int k = 1; k <= K; k++) {
-        // Build convex hull
-        stk.clear();
+        q.clear();
         for (int i = 1; i <= n; i++) {
-            // if (seq[i] == 0)
-            //     continue;
+            if (i > k) {
+                while (q.size() >= 2 &&
+                       q[0].eval(pre[i]) <= q[1].eval(pre[i])) {
+                    q.pop_front();
+                }  // while
 
-            Vector u(i, pre[i], f[i][k - 1] - pre[i] * pre[i]);
+                maxp[k][i] = q[0].index;
+                f[k][i] = q[0].eval(pre[i]);
+            }
 
-            while (stk.size() >= 2 &&
-                   cross(u - LAST(stk), u - SECOND(stk)) < 0) {
-                stk.pop_back();
+            Vector u(i, pre[i], f[k - 1][i] - pre[i] * pre[i]);
+
+            while (q.size() >= 2 && cross(u - q.last(), u - q.second()) <= 0) {
+                q.pop_back();
             }  // while
 
-            stk.push_back(u);
-        }  // for
+            if (q.size() == 1 && u.x == q.last().x)
+                q.pop_back();
 
-        int j = 0;
-        for (int i = k + 1; i <= n; i++) {
-            while (stk[j + 1].index < i &&
-                   stk[j + 1].y - stk[j].y >
-                       -pre[i] * (stk[j + 1].x - stk[j].x)) {
-                j++;
-            }  // while
-
-            int &p = stk[j].index;
-
-            while (p + 1 < i && seq[p + 1] == 0) {
-                p++;
-            }  // while
-
-            maxp[i][k] = p;
-            f[i][k] = f[p][k - 1] + pre[p] * (pre[i] - pre[p]);
+            q.push_back(u);
         }  // for
     }      // for
 
-    printf("%lld\n", f[n][K]);
+    printf("%lld\n", f[K][n]);
 
     int x = n;
     for (int i = K; i >= 1; i--) {
-        op[i] = maxp[x][i];
+        op[i] = maxp[i][x];
         x = op[i];
     }  // for
 
