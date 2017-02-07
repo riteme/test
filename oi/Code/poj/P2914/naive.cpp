@@ -1,4 +1,5 @@
 /**
+ * Stoer-Wagner algorithm
  * O(n^3) implementation with adjacency matrix.
  */
 
