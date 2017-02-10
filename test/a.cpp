@@ -1,63 +1,78 @@
-#include <cstdio>
+#include <cassert>
 #include <cstring>
-int n,a[30010],b[30010];
-const int Z=sizeof(int);
-int min(int x,int y){return x<y?x:y;}
-char s[300010];
-int sa[300010],rank[600010],tmp[300010],next[300010],first[300010],second[300010],
-	height[300010][19],log[300010];
-void make_sa(){
-	memset(first,-1,Z*(n>128?n:128));
-	memset(second,-1,Z*n);
-	memset(rank,0,Z*n<<1);
-	int cnt=0,tot=0;
-	for(int i=0;i<n;i++)next[i]=first[s[i]],first[s[i]]=i;
-	for(int i=0,j;tot<n;first[i++]=-1)if(first[i]>-1)
-		for(cnt++,j=first[i];j!=-1;j=next[j],tot++)rank[j]=cnt;
-	for(int k=1;cnt<n;k<<=1){
-		for(int i=tot=0,*p;i<n;i++)next[i]=*(p=second+rank[i+k]),*p=i;
-		for(int i=cnt;i>=0;second[i--]=-1)if(second[i]>-1)
-			for(int j=second[i],t,*p;j!=-1;j=t)t=next[j],next[j]=*(p=first+rank[j]),*p=j;
-		for(int i=cnt=0;tot<n;first[i++]=-1)if(first[i]>-1)
-			for(int j=first[i],l=-1,t;j!=-1;j=next[j],tot++)tmp[j]=(t=rank[j+k])>l?l=t,++cnt:cnt;
-		memcpy(rank,tmp,Z*n);
-	}
-	for(int i=0;i<n;i++)sa[--rank[i]]=i;
-	for(int i=0,l=log[1]=0;i<n;*height[rank[i++]]=l?l--:0)
-		if(rank[i]+1<n)for(;s[i+l]==s[sa[rank[i]+1]+l];l++);
-	for(int i=2;i<=n;i++)log[i]=log[i/2]+1;
-	for(int k=1;k<=log[n];k++)for(int i=0;i<n;i++)
-		height[i][k]=i+(1<<k-1)<n?min(height[i][k-1],height[i+(1<<k-1)][k-1]):height[i][k-1];
+
+#include <random>
+#include <thread>
+#include <chrono>
+#include <iostream>
+
+using namespace std;
+using namespace std::chrono;
+
+#define BUFFERSIZE 20000000
+#define MAX_DISTANCE 5000000
+
+typedef unsigned char u8;
+
+static random_device rd;
+static u8 memory[BUFFERSIZE];
+
+inline u8 randchr() {
+    return rd() % 255 + 1;
 }
-int lcp(int i,int j){
-	int t=log[j-i];
-	return min(height[i][t],height[j-(1<<t)][t]);
+
+inline int randint(int l, int r) {
+    return rd() % (r - l + 1) + l;
 }
-long long ans;
-void update(int i,int j){
-	j-=i;i=rank[i];
-	int l=-1,r=i,p,m;
-	while(r-l>1)lcp(m=l+r>>1,i)<j?l=m:r=m;
-	p=r;l=i;r=n;
-	while(r-l>1)lcp(i,m=l+r>>1)<j?r=m:l=m;
-	if(1ll*j*(r-p)>ans)ans=1ll*j*(r-p);
+
+inline u8 *strend(u8 *s) {
+    while (*s)
+        s++;
+
+    return s;
 }
-char S[600010];
-int r[600010];
-void manacher(){
-	int N=2;*S='#';S[1]='$';
-	for(int i=0;i<n;i++)S[N++]=s[i],S[N++]='$';S[N]='%';
-	for(int i=0;i<=N;i++)r[i]=1;
-	int mr=1,c;
-	for(int i=1,j;i<N;i++){
-		if(i<mr)r[i]=min(r[c-i],mr-i);
-		while(S[i-r[i]]==S[i+r[i]])r[i]++;
-		if(i+r[i]>mr)for(j=mr+2,mr=i+r[i],c=i*2;j<=mr;j+=2)update(c-j>>1,j/2-1);
-	}
-}
-int main(){
-	gets(s);n=strlen(s);
-	make_sa();
-	manacher();
-	printf("%lld\n",ans);
+
+int main() {
+    for (size_t i = 0; i < BUFFERSIZE; i++) 
+        memory[i] = randchr();
+    memory[randint(BUFFERSIZE - MAX_DISTANCE, BUFFERSIZE)] = 0;
+
+    steady_clock clock;
+    u8 *ret1, *ret2, *ret3, *ret4;
+
+    auto beg = clock.now();
+    ret1 = (u8 *) memchr(memory, 0, sizeof(memory));
+    auto now = clock.now();
+    long long span = duration_cast<nanoseconds>(now - beg).count();
+    cout << "memchr: " << span << "ns" << endl;
+
+    this_thread::sleep_for(seconds(1));
+
+    beg = clock.now();
+    ret2 = (u8 *) rawmemchr(memory, 0);
+    now = clock.now();
+    span = duration_cast<nanoseconds>(now - beg).count();
+    cout << "rawmemchr: " << span << "ns" << endl;
+
+    this_thread::sleep_for(seconds(1));
+
+    beg = clock.now();
+    ret3 = memory + strlen((char *) memory);;
+    now = clock.now();
+    span = duration_cast<nanoseconds>(now - beg).count();
+    cout << "strlen: " << span << "ns" << endl;
+
+    this_thread::sleep_for(seconds(1));
+
+    beg = clock.now();
+    ret4 = strend(memory);;
+    now = clock.now();
+    span = duration_cast<nanoseconds>(now - beg).count();
+    cout << "my impl: " << span << "ns" << endl;
+
+    assert(ret1 == ret2 &&
+           ret2 == ret3 &&
+           ret3 == ret4);
+
+    return 0;
 }
