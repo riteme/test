@@ -24,6 +24,26 @@ class SuffixTree {
     }
     // ~SuffixTree();
 
+    void trie(char *s) {
+        memcpy(str + 1, s, strlen(s));
+
+        for (int i = 1; str[i]; i++) {
+            trie_insert(str + i, i);
+        }  // for
+    }
+
+    void trie_insert(char *s, int start) {
+        Node *cur = root;
+        for (size_t i = 0; s[i]; i++) {
+            char c = s[i];
+
+            if (!cur->trans[c])
+                cur->trans[c] = new Edge(start + i, start + i, new Node);
+
+            cur = cur->trans[c]->next;
+        }  // for
+    }
+
     void add_char(char c) {
         // static Node *active = root;
         // static char active_trans = -1;
@@ -138,10 +158,11 @@ class SuffixTree {
 
     void print(stringstream &buffer) {
         buffer << "digraph {" << endl;
-        buffer << "node[shape=circle width=0.4 "
-                  "height=0.4 fixedsize=true "
-                  "fontname=\"consolas\"];edge[fontname=\"consolas\"];"
-               << endl;
+        buffer
+            << "node[shape=circle width=0.4 "
+               "height=0.4 fixedsize=true "
+               "fontname=\"consolas\"];edge[fontname=\"consolas\"];rankdir=LR;"
+            << endl;
         buffer << remain << ";" << endl;
         _print(root, buffer);
         buffer << "}" << endl;
@@ -187,15 +208,15 @@ class SuffixTree {
                    << (active_trans >= 0 ? static_cast<char>(active_trans)
                                          : '*')
                    << "\"";
+        // buffer << " color=red label=\"\"";
         else
             buffer << "label=\"\"";
 
         buffer << "];" << endl;
 
-        // if (x->suffix_link)
-        //     buffer << IDX(x) << "->" << IDX(x->suffix_link) <<
-        //     "[style=dashed];"
-        //            << endl;
+        if (x->suffix_link)
+            buffer << IDX(x) << "->" << IDX(x->suffix_link) << "[style=dashed];"
+                   << endl;
 
         for (int c = 0; c < SIGMA; c++) {
             Edge *t = x->trans[c];
@@ -250,9 +271,11 @@ int main() {
     SuffixTree tree;
     scanf("%s", buffer);
 
+    // tree.trie(buffer);
     for (size_t pos = 0; buffer[pos]; pos++) {
         tree.add_char(buffer[pos]);
     }  // for
+    show(tree);
 
     return 0;
 }  // function main

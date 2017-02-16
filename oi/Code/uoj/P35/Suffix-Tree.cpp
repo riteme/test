@@ -91,7 +91,8 @@ class SuffixTree {
             last = x;
 
             // Follow the suffix link to the next suffix
-            active = active->suffix_link ? active->suffix_link : root;
+            if (active != root)
+                active = active->suffix_link;
             cnt--;
         }  // while
 

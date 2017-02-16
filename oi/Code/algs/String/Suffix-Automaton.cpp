@@ -96,14 +96,14 @@ static void print(State *x, stringstream &buffer) {
 
     buffer << x->id << "[label=\"" << x->length << "\"];";
     for (unsigned c = 0; c < SIGMA; c++) {
-        if (x->transitions[c] != NULL)
-            buffer << x->id << "->" << x->transitions[c]->id << "[label=\""
-                   << char(c) << "\" style=bold];";
+        //if (x->transitions[c] != NULL)
+            // buffer << x->id << "->" << x->transitions[c]->id << "[label=\""
+            //       << char(c) << "\" style=bold];";
     }  // for
-    // if (x->suffix_link)
-    //     buffer << x->id << "->" << x->suffix_link->id << "[style=dashed];";
-    // else
-    //     buffer << x->id << "->" << x->id << "[style=dashed];";
+    if (x->suffix_link)
+        buffer << x->id << "->" << x->suffix_link->id << "[style=dashed];";
+    else
+        buffer << x->id << "->" << x->id << "[style=dashed];";
 
     for (unsigned c = 0; c < SIGMA; c++) {
         if (x->transitions[c] != NULL)
