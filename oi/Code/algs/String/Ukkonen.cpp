@@ -214,9 +214,9 @@ class SuffixTree {
 
         buffer << "];" << endl;
 
-        if (x->suffix_link)
-            buffer << IDX(x) << "->" << IDX(x->suffix_link) << "[style=dashed];"
-                   << endl;
+        // if (x->suffix_link)
+        //     buffer << IDX(x) << "->" << IDX(x->suffix_link) << "[style=dashed];"
+        //            << endl;
 
         for (int c = 0; c < SIGMA; c++) {
             Edge *t = x->trans[c];
