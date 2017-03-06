@@ -28,34 +28,39 @@ def compute_primes():
 
 
 def not_prime(n):
-    if n == 2:
-        return False
-    if n < 2:
-        return True
+    BASIS = [2, 7, 61]
 
-    def quick_pow(a, b, m):
+    if n in BASIS:
+        return False
+
+    def quick_pow(a, b, p):
         r = 1
 
         while b:
             if b & 1:
-                r = (r * a) % m
-            a = (a * a) % m
+                r = r * a % p
+            a = a * a % p
             b >>= 1
 
         return r
 
-    def witness(a, n):
-        return quick_pow(a, n - 1, n) != 1
+    # 将n - 1分解为2^r * t的形式，t是奇数
+    r = 0
+    t = n - 1
+    while not(t & 1):
+        t >>= 1
+        r += 1
 
-    global primes
-    S = primes[:20]
-    for a in S:
-        if a >= n:
-            a %= n
-        if a == 0:
-            a += 1
+    for b in BASIS:
+        v = quick_pow(b % n, t, n)
 
-        if witness(a, n):
+        for i in range(0, r):
+            u = v * v % n
+            if u == 1 and v != 1 and v != n - 1:
+                return True
+            v = u
+
+        if v != 1:
             return True
 
     return False
