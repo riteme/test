@@ -94,6 +94,8 @@ int main() {
             for (int j = i; j <= n - 1; j++) {
                 swap(mat[pivot][j], mat[i][j]);
             }
+            // What...
+            swap(ret[pivot], ret[i]);
         }
 
         for (int j = i + 1; j <= n - 1; j++) {

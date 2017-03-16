@@ -341,8 +341,8 @@ static void release(Node *x) {
 }
 
 int main() {
-    // freopen("freetourII.in", "r", stdin);
-    // freopen("freetourII.out", "w", stdout);
+    freopen("freetourII.in", "r", stdin);
+    freopen("freetourII.out", "w", stdout);
     initialize();
 
     set_root(1);

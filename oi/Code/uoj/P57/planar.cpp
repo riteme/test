@@ -583,7 +583,6 @@ void initialize() {
 }
 
 int main() {
-    // freopen("planar.in", "r", stdin);
     initialize();
     decompose();
     scanline();
