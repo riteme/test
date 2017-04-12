@@ -68,13 +68,19 @@ int main() {
 
     for (int i = 0; i <= n; i++) {
         if (color[i]) {
-            printf("%x: %d\n", i, color[i]);
             cnt[color[i]]++;
         }
     }
 
-    for (int i = 1; i <= 20; i++) {
-        printf("cnt[%d] = %d\n", i, cnt[i]);
+    int q;
+    scanf("%d", &q);
+    while (q--) {
+        int c;
+        scanf("%d", &c);
+        if (c < 20)
+            printf("%d\n", cnt[c - 1]);
+        else
+            printf("0\n");
     }
 
     return 0;

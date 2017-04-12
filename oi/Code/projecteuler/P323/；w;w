@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+
+from math import *
+
+def c(n, m):
+    return factorial(n) // factorial(m) // factorial(n - m)
+
+f = [[0] * 33 for i in range(100)]
+f[0][0] = 1
+
+for i in range(99):
+    for j in range(33):
+        for a in range(33):
+            f[i + 1][j - k] += f[i][j] * c(32, j)
+
+print(f)

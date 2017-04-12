@@ -23,4 +23,9 @@ for i in range(2, n + 1):
     if sg[i]:
         cnt += 1
 
+def p(s, l = 34):
+    for i in range(0, len(s), l):
+        print s[i : i + l]
+
+p("".join(map(str, sg)))
 print cnt

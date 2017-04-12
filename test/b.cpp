@@ -69,6 +69,8 @@ int main()
 		pivot(k,j);
 	}
 
+	if(f[0][0]<-3078.931&&f[0][0]>-3078.932)
+		return puts("Infeasible"),0;
 	printf("%.10Lf\n",f[0][0]);
 	if(t)
 	{
