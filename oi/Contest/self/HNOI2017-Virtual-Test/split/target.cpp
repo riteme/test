@@ -1,304 +1,174 @@
-// #define USE_FILE_IO
-// #define NDEBUG
-
-#define NAME "split"
-
-#include <cassert>
 #include <cstdio>
-#include <cstring>
-#include <climits>
-
-#include <set>
-#include <vector>
 #include <algorithm>
-
 using namespace std;
+#define N 30 + 5
+#define D 1000 + 5
+#define M 100000 + 5
+#define INF 593119681
 
-#define WMAX 30
-#define NMAX 900
-#define EMAX 2000
+int n, m, s, Min, Max, S, T, tot, Id[N][N], C_1[N][N], W_1[N][N], C_2[N][N], W_2[N][N], Head[D], Dfn[D], q[D];
 
-struct Edge {
-    Edge(int _u, int _v, int _c, int _w)
-        : u(_u), v(_v), c(_c), w(_w) {}
+struct Edge
+{
+	int next, node, flow;
+}h[M];
 
-    int u, v, c, w;
-
-    int either(int x) {
-        return u == x ? v : u;
-    }
-
-    int &select(int x) {
-        return u == x ? u : v;
-    }
-};
-
-struct Graph {
-    Graph() {
-        edges.reserve(EMAX);
-    }
-
-    Graph &operator=(const Graph &g) {
-        edges = g.edges;
-
-        for (int i = 1; i <= NMAX; i++) {
-            adj[i].clear();
-        }
-
-        for (size_t i = 0; i < edges.size(); i++) {
-            Edge *e = &edges[i];
-            adj[e->u].push_back(e);
-            adj[e->v].push_back(e);
-        }
-
-        return *this;
-    }
-
-    vector<Edge> edges;
-    vector<Edge *> adj[NMAX + 10];
-
-    void link(int u, int v, int c, int w) {
-        edges.push_back(Edge(u, v, c, w));
-        Edge *e = &edges[edges.size() - 1];
-        adj[u].push_back(e);
-        adj[v].push_back(e);
-    }
-
-    void merge(int u, int v) {
-        for (size_t i = 0; i < adj[v].size(); i++) {
-            Edge *e = adj[v][i];
-
-            if (e->either(v) != u) {
-                e->select(v) = u;
-                adj[u].push_back(e);
-            }
-        }
-    }
-
-    vector<Edge *> &operator[](const int u) {
-        return adj[u];
-    }
-};
-
-#define LEFT(x) (x << 1)
-#define RIGHT(x) ((x << 1) | 1)
-#define FATHER(x) (x >> 1)
-
-template <typename TCompare>
-struct Heap {
-    Heap() : heapsize(0) {}
-
-    void swim(int x) {
-        int &p = index[x];
-
-        while (p > 1) {
-            int &fp = index[heap[FATHER(p)]];
-
-            if (cmp(x, heap[fp])) {
-                // swap(heap[p], heap[fp]);
-                heap[p] = heap[fp];
-                heap[fp] = x;
-                swap(p, fp);
-            } else
-                break;
-        }
-    }
-
-    void sink(int x) {
-        int &p = index[x];
-
-        while (true) {
-            int nxt = p;
-            if (LEFT(p) <= heapsize && cmp(heap[LEFT(p)], heap[nxt]))
-                nxt = LEFT(p);
-            if (RIGHT(p) <= heapsize && cmp(heap[RIGHT(p)], heap[nxt]))
-                nxt = RIGHT(p);
-
-            if (nxt == p)
-                break;
-            
-            int &c = index[heap[nxt]];
-            // swap(heap[p], heap[nxt]);
-            heap[p] = heap[nxt];
-            heap[nxt] = x;
-            swap(p, c);
-        }
-    }
-
-    void push(int x) {
-        heap[++heapsize] = x;
-        index[x] = heapsize;
-        swim(x);
-    }
-
-    void pop() {
-        heap[1] = heap[heapsize--];
-        index[heap[1]] = 1;
-        sink(heap[1]);
-    }
-
-    int top() {
-        return heap[1];
-    }
-
-    int size() {
-        return heapsize;
-    }
-
-    int index[NMAX + 10];
-    int heap[NMAX + 10];
-    int heapsize;
-    TCompare cmp;
-};
-
-#undef LEFT
-#undef RIGHT
-#undef FATHER
-
-static int n, m, money;
-static Graph N;
-static int tail;
-static int sorted[EMAX + 10];
-
-inline int id(int i, int j) {
-    return (i - 1) * m + j;
+inline void addedge(int u, int v, int fl)
+{
+	h[++ tot].next = Head[u], Head[u] = tot;
+	h[tot].node = v, h[tot].flow = fl;
+	h[++ tot].next = Head[v], Head[v] = tot;
+	h[tot].node = u, h[tot].flow = 0;
 }
 
-void initialize() {
-    scanf("%d%d%d", &n, &m, &money);
-
-    tail = 2;
-    sorted[1] = 0;
-    for (int i = 1; i <= n; i++) {
-        for (int j = 1; j < m; j++) {
-            int c, w;
-            scanf("%d%d", &c, &w);
-            sorted[tail++] = c;
-            N.link(id(i, j), id(i, j + 1), c, w);
-        }
-    }
-
-    for (int i = 1; i < n; i++) {
-        for (int j = 1; j <= m; j++) {
-            int c, w;
-            scanf("%d%d", &c, &w);
-            sorted[tail++] = c;
-            N.link(id(i, j), id(i + 1, j), c, w);
-        }
-    }
-
-    sort(sorted + 1, sorted + tail);
-    tail = unique(sorted + 1, sorted + tail) - sorted;
-
-    n = id(n, m);
+inline void Flip_1()
+{
+	for (int i = 1; i <= n; i ++)
+		for (int j = 1; j * 2 < m; j ++)
+		{
+			swap(C_1[i][j], C_1[i][m - j]);
+			swap(W_1[i][j], W_1[i][m - j]);
+		}
+	for (int i = 1; i < n; i ++)
+		for (int j = 1; j * 2 <= m; j ++)
+		{
+			swap(C_2[i][j], C_2[i][m - j + 1]);
+			swap(W_2[i][j], W_2[i][m - j + 1]);
+		}
 }
 
-static Graph G;
-static int limit;
-static int marked[NMAX + 10];
-static int visited[NMAX + 10];
-static int weight[NMAX + 10];
-
-struct cmp {
-    bool operator()(const int a, const int b) const {
-        return weight[a] > weight[b] ||
-              (weight[a] == weight[b] && a < b);
-    }
-};
-
-int maximum_adjacency_search(int &s, int &t) {
-    memset(weight, 0, sizeof(weight));
-    memset(visited, 0, sizeof(visited));
-
-    Heap<cmp> q;
-    for (int u = 1; u <= n; u++) {
-        if (!marked[u])
-            q.push(u);
-    }
-
-    while (q.size() > 1) {
-        int u = q.top();
-        q.pop();
-
-        s = u;
-        visited[u] = true;
-        for (size_t i = 0; i < G[u].size(); i++) {
-            Edge *e = G[u][i];
-            int v = e->either(u);
-
-            if (e->c > limit || visited[v] || marked[v])
-                continue;
-
-            weight[v] += e->w;
-            q.swim(v);
-        }
-    }
-
-    t = q.top();
-    return weight[t];
+inline void Flip_2()
+{
+	for (int j = 1; j < m; j ++)
+		for (int i = 1; i * 2 <= n; i ++)
+		{
+			swap(C_1[i][j], C_1[n - i + 1][j]);
+			swap(W_1[i][j], W_1[n - i + 1][j]);
+		}
+	for (int j = 1; j <= m; j ++)
+		for (int i = 1; i * 2 < n; i ++)
+		{
+			swap(C_2[i][j], C_2[n - i][j]);
+			swap(W_2[i][j], W_2[n - i][j]);
+		}
 }
 
-int mincut(int cnt) {
-    int ret = INT_MAX;
-    for (int u = 1; u <= n; u++) {
-        int sum = 0;
-
-        for (size_t i = 0; i < N[u].size(); i++) {
-            Edge *e = N[u][i];
-
-            if (e->c > limit)
-                continue;
-
-            sum += e->w;
-        }
-
-        ret = min(ret, sum);
-    }
-
-    return ret;
+inline bool BFS(int st)
+{
+	for (int i = 0; i <= n * m; i ++)
+		Dfn[i] = 0;
+	int l = 1, r = 0;
+	q[++ r] = st, Dfn[st] = 1;
+	while (l <= r)
+	{
+		int z = q[l ++];
+		for (int i = Head[z]; i; i = h[i].next)
+		{
+			int d = h[i].node, p = h[i].flow;
+			if (Dfn[d] || !p) continue ;
+			Dfn[d] = Dfn[z] + 1;
+			q[++ r] = d;
+			if (d == T) return 1;
+		}
+	}
+	return 0;
 }
 
-bool test(int w) {
-    limit = w;
-    return mincut(n) > money;
+int Dinic(int z, int inflow)
+{
+	if (z == T || !inflow) return inflow;
+	int ret = inflow, flow;
+	for (int i = Head[z]; i; i = h[i].next)
+	{
+		int d = h[i].node, p = h[i].flow;
+		if (Dfn[d] != Dfn[z] + 1) continue ;
+		flow = Dinic(d, min(ret, p));
+		ret -= flow, h[i].flow -= flow, h[i ^ 1].flow += flow;
+		if (!ret) break ;
+	}
+	if (ret == inflow) Dfn[z] = -1;
+	return inflow - ret;
 }
 
-int main() {
-#ifdef USE_FILE_IO
-    freopen(NAME ".in", "r", stdin);
-    freopen(NAME ".out", "w", stdout);
-#endif
-    initialize();
-
-    // int left = 1, right = tail - 1;
-    // while (left + 1 < right) {
-    //     int mid = (left + right) / 2;
-
-    //     if (test(sorted[mid]))
-    //         right = mid;
-    //     else
-    //         left = mid + 1;
-    // }
-
-    // if (left != right && !test(sorted[left]))
-    //     left = right;
-
-    // if (!test(sorted[left]))
-    //     puts("-1");
-    // else
-    //     printf("%d\n", sorted[left]);
-
-    int pos = 1;
-    for (; pos < tail; pos++) {
-        if (test(sorted[pos]))
-            break;
-    }
-
-    if (pos >= tail)
-        puts("-1");
-    else
-        printf("%d\n", sorted[pos]);
-
-    return 0;
+void dfs(int z)
+{
+	Dfn[z] = 1;
+	for (int i = Head[z]; i; i = h[i].next)
+	{
+		int d = h[i].node, p = h[i].flow;
+		if (p && !Dfn[d]) dfs(d);
+	}
 }
 
+bool Handle(int k)
+{
+	for (S = 0, T = 2; T <= n * m; T ++)
+	{
+		tot = 1;
+		for (int i = 0; i <= n * m; i ++)
+			Head[i] = 0;
+		addedge(S, 1, s);
+		for (int i = 1; i <= n; i ++)
+			for (int j = 1; j < m; j ++)
+			{
+				if (C_1[i][j] > k) continue ;
+				addedge(Id[i][j], Id[i][j + 1], W_1[i][j]);
+				addedge(Id[i][j + 1], Id[i][j], W_1[i][j]);
+			}
+		for (int i = 1; i < n; i ++)
+			for (int j = 1; j <= m; j ++)
+			{
+				if (C_2[i][j] > k) continue ;
+				addedge(Id[i][j], Id[i + 1][j], W_2[i][j]);
+				addedge(Id[i + 1][j], Id[i][j], W_2[i][j]);
+			}
+		int res = 0;
+		while (BFS(S)) res += Dinic(S, INF);
+		for (int i = 1; i <= n * m; i ++) Dfn[i] = 0;
+		dfs(1);
+		for (int i = 1; i <= n * m; i ++)
+			if (!Dfn[i]) return 0;
+	}
+	return 1;
+}
+
+bool Check(int k)
+{
+	bool ok = 0;
+	for (int i = 0; i < 4; i ++)
+	{
+		if (!ok && Handle(k)) ok = 1;
+		if (i & 1) Flip_1();
+			else Flip_2();
+	}
+	return ok;
+}
+
+int main()
+{
+	scanf("%d%d%d", &n, &m, &s);
+	for (int i = 1, id = 0; i <= n; i ++)
+		for (int j = 1; j <= m; j ++)
+			Id[i][j] = ++ id;
+	for (int i = 1; i <= n; i ++)
+		for (int j = 1; j < m; j ++)
+		{
+			scanf("%d%d", C_1[i] + j, W_1[i] + j);
+			Max = max(Max, C_1[i][j]);
+		}
+	for (int i = 1; i < n; i ++)
+		for (int j = 1; j <= m; j ++)
+		{
+			scanf("%d%d", C_2[i] + j, W_2[i] + j);
+			Max = max(Max, C_2[i][j]);
+		}
+	int l = 1, r = Max + 1;
+	while (l < r)
+	{
+		int mid = l + r >> 1;
+		if (Check(mid)) r = mid;
+		else l = mid + 1;
+	}
+	printf("%d\n", l == Max + 1 ? -1 : l);
+	return 0;
+}

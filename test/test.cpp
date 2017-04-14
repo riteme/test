@@ -1,14 +1,15 @@
-#define rson(n) ((n << 1) | 1)
+class A {
+ private:
+    Node *func() {
 
-// int rson(int n) {
-//     return (n << 1) | 1;
-// }
+    }
+ public:
+    struct Node {
+        int fuck;
+    };
+};
 
 int main() {
-    int sum = 0;
-    for (int i = 1; i <= 100000000; i++) {
-        sum += rson(i);
-    }
-
+    A instance;
     return 0;
 }

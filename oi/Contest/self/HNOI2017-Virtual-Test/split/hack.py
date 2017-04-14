@@ -9,7 +9,7 @@ if sh("g++ std.cpp -O3 -o std.exec"):
 
 cnt = 1
 while True:
-    sh("./gen.py 10 10 1000000000 100000 100000 > split.in")
+    sh("./gen.py 10 10 1000 100 10 > split.in")
     sh("./target.exec < split.in > split.out")
     sh("./std.exec < split.in > split.ans")
 
