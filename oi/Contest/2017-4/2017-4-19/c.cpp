@@ -1,134 +1,188 @@
-#define NDEBUG
+// #define NDEBUG
+// #define USE_FILE_IO
 
 #include <cassert>
 #include <cstdio>
 #include <cstring>
 
+#include <deque>
+#include <vector>
 #include <algorithm>
 
 using namespace std;
 
-#define NMAX 300
-#define SMAX 2048
+#define NMAX 600
 
 static int n, m;
-static char seq[NMAX + 10];
-static char tmp[NMAX + 10];
-static int mask[NMAX + 10];
-static int cnt[70000];
-static int low[SMAX + 10];
+static vector<int> G[NMAX + 10];
+static int match[NMAX + 10];
 
-void initialize() {
-    scanf("%d%d", &n, &m);
-    scanf("%s", seq + 1);
+#define ODD 1
+#define EVEN 2
 
-    for (int i = 1; i <= n; i++) {
-        scanf("%s", tmp);
-        for (int j = 0; j < m; j++) {
-            if (tmp[j] == '1')
-                mask[i] |= 1 << j;
+static deque<int> q;
+static int set[NMAX + 10];
+static int link[NMAX + 10];
+static int mark[NMAX + 10];
+static char type[NMAX + 10];
+
+inline int id(int u) {
+    return set[u] ? set[u] = id(set[u]) : u;
+}
+
+inline void union_set(int x, int y) {
+    x = id(x);
+    y = id(y);
+
+    if (x != y)
+        set[x] = y;
+}
+
+inline int evaluate_lca(int u, int v) {
+    static int t = 0;
+    t++;
+    while (true) {
+        if (u) {
+            u = id(u);
+            if (mark[u] == t)
+                return u;
+            mark[u] = t;
+            u = link[match[u]];
         }
-    }
 
-    for (int i = 1; i < (1 << 16); i++) {
-        cnt[i] = cnt[i >> 1] + (i & 1);
-    }
-
-    for (int i = 0; i <= 11; i++) {
-        low[1 << i] = i;
+        swap(u, v);
     }
 }
 
-static int f[NMAX + 10][NMAX + 10][SMAX + 10];
+inline void process(int u, int p) {
+    while (u != p) {
+        int a = match[u], b = link[a];
 
-inline int code(char c) {
-    return c == '(' ? 1 : -1;
-}
+        if (id(b) != p)
+            link[b] = a;
 
-inline int bitcnt(int s) {
-    return cnt[s >> 16] + cnt[s & ((1 << 16) - 1)];
-}
-
-inline int lowbit(int s) {
-    return low[s & (-s)];
-}
-
-int dp(int n, int k, int s) {
-    if (k < 0)
-        return -1;
-    if (n == 1) {
-        if (k == code(seq[1]))
-            return s == 0 ? m + 1 : -1;
-        if (k != 0 || bitcnt(s) != 1)
-            return -1;
-
-        int b = lowbit(s);
-        if (mask[n] & (1 << b))
-            return b + 1;
-        return -1;
+        if (type[a] == ODD) {
+            type[a] = EVEN;
+            q.push_back(a);
+        }
+        assert(type[b] == EVEN);
+        union_set(u, a);
+        union_set(a, b);
+        u = b;
     }
+}
 
-    if (f[n][k][s])
-        return f[n][k][s];
+bool bfs(int s) {
+    memset(set, 0, sizeof(set));
+    memset(link, 0, sizeof(link));
+    memset(type, 0, sizeof(type));
+    q.clear();
+    q.push_back(s);
+    type[s] = EVEN;
 
-    int &ret = f[n][k][s];
-    ret = -1;
-    if (dp(n - 1, k - code(seq[n]), s) > 0)
-        ret = m + 1;
+    while (!q.empty()) {
+        int u = q.front();
+        q.pop_front();
 
-    if (ret < 0) {
-        for (int i = 1; i <= m; i++) {
-            if ((s & (1 << (i - 1))) && (mask[n] & (1 << (i - 1)))) {
-                if (dp(n - 1, k, s ^ (1 << (i - 1))) > 0) {
-                    ret = i;
-                    break;
+        for (int v : G[u]) {
+            if (!type[v]) {
+                type[v] = ODD;
+                link[v] = u;
+
+                if (match[v]) {
+                    int p = match[v];
+                    type[p] = EVEN;
+                    q.push_back(p);
+                } else {
+                    // printf("--- PATH BEGIN ---\n");
+                    while (u) {
+                        int nv = match[u];
+                        // printf("u = %d, v = %d\n", u, v);
+                        match[u] = v;
+                        match[v] = u;
+                        v = nv;
+                        u = link[v];
+                    }
+                    // printf("--- PATH END ---\n");
+
+                    return true;
                 }
+            } else if (type[v] == EVEN && id(u) != id(v)) {
+                int p = evaluate_lca(u, v);
+
+                if (id(u) != p)
+                    link[u] = v;
+                if (id(v) != p)
+                    link[v] = u;
+
+                process(u, p);
+                process(v, p);
             }
         }
+    }
+
+    return false;
+}
+
+int blossom_algorithm() {
+    int ret = 0;
+    for (int u = 1; u <= n; u++) {
+        if (!match[u] && bfs(u))
+            ret++;
     }
 
     return ret;
 }
 
-static int sol[NMAX + 10];
-static int sorted[SMAX + 10];
+void add_edge(int u, int v) {
+    G[u].push_back(v);
+    G[v].push_back(u);
+}
+
+static char s[NMAX + 10];
+
+void initialize() {
+    scanf("%d%d", &n, &m);
+    scanf("%s", s + 1);
+
+    for (int i = 1; i <= n; i++) {
+        for (int j = i + 1; j <= n; j++) {
+            if (s[i] == '(' && s[j] == ')')
+                add_edge(i, j);
+        }
+    }
+
+    for (int i = 1; i <= n; i++) {
+        scanf("%s", s + 1);
+        
+        for (int j = 1; j <= m; j++) {
+            if (s[j] == '1')
+                add_edge(i, n + j);
+        }
+    }
+
+    int tmp = n;
+    n = n + m;
+    m = tmp;
+
+    for (int i = 1; i <= n; i++) {
+        random_shuffle(G[i].begin(), G[i].end());
+    }
+}
 
 int main() {
-#ifdef NDEBUG
+#ifdef USE_FILE_IO
     freopen("c.in", "r", stdin);
     freopen("c.out", "w", stdout);
 #endif
     initialize();
 
-    for (int s = 0; s < (1 << m); s++) {
-        sorted[s] = s;
-    }
-    sort(sorted, sorted + (1 << m), [](const int a, const int b) {
-        return bitcnt(a) > bitcnt(b);
-    });
-
-    for (int i = 0; i < (1 << m); i++) {
-        int s = sorted[i];
-
-        if (dp(n, 0, s) > 0) {
-            int k = 0;
-            for (int i = n; i >= 1; i--) {
-                sol[i] = dp(i, k, s);
-
-                if (sol[i] <= m)
-                    s ^= 1 << (sol[i] - 1);
-                else {
-                    k -= code(seq[i]);
-                    sol[i] = -1;
-                }
-            }
-
-            break;
-        }
-    }
-
-    for (int i = 1; i <= n; i++) {
-        printf("%d\n", sol[i]);
+    blossom_algorithm();
+    for (int i = 1; i <= m; i++) {
+        if (match[i] > m)
+            printf("%d\n", match[i] - m);
+        else
+            puts("-1");
     }
 
     return 0;
