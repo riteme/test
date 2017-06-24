@@ -20,7 +20,7 @@ while True:
         if usr != std:
             print "Hacked!"
             break
-    elif abs(float(std) - float(usr)) >= 1e-6:
+    elif abs(float(std) - float(usr)) >= 1e-4:
         print "Hacked!"
         break
 

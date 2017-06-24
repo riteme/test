@@ -1,3 +1,4 @@
+#include <cassert>
 #include <cstdio>
 #include <cstring>
 
@@ -11,6 +12,7 @@ using namespace std;
 typedef long long i64;
 
 inline i64 inv(i64 n) {
+    assert(n);
     return n <= 1 ? n : (MOD - MOD / n) * inv(MOD % n) % MOD;
 }
 

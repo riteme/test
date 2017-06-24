@@ -3,6 +3,7 @@
 // #define NDEBUG
 #define PRETREAT_INV
 
+#include <cassert>
 #include <climits>
 #include <cstdio>
 #include <cstring>
@@ -18,6 +19,7 @@ using namespace std;
 typedef long long i64;
 
 static int n, m;
+static bool marked[NMAX + 10];
 static i64 G[NMAX + 1][NMAX + 1];
 static i64 W[NMAX + 1][NMAX + 1];
 static i64 M[NMAX + 1][NMAX + 1];
@@ -27,6 +29,8 @@ static i64 M[NMAX + 1][NMAX + 1];
 static i64 invtb[S + 10];
 
 inline i64 inv(i64 n) {
+    assert(n);
+
     i64 r = 1;
     while (n > S) {
         i64 d = MOD / n;
@@ -40,6 +44,7 @@ inline i64 inv(i64 n) {
 #else
 
 inline i64 inv(i64 n) {
+    assert(n);
     return n <= 1 ? n : (MOD - MOD / n) * inv(MOD % n) % MOD;
 }
 
@@ -49,7 +54,8 @@ i64 det() {
     bool flag = false;
     for (size_t i = 2; i < n; i++) {
         if (M[i][i] == 0) {
-            for (size_t j = i + 1; j <= n; j++) {
+            size_t j;
+            for (j = i + 1; j <= n; j++) {
                 if (M[j][i]) {
                     flag ^= 1;
 
@@ -60,6 +66,9 @@ i64 det() {
                     break;
                 }  // if
             }      // for
+
+            if (j > n)
+                return 0;
         }          // if
 
         for (size_t j = i + 1; j <= n; j++) {
@@ -79,6 +88,15 @@ i64 det() {
     }  // for
 
     return flag ? MOD - ret : ret;
+}
+
+void dfs(int x) {
+    marked[x] = true;
+
+    for (int y = 1; y <= n; y++) {
+        if (G[x][y] && !marked[y])
+            dfs(y);
+    }
 }
 
 void initialize() {
@@ -111,9 +129,21 @@ int main() {
 #endif  // IFDEF USE_FILE_IO
     initialize();
 
+    dfs(1);
+    bool flag = true;
+    for (int i = 1; i <= n; i++) {
+        flag &= marked[i];
+    }
+
+    if (!flag) {
+        puts("0");
+        return 0;
+    }
+
     i64 ans = 0, all, allinv;
     memcpy(M, G, sizeof(G));
     all = det();
+    assert(all);
     allinv = inv(all);
 
     for (int i = 1; i <= n; i++) {
@@ -123,14 +153,14 @@ int main() {
                 M[i][j] = M[j][i] = 0;
                 M[i][i]--;
                 M[j][j]--;
-                ans = (ans + (all - det()) * allinv % MOD * W[i][j]) % MOD;
+                ans = (ans + (all - det()) * W[i][j]) % MOD;
             }
         }  // for
     }      // for
 
     if (ans < 0)
         ans += MOD;
-    printf("%lld\n", ans);
+    printf("%lld\n", ans * allinv % MOD);
 
     return 0;
 }  // function main

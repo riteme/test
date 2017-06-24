@@ -176,7 +176,6 @@ static int dinic() {
 }
 
 int main() {
-    freopen("B.in", "r", stdin);
     int test;
     // scanf("%d", &test);
     test = readint();

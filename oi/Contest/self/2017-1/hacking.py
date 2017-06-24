@@ -8,7 +8,7 @@ if len(sys.argv) < 2:
     exit(-1)
 
 name = sys.argv[1]
-if sh("g++ -std=c++11 {0}.cpp -o {0}.exec".format(name)):
+if sh("g++ -std=c++11 {0}.cpp -O3 -o {0}.exec".format(name)):
     exit(-1)
 if sh("g++ -std=c++11 {0}-brute.cpp -O3 -o {0}-brute.exec".format(name)):
     exit(-1)
