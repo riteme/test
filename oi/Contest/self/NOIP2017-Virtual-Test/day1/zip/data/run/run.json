@@ -1,0 +1,14 @@
+{
+    "name": "run",
+    "source_ext": ".cpp",
+    "build_file": "a.out",
+    "compiler": "g++ -O2 -std=c++11 -DUSE_FILE_IO",
+    "start_id": 1,
+    "end_id": 10,
+    "input_suffix": "in",
+    "output_suffix": "ans",
+    "name_format": "{0}{1}.{2}",
+    "time_limit": 2.0,
+    "memory_limit": 512.0,
+    "special_judge": false
+}
