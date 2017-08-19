@@ -32,8 +32,8 @@ i64 dfs(i64 n, int k) {
     i64 s = isqrt(n);
     assert(s * s <= n);
     // printf("%lld %lld\n", n, s);
-    if (n - 2 * k > 25)
-        return dfs(25, k) + (s - 5) * 2 + (s * s == n ? 0 : 1);
+    if (n - 2 * k > 9)
+        return dfs(9, k) + (s - 3) * 2 + (s * s > n - k ? 0 : 1);
 
     s *= s;
     if (s < n)
