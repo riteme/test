@@ -1,7 +1,6 @@
 #pragma GCC optimize(3)
 
 #define NDEBUG
-#define USE_GENERATOR
 
 #include <cassert>
 #include <cstring>
@@ -23,7 +22,7 @@ static int64 sa, sb, sc, sd, a1, mod;
 inline int64 gf(int64 x) {
     int64 x2 = x * x % mod;
     int64 x3 = x2 * x % mod;
-    
+
     return (sa * x3 % mod + sb * x2 % mod + sc * x % mod + sd) % mod;
 }
 
@@ -53,13 +52,11 @@ static void initialize() {
 }
 
 int main() {
-    freopen("sequence.in", "r", stdin);
-    freopen("sequence.out", "w", stdout);
     initialize();
-    
-    int64 minv = seq[n];
+
+    int64 minv = seq[1];
     int64 answer = 0;
-    for (int i = n - 1; i >= 1; i--) {
+    for (int i = 2; i <= n; i++) {
         answer = max((seq[i] - minv + 1) >> 1, answer);
 
         minv = min(minv, seq[i]);
