@@ -1,5 +1,9 @@
 # OI Coding Guidelines
 
+## 目录
+
+[TOC]
+
 ## 前言
 
 这份简单的指南主要是关于以下两个方面：
@@ -123,6 +127,7 @@ for (int i = 1; i <= n; i++) {
 | :--------------------------: | :-----------------------: | :------------------------------------: |
 |            `aha`             |           Aha!            |            dalao HJWJBSR 最爱            |
 |            `ans`             |          answer           |                                        |
+|            `arr`             |           array           |                                        |
 |            `buc`             |          bucket           |                 桶排序相关                  |
 |            `buf`             |          buffer           |                 缓存、缓冲                  |
 |             `ch`             |     child / children      |                通常指树上的儿子                |
@@ -141,10 +146,10 @@ for (int i = 1; i <= n; i++) {
 |            `err`             |           error           |                                        |
 |            `eval`            |         evaluate          |                   计算                   |
 |            `expr`            |        expression         |                  表达式                   |
-|        `f`, `g`, `dp`        |             -             |               一般人的 DP 数组               |
+|        `f`, `g`, `dp`        |             -             |               一般的 DP 数组                |
 |             `fa`             |          father           |                                        |
 |            `func`            |         function          |                   函数                   |
-|           `g`, `G`           |           graph           |                   图                    |
+|           `g`, `G`           |   graph / primive root    |               图 / 数论中的原根               |
 |        `i`, `j`, `k`         |             -             |                  各种下标                  |
 |         `inf`, `INF`         |         infinity          |       `#define INF 0x3f3f3f3f`?        |
 |            `init`            |        initialize         |                                        |
@@ -155,12 +160,11 @@ for (int i = 1; i <= n; i++) {
 |            `jmp`             |           jump            |                                        |
 |        `l`, `r`, `m`         |    left, right, middle    |                 常用于二分中                 |
 |            `lch`             |        left child         |                                        |
-|            `rch`             |        right child        |                                        |
 |            `len`             |          length           |                                        |
 |          `ll`, `LL`          |   `long long` (in C++)    |                                        |
 |          `mi`, `mx`          |         min, max          |             （我个人不喜欢 `mi`）              |
 |            `mid`             |          middle           |                                        |
-|         `mod`, `MOD`         |          modulo           |        `#define MOD 998244353`?        |
+|         `mod`, `MOD`         |          modulo           |         $10^9 + 7,\;998244353$         |
 |            `mul`             |         multiply          |                                        |
 |            `num`             |          number           |                                        |
 |            `nxt`             |           next            |                                        |
@@ -168,20 +172,20 @@ for (int i = 1; i <= n; i++) {
 |            `pos`             |         position          |                                        |
 |            `pre`             |          prefix           |                   前缀                   |
 |            `pre`             |         previous          |                  上一个                   |
-|            `pri`             |           prime           |                   素数                   |
+|            `pri`             |           prime           |                                        |
 |            `ptr`             |          pointer          |                   指针                   |
 |        `rand`, `rnd`         |          random           |                                        |
 |            `rch`             |        right child        |                                        |
 |            `ref`             |         reference         |                   引用                   |
 |            `res`             |          result           |                                        |
 |            `ret`             |          return           |                                        |
-|            `rev`             |          reverse          |                   反转                   |
+|            `rev`             |          reverse          |                                        |
 |             `S`              |            set            |                 通常表示集合                 |
 |           `s`, `t`           |   source, sink (target)   |           源点和汇点，在网络流和最短路中常见            |
 |            `seg`             |          segment          |      You must know segment trees.      |
 |            `seq`             |         sequence          |                                        |
 |            `sqr`             |          square           |                 $x^2$                  |
-|             sqrt             |        square root        |               $\sqrt x$                |
+|            `sqrt`            |        square root        |               $\sqrt x$                |
 |            `stk`             |           stack           |                                        |
 |            `str`             |          string           |                                        |
 |            `suf`             |          suffix           |                   后缀                   |
