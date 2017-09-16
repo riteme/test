@@ -15,7 +15,7 @@
 
 ## 第一部分：C++ 语言
 
-CCF 已经发了公告[^1]，将要在不久后就会逐步取消 Pascal 和 C 语言。对于使用 Pascal 的同学，需要尽快转到 C++ 上面来，而对于使用 C 语言的同学，我觉得这是不存在的，因为 OI 中鲜有使用一些 C++ 高级特性的场景。
+CCF 已经发了公告[^1]，将要在不久后就会逐步取消 Pascal 和 C 语言。对于使用 Pascal 的同学，需要尽快转到 C++ 上面来。而对于使用 C 语言的同学，我觉得这是不存在的，因为 OI 中鲜有使用一些 C++ 高级特性的场景，那么 C 语言选手和 C++ 选手的主要区别就只剩是否使用 STL。
 
 [^1]: http://www.noi.cn/about/rules/744-ccfnoi 
 
@@ -119,7 +119,7 @@ for (int i = 1; i <= n; i++) {
 
 通常普遍为大家所接受的就是使用英文（或简写），而不是拼音甚至是拼音简写。我见过一个比较极端的例子就是 `ksm`。乍一看不知道是个什么东西，知道看了代码才知道是 “快速幂” 的意思......一般这种函数通常都会写做 `quick_pow` 或者是 `qpow`。当然，上面的结论是基于方便他人理解你的代码而得出的。在 OI 中，基本没人会在意你是怎么写的。所以如果你更熟悉我们的国语，使用拼音命名法也无妨。
 
-兼顾阅读效率和编码效率，我的推荐是名称最好是 2-4 个字符，超过 6 个字符是不太适合的。之所以不推荐 1 个字符，是因为容易产生命名冲突，也容易写错代码。
+兼顾阅读效率和编码效率，我的推荐是名称最好是 $2$-$4$ 个字符，超过 $6$ 个字符是不太适合的。之所以不推荐 1 个字符，是因为容易产生命名冲突，也容易写错代码。
 
 下面列举了一些在 OI 中常见的写法及其含义：
 
@@ -168,7 +168,7 @@ for (int i = 1; i <= n; i++) {
 |            `mul`             |         multiply          |                                        |
 |            `num`             |          number           |                                        |
 |            `nxt`             |           next            |                                        |
-|          `pi`, `PI`          |    $\pi = 3.14159...$     |          `cmath` 中提供了 `M_PI`           |
+|          `pi`, `PI`          |          `cmath`          |     `M_PI` 中提供了 $\pi = 3.14159...$     |
 |            `pos`             |         position          |                                        |
 |            `pre`             |          prefix           |                   前缀                   |
 |            `pre`             |         previous          |                  上一个                   |
@@ -198,4 +198,264 @@ for (int i = 1; i <= n; i++) {
 
 当然，每个人都会有自己的喜好，你可以参照上面来简化你的命名规范。
 
-(new part)
+### 全局中的变量和函数
+
+这一部分主要是提一下 `inline` 和 `static` 关键字。`inline` 关键字用于函数，表示提醒编译器可以对这个函数展开内联优化，简单的说就是将函数的代码直接写出来，而不是一个函数调用。这里给一个具体的例子：
+
+```c++
+int func(int n) {
+  	return n + 5;
+}
+
+int main() {
+  	printf("%d\n", func(10));  // 输出 15
+  	return 0;
+}
+```
+
+那么内联展开后的结果应该等价于：
+
+```c++
+int main() {
+  	printf("%d\n", 10 + 5);  // 输出 15
+  	return 0;
+}
+```
+
+从实际的汇编代码来看，如果进行 `inline`，得到的代码是这样的：
+
+```assembly
+.LC0:  // 字符串 "%d\n" 的声明
+	.string	"%d\n"
+	.text
+	.globl main
+	.type main, @function
+
+// ...
+movl $10, %edi    // 填入参数 10
+call func         // 执行 func
+movl %eax, %esi   // 将 func 的返回结果填入 printf 的参数
+movl $.LC0, %edi  // 将 "%d\n" 填入参数
+movl $0, %eax     // 由于 printf 使用了变长参数列表，所以这里应该是填了一个终止标记？
+call printf       // 调用 printf
+```
+
+而进行了内联优化之后，就会变成这样子：
+
+```assembly
+movl $10, -4(%rbp)
+movl -4(%rbp), %eax
+addl $5, %eax  // 直接执行 10 + 5 (eax 处原是 10)
+movl %eax, %esi
+movl $.LC0, %edi
+movl $0, %eax
+call printf
+```
+
+上面的过程在不开优化的情况下是不会进行的，这里我是通过强制 GCC 内联才得到的结果。此外，对于递归函数，编译器是不会进行内联优化的，也就是说递归函数前面加上 `inline` 没有任何用处。如果一个函数很长或者很复杂，编译器也通常不会进行优化。我的推荐是如果行数不超过 $7$ 行，就写一个 `inline`，否则就没有必要浪费时间。
+
+`static` 可以用于函数和变量前。在函数前写个 `static` 纯属画蛇填足，因为没有任何用处，但在变量前写个 `static`，可以使你少写一个清零。被声明为 `static` 的原始类型变量初始默认都是 $0$，而不是一个随机的值。
+
+在函数中的静态变量相当于是一个全局变量，只是函数外部不可以访问到它。这个特性通常被拿来做计数器：
+
+```c++
+// 调用 5 次 cnt 将分别返回 1 2 3 4 5
+int cnt() {
+  	static int tot;  // 初始为 0
+  	return ++tot;
+}
+```
+
+### 模块化
+
+虽然大部分题目只会涉及到一两个算法，但是 OI 中不缺乏代码量大、涉及算法和方法比较多的题目，例如需要打各种公式的 “[【清华集训2016】定向越野](http://uoj.ac/problem/277)”、为了给部分分而造出的三合一　“[【NOI2015】小园丁与老司机](http://uoj.ac/problem/132)”，以及 NOIP 三合一的 "[【WC2013】平面图](http://uoj.ac/problem/57)"，如果代码没有良好的规划，那么在考场上写这种题目出错的概率将大大增加。
+
+模块化通常是将没有什么关联的代码块做出适当的隔离。最需要这种方法的情况是需要使用不同的算法解决不同要求的问题的时候，通常代码会有下面的结构：
+
+```c++
+struct NAIVE {
+    // 暴力算法
+
+    void main() {
+        // ...
+    }
+};
+
+struct Solver1 {
+    // 骗分算法 1
+
+    void main() {
+        // ...
+    }
+};
+
+struct Solver2 {
+    // 骗分算法 2
+
+    void main() {
+        // ...
+    }
+};
+
+int main() {
+    if (n <= 1000)
+        (new NAIVE)->main();    // 使用暴力算法
+  	else if (something met)
+      	(new Solver1)->main();  // 采用算法一
+  	else if (something else met)
+      	(new Solver2)->main();  // 采用算法二
+  	else  // ***k the problem
+      	puts("orz");            // 表示对出题人崇高的敬意
+
+  	return 0;
+}
+```
+
+这样做相比于所有算法都写在全局的好处在于它首先避免了算法之间的命名冲突。其次，如果一个算法将不会被使用，那么它所需要的内存也不会被申请，避免了全部开在全局而导致超出内存限制的隐患。
+
+除了使用 `class`/`struct` 这种方法之外，一些人还会使用 `namespace`。虽然我个人是觉得 `namespace` 是没什么用的，因为它的作用可以说只是把命名空间中的所有名字全部加上了命名空间的名称。比如 STL 中的所有东西全部被放在了一个叫做 `std` 的命名空间，所以，如果程序前面不加上 `using namespace std`，那么使用其中的函数就都需要加上一个 `std::`，如 `std::sort`。
+
+### `class` 与 `struct`
+
+在 C++ 中，`class` 与 `struct` 的唯一区别在于：`class` 的成员默认使用 `private` 修饰，而 `struct` 中默认使用 `public`。换句话说，下面的这个定义：
+
+```c++
+class A {
+ public:
+	// ...
+};
+```
+
+与 `struct A {};` 是等价的。在 OI 中，没有必要关心成员应该被声明为 `public` 还是 `private`，所以大家普遍使用 `struct`。出于这个原因，下文中将不会再提及 `class`。
+
+构造函数是 `struct` 一个很方便的特性，一般被用于给算法或数据结构提供参数，或者用于初始化。但是请注意，构造函数不是普通的函数。构造函数的调用意味着一个新的实例的创建，因此一般不会递归的调用构造函数。例如，下面这份代码：
+
+```c++
+struct Aha {
+	int arr[1000000];
+
+	Aha(int n) {
+      	if (!n)
+      		return;
+      	printf("%d\n", arr[0]);  // 防止编译器优化
+      	Aha(n - 1);
+	}
+};
+```
+
+如果执行 `new Aha(1000)`，将意味着会有 $1000$ 个 `Aha` 会被创建，意味着 $10^6 \times 10^3 = 10^9$ 个 `int` 被创建，意味着你会获得 Memory Limit Exceeded 或者 Runtime Error。意思是，每一次 `Aha` 构造函数的递归，都是在一个新的 `Aha` 上进行的，而不是在同一个上。所以，像线段树这种普遍使用递归来构造的数据结构，一般会新声明一个函数来构建。
+
+此外，构造函数在 OI 中更普遍的应用是简单数据的声明，如 `Point`、`Vector` 和 `Line` 之类的东西。例如在需要计算几何的代码中，通常会有：
+
+```c++
+struct Point {
+  	Point() : x(0), y(0) {}  // 默认构造函数
+	Point(double _x, double _y) : x(_x), y(_y) {}
+  	Point(const Point &p) : x(p.x), y(p.y) {}  // 复制构造函数
+
+	double x, y;
+};
+```
+
+那么，使用 `Point()` 将会得到一个位于原点的点，而使用 `Point(2, 3)` 将会得到一个坐标在 $(2,\;3)$ 的点。
+
+OIer 普遍不会关心内存回收的问题，除非是确实不回收会导致超内存。所以大家的代码中都鲜有析构函数的出现。一般析构函数的作用就是删除一些用 `new` 或者 `malloc` 申请出的空间，一个典型的例子就是线段树和平衡树的删除：
+
+```c++
+struct Node {
+	Node(int l, int r)  // 构造函数
+        : left(l), right(r), lch(NULL), rch(NULL) {
+        dat = new int;
+    }
+
+  	~Node() {
+        delete dat;
+        delete lch;
+        delete rch;
+    }
+
+	int left, right;
+  	int *dat;
+  	Node *lch, *rch;
+};
+```
+
+假设 `root` 是树根，那么 `delete root` 将会回收整个线段树，因为 `delete lch` 和 `delete rch` 意味着左儿子和右儿子的析构函数也会被递归的调用。也许你会问当 `lch` 或 `rch` 为 `NULL` 的时候会怎么样，其实什么事都不会发生，因为如果 `delete` 一个空指针（`0`、`NULL` 或者 C++11 中的 `nullptr`），这个操作将会被无视。
+
+另外一个常用的特性就是运算符重载。基本上你能想到的运算符都是可以重载的，这些都可以在 [cppreference](http://en.cppreference.com/w/cpp/language/operators) 上看到。接下来只介绍几个常用的重载。
+
+重载比较关系符，大于小于等于之类的，如果重载了小于就可以直接用 `std::sort` 排序而不用写 `cmp`：
+
+```c++
+#include <cmath>  // For hypot
+
+#define EPS 1e-8
+
+inline bool equ(double a, double b) {
+    return a - EPS < b && b < a + EPS;
+}
+
+struct Point {
+  	double x, y;
+
+  	// 计算模长
+  	double len() const {
+      	return hypot(x, y);
+  	}
+
+  	bool operator<(const Point &b) const {
+        return len() < b.len();  // 按模长长短排序。
+    }
+
+  	// 相等和不等
+	bool operator==(const Point &b) const {
+        return equ(x, b.x) && equ(y, b.y);
+    }
+  
+  	bool operator!=(const Point &b) const {
+        return !(*this == b);
+    }
+};
+```
+
+通常，运算符重载还可以用友元函数来写。上面的例子用友元函数来写就是这样的：
+
+```c++
+struct Point {
+  	double x, y;
+
+  	double len() const {
+      	return hypot(x, y);
+  	}
+
+	friend bool operator<(const Point &a, const Point &b);
+};
+
+bool operator<(const Point &a, const Point &b) {
+	return a.len() < b.len();
+}
+```
+
+这就类似于写 `cmp` 这种东西了。
+
+像向量这种东西，我们经常会需要重载加减、数乘、叉积和点积运算，这时候就可以使用运算符重载。具体的写法你们可以自己脑补。我一般把数乘和点积重载为 `*` 号，把点积重载为 `%` 号。
+
+此外，函数调用也可以重载（就是函数调用后的那一对括号...）。这通常用于提供给 `std::map` 和 `std::priority_queue` 之类的 `cmp`：
+
+```c++
+struct cmp {
+  	bool operator()(int a, int b) const {
+      	return a > b;
+  	}
+};
+
+static priority_queue<int, vector<int>, cmp> q;  // 转变为小根堆
+static cmp func;  // 可以直接把 func 当函数用。
+```
+
+Plan:
+
+1.  运算符优先级？
+2.  模板 template
+3.  宏定义
+4.  常用 STL 函数
