@@ -13,6 +13,8 @@
 
 由于大多是我个人的感受，所以后面的内容大家简单看看就好。
 
+下面有些段落前面会标上 “\*” 号，表示这一部分的内容在正式赛场上不能使用，至少需要 C++11 的支持。
+
 ## 第一部分：C++ 语言
 
 CCF 已经发了公告[^1]，将要在不久后就会逐步取消 Pascal 和 C 语言。对于使用 Pascal 的同学，需要尽快转到 C++ 上面来。而对于使用 C 语言的同学，我觉得这是不存在的，因为 OI 中鲜有使用一些 C++ 高级特性的场景，那么 C 语言选手和 C++ 选手的主要区别就只剩是否使用 STL。
@@ -382,7 +384,7 @@ struct Node {
 
 假设 `root` 是树根，那么 `delete root` 将会回收整个线段树，因为 `delete lch` 和 `delete rch` 意味着左儿子和右儿子的析构函数也会被递归的调用。也许你会问当 `lch` 或 `rch` 为 `NULL` 的时候会怎么样，其实什么事都不会发生，因为如果 `delete` 一个空指针（`0`、`NULL` 或者 C++11 中的 `nullptr`），这个操作将会被无视。
 
-另外一个常用的特性就是运算符重载。基本上你能想到的运算符都是可以重载的，这些都可以在 [cppreference](http://en.cppreference.com/w/cpp/language/operators) 上看到。接下来只介绍几个常用的重载。
+另外一个常用的特性就是运算符重载。基本上你能想到的运算符都是可以重载的，这些都可以在 cppreference (<http://en.cppreference.com/w/cpp/language/operators>) 上看到。接下来只介绍几个常用的重载。
 
 重载比较关系符，大于小于等于之类的，如果重载了小于就可以直接用 `std::sort` 排序而不用写 `cmp`：
 
@@ -453,9 +455,146 @@ static priority_queue<int, vector<int>, cmp> q;  // 转变为小根堆
 static cmp func;  // 可以直接把 func 当函数用。
 ```
 
-Plan:
+### 运算符优先级
 
-1.  运算符优先级？
-2.  模板 template
-3.  宏定义
-4.  常用 STL 函数
+C++ 中书写表达式的时候不可避免的就是运算符优先级的考虑，尤其是含有位运算的表达式中。了解 C++ 中的运算符优先级有利于我们在考场上节约时间和精力。一般情况下只要知道以下几个相对顺序就可以了：
+
+1.  乘法、除法、取模 (`*`, `/`, `%`)
+2.  加法、减法 (`+`, `-`)
+3.  按位左移、右移 (`<<`, `>>`)
+4.  大于、小于、不大于、不小于 (`>`, `<`, `<=`, `>=`)
+5.  相等、不相等 (`==`, `!=`)
+6.  按位与 (`&`)
+7.  按位异或 (`^`)
+8.  按位或 (`|`)
+9.  逻辑与 (`&&`)
+10.  逻辑或 (`||`)
+
+比较容易写错的是有按位左移、右移的，要注意加法减法的优先级比按位左移右移高，因此 `1 << 3 + 7` 的结果不是 $2^3 + 7$，而是 $2^{10}$。此外由于比较运算符的优先级没有按位左移、右移高，所以如果比较符两边的按位平移要用括号包起来。另外，与的优先级高于或的优先级。如果考试时忘记了，那你最好还是多写几个括号以免出错。
+
+详细的运算符优先级也可以在 cppreference  (<http://en.cppreference.com/w/cpp/language/operator_precedence>) 上看到。
+
+### 模板
+
+这里将介绍一些简单的模板 (`template`) 的使用。一般是用于一些简单的函数，如 `max`：
+
+```c++
+template <typename T>
+inline T max(const T &a, const T &b) {
+  	return b < a ? a : b;
+}
+```
+
+我们可以直接使用 `max(1, 2)`，它将返回 `2`。实际上是编译器发现你填入的参数 `a` 和 `b` 都是 `int`，所以编译器可以推断出 `template` 中的声明 `T` 应该是 `int`。于是编译器将上面的 `max` 函数补全，然后产生了下面的代码：
+
+```c++
+inline int max(const int &a, const int &b) {
+  	return b < a ? a : b;
+}
+```
+
+这是模板的本质。实际上，编译器可能有时候无法推断类型是什么，就比如下面这段快读的代码：
+
+```c++
+template <typename T>
+inline T read() {
+    T x = 0, f = 1;
+  	char c;
+  	do {
+        c = getchar();
+      	if (c == '-')
+          	f = -1;
+    } while (!isdigit(c));
+
+  	do {
+        x = x * 10 + c - '0';
+      	c = getchar();
+    } while (isdigit(c));
+
+  	return f * x;
+}
+```
+
+此时，如果你想读入一个 `int`，就需要调用 `read<int>()`，通过尖括号内的内容告诉编译器 `T` 应该是什么东西。当然，一般的快读不会这么写，因为在性能要求很高的情况下返回值可能会增大常数，所以一般都是引用参数：
+
+```c++
+template <typename T>
+inline void read(T &x) {
+    x = 0;
+  	// 下面基本一致
+}
+```
+
+这样就不用填模板参数了，直接像 `read(n)` 一样使用就好。
+
+模板当然可以多放几个待定的类型，例如，我一般写的判断两个浮点数是否相同的代码是这样的：
+
+```c++
+template <typename T1, typename T2>
+inline bool equ(const T1 a, const T2 b) {
+  	return fabs(a - b) < EPS;
+}
+```
+
+如果 `a` 和 `b` 只声明一个 `T`，那么当调用 `equ(1.0f, 1.0)` 会出现编译错误，因为 `a` 是 `float` 而 `b` 是 `double`，`T` 不能同时是两个类型。
+
+你可以为特定的类型写特化的函数。还是拿之前快读做例子，读入整型应该是那么读，但读入字符串就要换一种方式，因此我们需要这么写：
+
+```c++
+template <>
+// read<char> 可以简写为 read，因为 T = char 可以从参数中推出
+inline void read<char>(char &ch) {
+	do {
+		ch = getchar();		
+	} while (!isalpha(ch));
+
+	char *str = &ch;
+	size_t pos = 1;
+	do {
+		str[pos++] = getchar();
+	} while (isalpha(str[pos - 1]));
+	str[pos - 1] = 0;
+}
+
+// 输入 "owengetmad"
+char buf[233];
+read(buf[0]);  // buf = "owengetmad"
+```
+
+上面是将 `T` 指定为 `char` 时的特化，说白了就是将 `T` 替换掉再写一遍。之所以不特化为 `char []`，是因为之前读取整数的模板使用的是引用参数，而数组类型不能为引用，所以只能折中一下使用 `char`，对 `ch` 取个地址就可得到字符数组的地址。
+
+`class` 和 `struct` 也可以使用模板，虽然这在 OI 中不常用。我所在 OI 见到的也就类似于下面这种情况：
+
+```c++
+template <typename T>
+struct Point {
+    T x, y;
+};
+```
+
+如果需要特化，会写成这样：
+
+```c++
+template <>
+struct Point<int> {
+    int x, y;
+};
+```
+
+\* 剩下一个常用的就是变长模板参数，一般用于输出调试信息：
+
+```c++
+template <typename ... Args>
+void DEBUG(const char *str, const Args & ... args) {
+  	printf("(debug) ");
+  	printf(str, args...);
+  	putchar('\n');
+}
+```
+
+使用 `DEBUG("BOY♂%s♂DOOR %d", "NEXT", 123)` 会输出 `(debug) BOY♂NEXT♂DOOR 123`。
+
+Plan
+
+1.  宏定义
+2.  常用 STL 函数
