@@ -9,17 +9,15 @@
 这份简单的指南主要是关于以下两个方面：
 
 1.  OI 赛场上 C++ 语言的一些常用技巧和注意事项。
-2.  NOI Linux (Ubuntu) 中常用的工具和习惯。
+2.  NOI Linux (Ubuntu) 中常用的工具。
 
-由于大多是我个人的感受，所以后面的内容大家简单看看就好。
+由于大多是我个人的感受，而本人又是一个菜鸡被线踩选手，所以后面的内容大家简单看看就好。
 
-下面有些段落前面会标上 “\*” 号，表示这一部分的内容在正式赛场上不能使用，至少需要 C++11 的支持。
+下面有些段落前面会标上 “\*” 号，表示这一部分的内容在正式赛场上不能使用，因为至少需要 C++11 的支持。
 
 ## 第一部分：C++ 语言
 
-CCF 已经发了公告[^1]，将要在不久后就会逐步取消 Pascal 和 C 语言。对于使用 Pascal 的同学，需要尽快转到 C++ 上面来。而对于使用 C 语言的同学，我觉得这是不存在的，因为 OI 中鲜有使用一些 C++ 高级特性的场景，那么 C 语言选手和 C++ 选手的主要区别就只剩是否使用 STL。
-
-[^1]: http://www.noi.cn/about/rules/744-ccfnoi 
+CCF 已经发了公告，不久后将会逐步取消 Pascal 和 C 语言。对于使用 Pascal 的同学，需要尽快转到 C++ 上面来。而对于使用 C 语言的同学，我觉得这是不存在的，因为 OI 中鲜有使用一些 C++ 高级特性的场景，那么 C 语言选手和 C++ 选手的主要区别就只剩是否使用 STL。 
 
 这里我将会写一点一般 OIer 容易忽视的一些 C++ 语法和技巧，希望对你们有用。
 
@@ -33,7 +31,7 @@ CCF 已经发了公告[^1]，将要在不久后就会逐步取消 Pascal 和 C �
 #include <...>
 #include <...>
 #include <...>
-// #include <bits/stdc++.h>: someone may love it.
+// #include <bits/stdc++.h>: someone may love it. This is OK in NOI.
 
 // 花式宏定义
 // 一些简单的函数
@@ -64,7 +62,7 @@ int main() {
 }
 ```
 
-至于到底该怎么写，这都是个人的习惯和爱好。这里只是建议每个函数不宜过长，最好不要有超过 20 行的函数，因为这种很长的函数不利于代码调试。
+至于到底该怎么写，这都是个人的习惯和爱好。这里只是建议每个函数不宜过长，最好不要有超过 $20$ 行的函数，因为这种很长的函数不利于代码调试。
 
 ### 空格与空行
 
@@ -85,7 +83,7 @@ x2 = -b - sqrt(b * b - 4 * a * c) / (2 * a);  // 注释与代码之间通常也�
 
 空行通常用于分隔两段作用有明显差异的代码块，如两个函数之间、同一个函数的不同步骤之间。这个时候写点注释也是可以的，但是上了考场，由于时间原因，大家普遍不会写注释......
 
-下面这段代码我是随便从 UOJ 上截的一段改的，大家体会一下就好。
+下面这段代码我是随便从 UOJ 上截的一段改的，体会一下就好。
 
 ```c++
 sieve();
@@ -95,23 +93,22 @@ for (int i = 1; i <= h; i++)
 
 for (int i = 1; i <= n; i++) {
     i64 t = gcd(a[1], a[i]);
-    
+
     if (t == 1) {
     	printf("-1 ");
     	continue;
     }
 
     bool flag = 1;
-    for (int j = 1; j <= tot && 1LL * p[j] * p[j] <= t; j++)
+    for (int j = 1; j <= tot && 1LL * p[j] * p[j] <= t; j++) {
         if (!(t % p[j])){
             printf("%lld ", t / p[j]);
             flag = 0;
             break;
         }
+    }
 
-    if (flag)
-    	printf("1 ");  // t为质数
-  	// 一些人可能喜欢这样：if (flag) printf("1 ");  // t为质数
+    if (flag) printf("1 ");  // t为质数
 }
 ```
 
@@ -119,84 +116,84 @@ for (int i = 1; i <= n; i++) {
 
 ### 命名习惯
 
-通常普遍为大家所接受的就是使用英文（或简写），而不是拼音甚至是拼音简写。我见过一个比较极端的例子就是 `ksm`。乍一看不知道是个什么东西，知道看了代码才知道是 “快速幂” 的意思......一般这种函数通常都会写做 `quick_pow` 或者是 `qpow`。当然，上面的结论是基于方便他人理解你的代码而得出的。在 OI 中，基本没人会在意你是怎么写的。所以如果你更熟悉我们的国语，使用拼音命名法也无妨。
+通常普遍为大家所接受的就是使用英文（或简写），而不是拼音乃至拼音简写。我见过一个比较极端的例子就是 `ksm`。乍一看不知道是个什么东西，直到看了代码才知道是 “快速幂” 的意思......一般这种函数通常都会写做 `quick_pow` 或者是 `qpow`。当然，上面的结论是基于方便他人理解你的代码而得出的。在 OI 中，基本没人会在意你是怎么写的。所以如果你更熟悉我们的国语，使用拼音命名法也无妨。
 
-兼顾阅读效率和编码效率，我的推荐是名称最好是 $2$-$4$ 个字符，超过 $6$ 个字符是不太适合的。之所以不推荐 1 个字符，是因为容易产生命名冲突，也容易写错代码。
+兼顾阅读效率和编码效率，我的推荐是名称最好 $2$-$4$ 个字符，超过 $6$ 个字符是不太适合的。之所以不推荐 $1$ 个字符，是因为容易产生命名冲突，也就意味着容易写错代码。
 
 下面列举了一些在 OI 中常见的写法及其含义：
 
-|              写法              |         原始单词 / 符号         |                   注释                   |
-| :--------------------------: | :-----------------------: | :------------------------------------: |
-|            `aha`             |           Aha!            |            dalao HJWJBSR 最爱            |
-|            `ans`             |          answer           |                                        |
-|            `arr`             |           array           |                                        |
-|            `buc`             |          bucket           |                 桶排序相关                  |
-|            `buf`             |          buffer           |                 缓存、缓冲                  |
-|             `ch`             |     child / children      |                通常指树上的儿子                |
-|            `chk`             |           check           |                                        |
-|            `cls`             |           clear           |               貌似来源于一个命令                |
-|        `cmp`, `comp`         |          compare          |            想必你在 `sort` 中用过             |
-|            `cnt`             |           count           |                                        |
-|            `cur`             |          current          |                                        |
-|            `del`             |          delete           |                                        |
-|        `dist`, `dis`         |         distance          |                                        |
-|            `div`             |          divisor          |                   因子                   |
-|            `div`             |          divide           |                   除法                   |
-|           `e`, `E`           | $\mathrm{e} = 2.71828...$ |               自然对数函数的底数                |
-|         `eps`, `EPS`         |  $\varepsilon$ (epsilon)  |             通常表示精度设定（浮点数中）             |
-|            `equ`             |           equal           |                                        |
-|            `err`             |           error           |                                        |
-|            `eval`            |         evaluate          |                   计算                   |
-|            `expr`            |        expression         |                  表达式                   |
-|        `f`, `g`, `dp`        |             -             |               一般的 DP 数组                |
-|             `fa`             |          father           |                                        |
-|            `func`            |         function          |                   函数                   |
-|           `g`, `G`           |   graph / primive root    |               图 / 数论中的原根               |
-|        `i`, `j`, `k`         |             -             |                  各种下标                  |
-|         `inf`, `INF`         |         infinity          |       `#define INF 0x3f3f3f3f`?        |
-|            `init`            |        initialize         |                                        |
-|            `ins`             |          insert           |                                        |
-|           `interp`           |        interpolate        | 线性插值，$\vec c = (1-t)\vec a + t \vec b$ |
-|            `inv`             |          inverse          |                   逆元                   |
-| `iX` `(X = 16, 32, 64, 128)` |      signed integer       |                 有符号整型                  |
-|            `jmp`             |           jump            |                                        |
-|        `l`, `r`, `m`         |    left, right, middle    |                 常用于二分中                 |
-|            `lch`             |        left child         |                                        |
-|            `len`             |          length           |                                        |
-|          `ll`, `LL`          |   `long long` (in C++)    |                                        |
-|          `mi`, `mx`          |         min, max          |             （我个人不喜欢 `mi`）              |
-|            `mid`             |          middle           |                                        |
-|         `mod`, `MOD`         |          modulo           |         $10^9 + 7,\;998244353$         |
-|            `mul`             |         multiply          |                                        |
-|            `num`             |          number           |                                        |
-|            `nxt`             |           next            |                                        |
-|          `pi`, `PI`          |          `cmath`          |     `M_PI` 中提供了 $\pi = 3.14159...$     |
-|            `pos`             |         position          |                                        |
-|            `pre`             |          prefix           |                   前缀                   |
-|            `pre`             |         previous          |                  上一个                   |
-|            `pri`             |           prime           |                                        |
-|            `ptr`             |          pointer          |                   指针                   |
-|        `rand`, `rnd`         |          random           |                                        |
-|            `rch`             |        right child        |                                        |
-|            `ref`             |         reference         |                   引用                   |
-|            `res`             |          result           |                                        |
-|            `ret`             |          return           |                                        |
-|            `rev`             |          reverse          |                                        |
-|             `S`              |            set            |                 通常表示集合                 |
-|           `s`, `t`           |   source, sink (target)   |           源点和汇点，在网络流和最短路中常见            |
-|            `seg`             |          segment          |      You must know segment trees.      |
-|            `seq`             |         sequence          |                                        |
-|            `sqr`             |          square           |                 $x^2$                  |
-|            `sqrt`            |        square root        |               $\sqrt x$                |
-|            `stk`             |           stack           |                                        |
-|            `str`             |          string           |                                        |
-|            `suf`             |          suffix           |                   后缀                   |
-|            `tmp`             |         temporary         |                  临时的                   |
-|            `tot`             |           total           |            似乎 Pascal 选手喜欢用？            |
-|        `u`, `v`, `w`         |    vertexes and weight    |                图论题中天天有                 |
-|            `upd`             |          update           |                                        |
-| `uX` `(X = 16, 32, 64, 128)` |     unsigned integer      |                 无符号整型                  |
-|            `val`             |           value           |                                        |
+|              写法              |         原始单词 / 符号         |                    注释                    |
+| :--------------------------: | :-----------------------: | :--------------------------------------: |
+|            `aha`             |           Aha!            |             dalao HJWJBSR 最爱             |
+|            `ans`             |          answer           |                                          |
+|            `arr`             |           array           |                                          |
+|            `buc`             |          bucket           |                  桶排序相关                   |
+|            `buf`             |          buffer           |                  缓存、缓冲                   |
+|             `ch`             |     child / children      |                 通常指树上的儿子                 |
+|            `chk`             |           check           |                                          |
+|            `cls`             |           clear           |                貌似来源于一个命令                 |
+|        `cmp`, `comp`         |          compare          |             想必你在 `sort` 中用过              |
+|            `cnt`             |           count           |                                          |
+|            `cur`             |          current          |                                          |
+|            `del`             |          delete           |                                          |
+|        `dist`, `dis`         |         distance          |                                          |
+|            `div`             |          divisor          |                    因子                    |
+|            `div`             |          divide           |                    除法                    |
+|           `e`, `E`           | $\mathrm{e} = 2.71828...$ |                自然对数函数的底数                 |
+|         `eps`, `EPS`         |  $\varepsilon$ (epsilon)  |              通常表示精度设定（浮点数中）              |
+|            `equ`             |           equal           |                                          |
+|            `err`             |           error           |                                          |
+|            `eval`            |         evaluate          |                    计算                    |
+|            `expr`            |        expression         |                   表达式                    |
+|     `f`, `g`, `h`, `dp`      |             -             |                一般的 DP 数组                 |
+|             `fa`             |          father           |                                          |
+|            `func`            |         function          |                    函数                    |
+|           `g`, `G`           |   graph / primive root    |                图 / 数论中的原根                |
+|        `i`, `j`, `k`         |             -             |                   各种下标                   |
+|         `inf`, `INF`         |         infinity          |        `#define INF 0x3f3f3f3f`?         |
+|            `init`            |        initialize         |                                          |
+|            `ins`             |          insert           |                                          |
+|           `interp`           |        interpolate        |  线性插值，$\vec c = (1-t)\vec a + t \vec b$  |
+|            `inv`             |          inverse          |                    逆元                    |
+| `iX` `(X = 16, 32, 64, 128)` |      signed integer       |                  有符号整型                   |
+|            `jmp`             |           jump            |                                          |
+|        `l`, `r`, `m`         |    left, right, middle    |                  常用于二分中                  |
+|            `lch`             |        left child         |                                          |
+|            `len`             |          length           |                                          |
+|          `ll`, `LL`          |   `long long` (in C++)    |                                          |
+|          `mi`, `mx`          |         min, max          |              （我个人不喜欢 `mi`）               |
+|            `mid`             |          middle           |                                          |
+|         `mod`, `MOD`         |          modulo           | $10^9 + 7,\;998244353$, your best friends |
+|            `mul`             |         multiply          |                                          |
+|            `num`             |          number           |                                          |
+|            `nxt`             |           next            |                                          |
+|          `pi`, `PI`          |    $\pi = 3.14159...$     |                                          |
+|            `pos`             |         position          |                                          |
+|            `pre`             |          prefix           |                    前缀                    |
+|        `pre`, `prev`         |         previous          |                   上一个                    |
+|            `pri`             |           prime           |                                          |
+|            `ptr`             |          pointer          |                    指针                    |
+|        `rand`, `rnd`         |          random           |                                          |
+|            `rch`             |        right child        |                                          |
+|            `ref`             |         reference         |                    引用                    |
+|            `res`             |          result           |                                          |
+|            `ret`             |          return           |                                          |
+|            `rev`             |          reverse          |                                          |
+|             `S`              |            set            |                  通常表示集合                  |
+|           `s`, `t`           |   source, sink (target)   |            源点和汇点，在网络流和最短路中常见             |
+|            `seg`             |          segment          |       You must know segment trees.       |
+|            `seq`             |         sequence          |                                          |
+|            `sqr`             |          square           |                  $x^2$                   |
+|            `sqrt`            |        square root        |                $\sqrt x$                 |
+|            `stk`             |           stack           |                                          |
+|            `str`             |          string           |                                          |
+|            `suf`             |          suffix           |                    后缀                    |
+|            `tmp`             |         temporary         |                   临时的                    |
+|            `tot`             |           total           |             似乎 Pascal 选手喜欢用？             |
+|        `u`, `v`, `w`         |    vertexes and weight    |                 图论题中天天有                  |
+|            `upd`             |          update           |                                          |
+| `uX` `(X = 16, 32, 64, 128)` |     unsigned integer      |                  无符号整型                   |
+|            `val`             |           value           |                                          |
 
 当然，每个人都会有自己的喜好，你可以参照上面来简化你的命名规范。
 
@@ -224,7 +221,7 @@ int main() {
 }
 ```
 
-从实际的汇编代码来看，如果进行 `inline`，得到的代码是这样的：
+从实际的汇编代码来看，如果不写 `inline`，得到的代码是这样的：
 
 ```assembly
 .LC0:  // 字符串 "%d\n" 的声明
@@ -233,7 +230,7 @@ int main() {
 	.globl main
 	.type main, @function
 
-// ...
+// main 函数中
 movl $10, %edi    // 填入参数 10
 call func         // 执行 func
 movl %eax, %esi   // 将 func 的返回结果填入 printf 的参数
@@ -254,9 +251,9 @@ movl $0, %eax
 call printf
 ```
 
-上面的过程在不开优化的情况下是不会进行的，这里我是通过强制 GCC 内联才得到的结果。此外，对于递归函数，编译器是不会进行内联优化的，也就是说递归函数前面加上 `inline` 没有任何用处。如果一个函数很长或者很复杂，编译器也通常不会进行优化。我的推荐是如果行数不超过 $7$ 行，就写一个 `inline`，否则就没有必要浪费时间。
+上面的过程在不开优化的情况下是不会进行的，这里我是通过强制 GCC 执行内联才得到的结果。此外，对于递归函数，编译器是不会进行内联优化的，也就是说递归函数前面加上 `inline` 没有任何用处。如果一个函数很长或者很复杂，编译器也通常不会进行优化。我的推荐是如果行数不超过 $7$ 行，就写一个 `inline`，否则就没有必要浪费时间。
 
-`static` 可以用于函数和变量前。在函数前写个 `static` 纯属画蛇填足，因为没有任何用处，但在变量前写个 `static`，可以使你少写一个清零。被声明为 `static` 的原始类型变量初始默认都是 $0$，而不是一个随机的值。
+`static` 可以用于函数和变量前。在函数前写个 `static` 纯属画蛇填足，因为 OI 中没有任何用处，但在变量前写个 `static`，可以使你少写一个清零。被声明为 `static` 的原始类型变量初始默认都是 $0$，而不是一个随机的值。
 
 在函数中的静态变量相当于是一个全局变量，只是函数外部不可以访问到它。这个特性通常被拿来做计数器：
 
@@ -313,9 +310,9 @@ int main() {
 }
 ```
 
-这样做相比于所有算法都写在全局的好处在于它首先避免了算法之间的命名冲突。其次，如果一个算法将不会被使用，那么它所需要的内存也不会被申请，避免了全部开在全局而导致超出内存限制的隐患。
+这样做相比于所有算法都写在全局的好处在于它首先避免了算法之间的命名冲突。其次，如果一个算法将不会被使用，那么它所需要的内存也不会被申请，避免了全部开在全局而导致超出内存限制的隐患。请注意，在 NOI 的评测机中，你开了多大的数组就会计入多少的内存，而不是某些评测机，即使开了 $512\mathrm{MB}$ 的数组，但是如果只用了 $32\mathrm{MB}$，就只会记你 $32\mathrm{MB}$。
 
-除了使用 `class`/`struct` 这种方法之外，一些人还会使用 `namespace`。虽然我个人是觉得 `namespace` 是没什么用的，因为它的作用可以说只是把命名空间中的所有名字全部加上了命名空间的名称。比如 STL 中的所有东西全部被放在了一个叫做 `std` 的命名空间，所以，如果程序前面不加上 `using namespace std`，那么使用其中的函数就都需要加上一个 `std::`，如 `std::sort`。
+除了使用 `class`/`struct` 这种方法之外，一些人还会使用 `namespace`。虽然我个人觉得 `namespace` 在 OI 中没什么用，因为它的作用可以说只是把命名空间中的所有名字全部加了个前缀。比如 STL 中的所有东西全部被放在了一个叫做 `std` 的命名空间，所以，如果程序前面不用 `using namespace std`，那么使用 STL 中的函数就都需要加上一个 `std::`，如 `std::sort`。
 
 ### `class` 与 `struct`
 
@@ -345,7 +342,7 @@ struct Aha {
 };
 ```
 
-如果执行 `new Aha(1000)`，将意味着会有 $1000$ 个 `Aha` 会被创建，意味着 $10^6 \times 10^3 = 10^9$ 个 `int` 被创建，意味着你会获得 Memory Limit Exceeded 或者 Runtime Error。意思是，每一次 `Aha` 构造函数的递归，都是在一个新的 `Aha` 上进行的，而不是在同一个上。所以，像线段树这种普遍使用递归来构造的数据结构，一般会新声明一个函数来构建。
+如果执行 `new Aha(1000)`，将意味着会有 $1000$ 个 `Aha` 会被创建，意味着 $10^6 \times 10^3 = 10^9$ 个 `int` 被创建，意味着你会获得 Memory Limit Exceeded 或者 Runtime Error。意思是，每一次 `Aha` 构造函数的递归，都是在一个新的 `Aha` 上进行的，而不是在同一个上。所以，像线段树这种普遍使用递归来构造的数据结构，一般会新定义一个函数来构建。
 
 此外，构造函数在 OI 中更普遍的应用是简单数据的声明，如 `Point`、`Vector` 和 `Line` 之类的东西。例如在需要计算几何的代码中，通常会有：
 
@@ -413,7 +410,7 @@ struct Point {
 	bool operator==(const Point &b) const {
         return equ(x, b.x) && equ(y, b.y);
     }
-  
+
   	bool operator!=(const Point &b) const {
         return !(*this == b);
     }
@@ -440,9 +437,9 @@ bool operator<(const Point &a, const Point &b) {
 
 这就类似于写 `cmp` 这种东西了。
 
-像向量这种东西，我们经常会需要重载加减、数乘、叉积和点积运算，这时候就可以使用运算符重载。具体的写法你们可以自己脑补。我一般把数乘和点积重载为 `*` 号，把点积重载为 `%` 号。
+像向量这种东西，我们经常会需要重载加减、数乘、叉积和点积运算，这时候就可以使用运算符重载。具体的写法你们可以自己脑补。我一般把数乘和点积重载为 `*` 号，把叉积重载为 `%` 号。
 
-此外，函数调用也可以重载（就是函数调用后的那一对括号...）。这通常用于提供给 `std::map` 和 `std::priority_queue` 之类的 `cmp`：
+此外，函数调用也可以重载（就是函数调用后的那一对括号......）。这通常用于提供给 `std::map` 和 `std::priority_queue` 之类的 `cmp`：
 
 ```c++
 struct cmp {
@@ -476,7 +473,7 @@ C++ 中书写表达式的时候不可避免的就是运算符优先级的考虑�
 
 ### 模板
 
-这里将介绍一些简单的模板 (`template`) 的使用。一般是用于一些简单的函数，如 `max`：
+这里将介绍一些简单的模板（`template`）的使用。一般是用于一些简单的函数，如 `max`：
 
 ```c++
 template <typename T>
@@ -581,7 +578,7 @@ struct Point<int> {
 };
 ```
 
-\* 剩下一个常用的就是变长模板参数，一般用于输出调试信息：
+\* 剩下一个常用的就是变长模板参数，OI 中一般用于输出调试信息：
 
 ```c++
 template <typename ... Args>
@@ -596,14 +593,14 @@ void DEBUG(const char *str, const Args & ... args) {
 
 ### 宏定义
 
-宏定义的本质是文本替换，通常用于节约代码量。当需要重复打很多形式差不多的代码的时候，宏是一个非常有用的工具。例如 "[【NOIP2015】斗地主“加强”版](http://uoj.ac/problem/151)" 的 "爆搜 + DP" 做法，其 DP 转移长得几乎一模一样，但是转移却很多，因此这里使用宏定义可以大大节约时间。
+宏定义的本质是文本替换，通常用于节约代码量。当需要重复打很多形式差不多的代码的时候，宏是一个非常有用的工具。例如 "[【NOIP2015】斗地主“加强”版](http://uoj.ac/problem/151)" 的 "爆搜 + DP" 做法，其 DP 转移几乎长得一模一样，但是数量很多，因此这里使用宏定义可以大大节约时间。
 
 `for` 通常会被众多 OIer 弄成宏函数：
 
 ```c++
 #define rep(i, l, r) for (int i = l; i <= (r); i++)
 #define rrep(i, r, l) for (int i = r; i >= (l); i--)
-// ...
+
 rep(i, 1, n) rep(j, 1, m) {
     // ...
 }
@@ -625,14 +622,14 @@ for (auto &v : vec) {
 ```c++
 // #define NDEBUG
 
-#ifdef NDEBUG  // 如果 NDEBUG 打开
+#ifdef NDEBUG  // 如果 NDEBUG 打开 (取消第一行的注释)
 #define DEBUG(...)  // 空的调试信息输出函数
 #else
-#define DEBUG(msg, ...) printf("(debug) " msg, __VA_ARGS__);  // 否则启用调试
+#define DEBUG(msg, ...) printf("(%s #%d) " msg, __FUNCTION__, __LINE__, __VA_ARGS__);  // 否则启用调试
 #endif
 ```
 
-上面的 "`...`" 跟之前模板中的变长参数类似，使用 `__VA_ARGS__` 这个特殊的宏可以将 "`...`" 所指代的参数放入。另外，`assert` 的打开和关闭也是受 `NDEBUG` 影响。`assert` 意思是断言，即做一个假设，如果假设不成立则终止程序 (调用 `abort`)，它包含在 `cassert` 头文件中。一般的用法如下：
+上面的 "`...`" 跟之前模板中的变长参数类似，使用 `__VA_ARGS__` 这个特殊的宏可以将 "`...`" 所指代的参数放入。`__FUNCTION__` 和 `__LINE__` 是另外两个特殊的宏，它们可以记录下 `DEBUG` 宏函数被调用的地方所处的函数名称和行号。也可以使用 `__PRETTY_FUNCTION__`，它会记录下所处的函数的详细声明，可以用于区分重载的函数 。另外，`assert` 的打开和关闭也是受 `NDEBUG` 影响。`assert` 意思是断言，即做一个假设，如果假设不成立则终止程序 （调用 `abort`），它包含在 `cassert` 头文件中。一般的用法如下：
 
 ```c++
 #include <cassert>
@@ -642,13 +639,460 @@ assert(a == 2);  // 想必 a = 2
 assert(a == 3);  // a 显然不等于 3，所以这里会导致程序终止
 ```
 
-善用 `assert` 是一个良好的习惯。在比较复杂的数据结构中，一些地方可以添加几个断言，从而在调试的时候，如果出现异常，可以很快的发现错误的位置。最后提交文件的时候在开头声明一下 `NDEBUG`，就可以关掉所有的调试信息和断言。
+善用 `assert` 是一个良好的习惯。在比较复杂的数据结构中，一些地方可以添加几个断言，比如在访问一个指针前 `assert` 一下看指针是否为空。从而在调试的时候，如果出现异常，可以很快的发现错误的位置。最后提交文件的时候在开头声明一下 `NDEBUG`，就可以关掉所有的调试信息和断言。
 
-作为一个简单的文本替换，宏的弊端是非常多并且容易使人犯错。首先就是运算符优先级的问题。一个典型的例子就是开一个大小为 $2n$ 的数组。OI 中由于不是很关心浪费的一点点空间，所以有人可能会写出这样的代码：
+作为一个简单的文本替换，宏的弊端在于容易使人犯错。首先就是运算符优先级的问题。一个典型的例子就是开一个大小为 $2n$ 的数组。OI 中由于不是很关心浪费的一点点空间，所以有人可能会写出这样的代码：
 
 ```c++
 #define NMAX 100000 + 5
 int arr[NMAX * 2];  // arr 的大小为 100010 而不是所期望的 200010
 ```
 
-这种错误是会让人非常苦恼的，因为你的程序会不停的 Runtime Error，可你却一直看不出有什么问题。还有就是之前的 `rep` 的定义中，我写的是 `i <= (r)` 而不是 `i <= r`，原因非常简单，如果你要使用 `rep(i, 1, a ^ b)` 后者可能会导致你无尽的循环（因为是 `i <= a ^ b`，小于等于的优先级高于异或，所以它的值是 `(i <= a) ^ b` ）。
+这种错误是会让人非常苦恼的，因为你的程序小数据不会有事，而大数据会不停的 Runtime Error，可你却一直看不出有什么问题。还有就是之前的 `rep` 的定义中，我写的是 `i <= (r)` 而不是 `i <= r`，原因非常简单，如果你要使用 `rep(i, 1, a ^ b)` 后者可能会导致你无尽的循环（因为是 `i <= a ^ b`，小于等于的优先级高于异或，所以它的值是 `(i <= a) ^ b` ）。这种例子相当之多，这里就不再列举。因此，但凡使用宏，就一定要注意多打几个括号。
+
+另外一个经典的错误，来自于一个简单的 `max` 宏函数：
+
+```c++
+#define max(a, b) ((a) > (b) ? a : b)
+
+int query(Node *x, int l, int r) {
+    if (l <= x->left && x->right <= r)
+    	return x->value;
+
+  	int mid = (x->left + x->right) >> 1, ans = INT_MIN;
+  	if (l <= mid)
+      	ans = max(ans, query(x->lch, l, r));
+  	if (r > mid)
+      	ans = max(ans, query(x->rch, l, r));
+
+  	return ans;
+}
+```
+
+乍一看好像没什么问题，但实际上你的线段树早已背叛了你，它将给予你无尽的 Time Limit Exceeded。原因在于，上述代码中两个取 `max` 的地方，如果儿子给出的答案更大，那么那个 `query` 将会被调用第二次，导致线段树时间复杂度的退化。因此在这里我还是推荐使用内联函数而不是宏来实现这些简单的函数。
+
+### 常用函数和 STL
+
+虽然像 `max`、`min` 之类的函数在 `algorithm` 头文件已有定义，但是一些特别的情况下可以使用更简单的函数来减小常数。例如用于更新最值：
+
+```c++
+template <typename T>
+inline void chkmax(T &a, const T &b) {
+    if (b > a) a = b;
+}
+
+template <typename T>
+inline void chkmin(T &a, const T &b) {
+    if (b < a) a = b;
+}
+```
+
+相比于 `a = max(a, b)` 而言，可以减少不必要的赋值，从而减小了常数。另外一个同类型的就是取模加法：
+
+```c++
+template <typename T>
+inline void add(T &a, const T &b) {
+    a += b;
+
+  	if (a >= MOD) a -= MOD;
+  	if (a < 0) a += MOD;
+}
+```
+
+因为只是加减法，所以使用 `(a + b) % MOD` 实际上会浪费一次取模操作。顺带一提，一般的计算机上加减乘的速度差不多，取模和除法速度与它们相比慢很多，所以经常会尝试减少除法和取模的次数来减小常数。在浮点数中，减法和除法造成的精度误差比较大。
+
+`algorithm` 头文件中有很多 OI 常用的函数，下面将列举我经常用的几个。
+
+使用 `reverse` 可以将数组翻转：
+
+```c++
+int a[] = {1, 2, 3, 4, 5};
+reverse(a, a + 5);  // a = {5 4, 3, 2, 1}
+```
+
+众所周知 `sort` 主要使用的是快速排序算法，同时也有一个 `stable_sort`，使用的是归并排序。绝大部分情况下大家都会使用 `sort`，少数交互题可能会卡快速排序的比较次数，这时才会使用 `stable_sort` 来避免。
+
+`unique` 的作用是将多个连续相同的元素变为一个，通常和 `sort` 一起使用来去重：
+
+```c++
+int a[] = {1, 3, 2, 1, 2, 1, 4};
+sort(a, a + 7);
+int cnt = unique(a, a + 7) - a;
+// a = {1, 2, 3, 4, ...}, cnt = 4
+```
+
+`lower_bound` 和 `upper_bound` 则是常用的二分函数。它们只能用于有序的序列上。`lower_bound` 会帮你找出某个元素第一次出现的位置，而 `upper_bound` 会帮你找出某个元素最后一次出现的位置的下一个位置，如：
+
+```c++
+int a[] = {1, 2, 2, 2, 2, 3, 7};
+//            ^           ^
+//            lower       upper
+lower = lower_bound(a, a + 7, 2);
+upper = upper_bound(a, a + 7, 2);
+```
+
+`inplace_merge` 是用于合并两个有序序列的，用于实现归并排序。在一些情况下可能会用到。
+
+```c++
+int a[] = {1, 3, 5, 2, 4, 6};
+inplace_merge(a, a + 3, a + 6);  // a = {1, 2, 3, 4, 5, 6}
+```
+
+STL 中的容器也常常被使用，用于减少代码量。一般常用的有这么一些：
+
+*   `vector` 动态数组，这个其实看个人喜好，它可以支持下标访问，并且可以快速在末尾增加、删除元素。
+*   `deque` 双端队列，可以下标访问，但常数比数组略高，可以在两头快速插入、删除。
+*   `queue` 队列，接口比较简单，用 `front` 查看队首，`pop` 弹出队首，`push` 加入队尾。
+*   `stack` 栈，类似于 `queue`，只不过是用 `top` 查看栈顶。
+*   `set` 和 `map`，这是 STL 良心为大家提供的红黑树，可以快速查找和使用与 `algorithm` 中类似的 `lower_bound` 以及 `upper_bound`。
+*   `priority_queue` 优先队列，也就是大根堆，接口和 `stack` 差不多。
+*   `bitset` 卡常神器，用于存储二进制序列，可以进行位运算，时空复杂度基本都是 $O(n / w)$。
+*   `string` 字符串，其实就是 `vector<char>`，一般不怎么用。
+*   \* `unordered_set` 和 `unordered_map`，功能与 `set` 和 `map` 对应，但是是哈希表实现的，复杂度更优秀，但不支持二分查找。可以在头文件 `tr1/unordered_set` 和 `tr1/unordered_map` 中找到。
+
+这些东西主要还是推荐大家自己去 cppreference 上去查然后试着用一下，相信你们的英文水平足够了。
+
+## 第二部分：Linux 下编程环境
+
+### 编辑器
+
+写程序第一步是什么？当然是写代码。在写代码之前，你需要确定你在将来在考场上要使用什么编辑器。NOI Linux 目前提供的编辑器有这些：
+
+*   gedit
+*   VIM
+*   Emacs
+*   GUIDE、Anjuta、Lazarus 之流
+
+在这里我也不做什么推荐，大家找自己喜欢的就好。我只知道正式考场上普通玩家都是使用与 "UOJ 自定义测试" 差不多的 gedit，中高端玩家普遍选择 Emacs 或 VIM。
+
+### 编译器
+
+NOI Linux 下只提供了 `g++` 来给我们编译程序。如果你的源代码叫做 `a.cpp`，那么使用：
+
+```shell
+g++ a.cpp
+```
+
+将会在当前目录下产生一个 `a.out` 的可执行文件，使用 `./a.out` 就可以运行它。如果你觉得 `a.out` 这个名字太 naïve，可以使用：
+
+```shell
+g++ a.cpp -o exec
+```
+
+将会得到 `exec` 这个可执行文件。对于交互式的题目，一般会提供一个叫做 `grader.cpp` 的文件，此时你按照要求写好程序后，应该这样编译：
+
+```shell
+g++ grader.cpp a.cpp
+```
+
+如果需要打开优化，可以使用：
+
+```shell
+g++ a.cpp -O2  // 或者 -O3
+```
+
+一套题目的第一页通常会有注明表示某些题目是否开优化。这是比较重要的信息，通常会决定你是否需要花时间来卡常数。
+
+一般为了充分发挥编译器的作用，我会打开编译器的绝大部分警告：
+
+```shell
+g++ a.cpp -Wall -Wextra
+```
+
+打开之后，一些常见的却不是语法错误的小问题都会被编译器报告。如 `if (a = b)` 这种相等符号少写一个等号的错误，编译器都会提示你。
+
+### 调试器
+
+`gdb` 是最常用于调试程序的工具。尽管多数情况下输出调试可以解决问题，但是 `gdb` 可以帮你在某些情况下节约时间。`gdb` 的主要优势在于可以灵活的跟踪程序运行的状况，方便我们找出 BUG 的根源。
+
+如果一个程序想要使用 `gdb` 调试，那么在编译的时候需要加上 `-g` 选项：
+
+```shell
+g++ a.cpp -g
+```
+
+然后执行 `gdb a.out` 即可进入调试。一般你会看到下面这些东西：
+
+```
+GNU gdb (Ubuntu 7.11.1-0ubuntu1~16.5) 7.11.1
+Copyright (C) 2016 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from a.out...done.
+(gdb) 
+```
+
+其实只有最后一句 "`Reading symbols from a.out...done.`" 有用，它告诉我们 `a.out` 被成功读取。如果你不想看到上面一大堆话，那么在命令末尾加个 `-q` 即可。
+
+现在来举个例子。就以下面的程序开刀，来体会一下使用 `gdb` 的基本流程：
+
+```c++
+#include <cstdio>
+
+int fac(int n) {
+    return fac(n - 1) * n;
+}
+
+int main() {
+    int n;
+    scanf("%d", &n);
+    n = fac(n);
+    
+    for (unsigned i = n; i >= 0; i--) {
+        puts("Aha!");
+    }
+
+    return 0;
+}
+```
+
+编译后进入 `gdb`，输入 `l` 并回车，可以看到程序的前面几行：
+
+```
+(gdb) l
+1	#include <cstdio>
+2	
+3	int fac(int n) {
+4	    return fac(n - 1) * n;
+5	}
+6	
+7	int main() {
+8	    int n;
+9	    scanf("%d", &n);
+10	    n = fac(n);
+```
+
+这时按下回车，可以看到紧接着的后面几行：
+
+```
+(gdb) 
+11	    
+12	    for (unsigned i = n; i >= 0; i--) {
+13	        puts("Aha!");
+14	    }
+15	
+16	    return 0;
+17	}
+```
+
+这不是因为回车就是看代码的功能，而是在 `gdb` 中什么也不输入就直接回车表示执行上一个你使用的命令。所以这里实际上是又执行了一遍 `l` 命令。你也可以使用上下方向键来翻阅你之前使用的命令。使用 `l [行号]` 将会把你所指定的行号附近的代码展示给你。而 `l [函数名]` 则会把对应函数展示。
+
+当然我们不是拿 `gdb` 来看代码的......如果你现在使用 `r` 命令，`gdb` 将会正常启动这个程序。你会发现这在和 `gdb` 外面运行程序没什么区别，输入了一个数字之后程序就会段错误。这是因为我们还没有设置断点，`gdb` 不会无缘无故使程序暂停。
+
+使用 `b [函数名 / 行号]` 可以在特定的函数入口或者某一行设置断点，当程序运行到这里的时候，就会暂停下来：
+
+```
+(gdb) b main
+Breakpoint 1 at 0x40058c: file a.cpp, line 7.
+(gdb) r
+Starting program: /home/owen/aknoi/a.out 
+
+Breakpoint 1, main () at a.cpp:7
+7	int main() {
+```
+
+使用 `n` 可以执行当前这一行代码：
+
+```
+(gdb) n
+9	    scanf("%d", &n);
+```
+
+这里再回车一下就会执行 `scanf` 了，也就会要你输入一个数字了：
+
+```
+(gdb) n
+1
+10	    n = fac(n);
+```
+
+注意，到了第 $10$ 如果继续使用 `n`，将不会进入 `fac` 函数。如果想进入 `fac` 函数一探究竟，就需要使用 `s`：
+
+```
+(gdb) s
+fac (n=1) at a.cpp:4
+4	    return fac(n - 1) * n;
+```
+
+使用 `p` 可以计算一些表达式，如：
+
+```
+(gdb) p n * 123
+$1 = 123
+```
+
+`p` 是 `gdb` 的方便所在，它可以查看程序中的变量从而知道程序当前的状况。当然，总是手动使用 `p` 非常麻烦，我们可以使用 `disp` 来将某个表达式挂在旁边随时查看：
+
+```
+(gdb) disp n
+1: n = 1
+(gdb) s
+fac (n=0) at a.cpp:4
+4	    return fac(n - 1) * n;
+1: n = 0
+```
+
+没错，你会发现 `n` 的值会在每一步指令结束后展示给你。注意到左边的那个标号 `1`，你可以使用 `undisp 1` 来取消这个显示。
+
+当然你不会一直使用 `n` 和 `s` 让程序跑下去，有时候是希望让程序先自由的跑一跑。这里我们先给第 $4$ 行加个断点，并使用 `c` 命令继续运行程序：
+
+```
+(gdb) b 4
+Breakpoint 2 at 0x400571: file a.cpp, line 4.
+(gdb) c
+Continuing.
+
+Breakpoint 2, fac (n=-1) at a.cpp:4
+4	    return fac(n - 1) * n;
+```
+
+由于在继续执行的过程中遇上了断点 $2$，所以程序又一次暂停。现在可以来看看函数的调用栈了：
+
+````
+(gdb) bt
+#0  fac (n=-1) at a.cpp:4
+#1  0x000000000040057e in fac (n=0) at a.cpp:4
+#2  0x000000000040057e in fac (n=1) at a.cpp:4
+#3  0x00000000004005bb in main () at a.cpp:10
+````
+
+ 可以看到 `fac` 调用了三层。我们可以使用 `d` 命令来删除一个断点，并且尝试继续执行：
+
+```
+(gdb) d 2
+(gdb) c
+Continuing.
+
+Program received signal SIGSEGV, Segmentation fault.
+0x000000000040056e in fac (n=<error reading variable: Cannot access memory at address 0x7fffff7feffc>) at a.cpp:3
+3	int fac(int n) {
+```
+
+没有了断点的阻挠，我们的程序直接段错误。输入 `bt` 就可以看到 `fac` 递归了相当多层，导致超出栈空间。找到了错误原因，就可使用 `q` 命令退出 `gdb` 了：
+
+```
+(gdb) q
+A debugging session is active.
+
+	Inferior 1 [process 23333] will be killed.
+
+Quit anyway? (y or n) y
+```
+
+由于 `fac` 函数缺少边界条件导致爆栈，所以修改之后的程序是这样的：
+
+```c++
+#include <cstdio>
+
+int fac(int n) {
+    if (n == 0)
+        return 1;
+    return fac(n - 1) * n;
+}
+
+int main() {
+    int n;
+    scanf("%d", &n);
+    n = fac(n);
+    
+    for (unsigned i = n; i >= 0; i--) {
+        puts("Aha!");
+    }
+
+    return 0;
+}
+```
+
+现在编译并运行程序将会无限输出 "Aha!"。再次使用 `gdb` 来调试，这次直接开始运行程序，并且在一堆 "Aha!" 面前沉着地按下 "Ctrl + C"：
+
+```
+Aha!
+Aha!
+Aha!
+Aha!
+Aha!
+^C
+Program received signal SIGINT, Interrupt.
+0x00007ffff7856290 in __write_nocancel () at ../sysdeps/unix/syscall-template.S:84
+84	../sysdeps/unix/syscall-template.S: No such file or directory.
+(gdb) 
+```
+
+然后这个程序就暂停了。`gdb` 告诉你现在在一个奇怪的文件里面，其实是因为在执行 `puts` 时暂停了。现在我们想回到 `a.cpp` 函数的第 $15$ 行，因此可以设一个断点：
+
+```
+(gdb) b a.cpp:15
+Breakpoint 2 at 0x4005d1: file a.cpp, line 15.
+(gdb) c
+Continuing.
+
+
+Breakpoint 2, main () at a.cpp:15
+15	        puts("Aha!");
+(gdb) p i
+$1 = 4294925190
+```
+
+打印出 `i` 的值，发现变得非常大。这是因为 `i` 是无符号整型，当 `i = 0` 时再减一，就会变成 `UINT_MAX`，因而导致死循环。至此，这个程序的异常就全部查清了。以上也差不多就是 OI 中常用的命令，如果想要 `gdb` 为你发挥更大的作用，就需要平常多练习使用，然后才能在正式考场上熟练运用这些工具。
+
+### 性能剖析工具
+
+NOI Linux 上唯一提供的性能剖析工具就是 `gprof` 了。它的主要目的就是生成一份程序的运行报告，主要包括程序中每个函数的相关数据。使用方法并不复杂，大致流程如下：
+
+首先，编译程序的时候带上 `-pg` 选项：
+
+```shell
+g++ a.cpp -pg
+```
+
+然后运行一下这个程序，OI 中通常会拿个大数据来跑一下。注意，带上这个选项后程序运行速度可能变慢了很多，这是因为此时程序运行中会收集一些信息，变慢是正常的。程序运行完毕后，使用 `gprof` 生成报告：
+
+```shell
+gprof a.out > result.out
+```
+
+`result.out` 就是报告了，使用任意编辑器可以打开。下面放一个我最近写的程序生成的报告的前几行：
+
+```
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls  ms/call  ms/call  name    
+ 17.29      0.52     0.52 99401724     0.00     0.00  pushdown(int)
+ 10.97      0.85     0.33 25936095     0.00     0.00  rotate(int, int)
+  6.32      1.36     0.19  6808190     0.00     0.00  upans(int, int)
+  6.15      1.54     0.19 38677554     0.00     0.00  update(int)
+  5.32      1.70     0.16 36189660     0.00     0.00  clear(int)
+  5.15      1.86     0.16 40849140     0.00     0.00  splay(int)
+  4.99      2.16     0.15       43     3.49    60.87  dfs(int, int)
+  4.82      2.30     0.15 13616380     0.00     0.00  query(int, long long)
+  4.82      2.45     0.15 83375581     0.00     0.00  rminb(int)
+  3.66      2.56     0.11                             main
+  2.66      2.64     0.08 83375581     0.00     0.00  rmina(int)
+  2.33      2.71     0.07        1    70.06   130.11  initialize()
+```
+
+上面可以看到每个被调查到的函数所占用的时间百分比，秒数和调用次数。排名越靠前的表明占用时间越多。从上面可以看出，`pushdown` 和 `rotate` 占用了绝大部分时间，因此如果想卡常数，首先应考虑它们，这样效果才最明显。有时候这份报告里面可能会出现一些名字很长很奇怪的函数，不要觉得是出了问题，因为它们可能是 STL 里面的函数，所以名字才会很奇怪。
+
+`gprof` 一般是用在你考试时间比较充裕的情况下，给大数据结构和一些数论筛题来分析程序性能瓶颈用的。如果你想卡常数了，可以利用这份报告做一个参考。
+
+## 后记
+
+至此，这篇废话连篇的简单的指南就结束了~~~
+
+（我自己也没想到写了这么长......）
+
+最后祝大家 OI 顺利，最后都实现自己心中的理想！
+
+23-24 Sept 2017, by riteme
