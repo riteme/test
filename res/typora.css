@@ -16,8 +16,13 @@
 
 @font-face {
     font-family: SC;
-    font-weight: lighter;
-    src: local('Source Han Sans CN');
+    src: url("light.otf");
+}
+
+@font-face {
+    font-family: SC;
+    font-weight: bold;
+    src: url("normal.otf");
 }
 
 html {
