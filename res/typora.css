@@ -10,7 +10,20 @@
 }
 
 @font-face {
+    font-family: NUM;
+    unicode-range: U+30-39;
+    font-style: italic;
+    src: local("Times New Roman");
+}
+
+@font-face {
     font-family: EN;
+    src: local(Georgia);
+}
+
+@font-face {
+    font-family: EN;
+    font-style: italic;
     src: local(Georgia);
 }
 
