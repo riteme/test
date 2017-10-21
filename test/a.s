@@ -1,50 +1,26 @@
-	.file	"a.c"
 	.text
-	.globl	func
-	.type	func, @function
-func:
-.LFB0:
-	.cfi_startproc
-	leal	5(%rdi), %eax
-	ret
-	.cfi_endproc
-.LFE0:
-	.size	func, .-func
-	.section	.rodata.str1.1,"aMS",@progbits,1
-.LC0:
-	.string	"%d"
-.LC1:
-	.string	"%d\n"
-	.text
+	.file	"a.cpp"
 	.globl	main
-	.type	main, @function
-main:
-.LFB1:
+	.align	16, 0x90
+	.type	main,@function
+main:                                   # @main
 	.cfi_startproc
-	subq	$24, %rsp
-	.cfi_def_cfa_offset 32
-	movq	%fs:40, %rax
-	movq	%rax, 8(%rsp)
+# BB#0:
+	pushq	%rbp
+.Ltmp0:
+	.cfi_def_cfa_offset 16
+.Ltmp1:
+	.cfi_offset %rbp, -16
+	movq	%rsp, %rbp
+.Ltmp2:
+	.cfi_def_cfa_register %rbp
 	xorl	%eax, %eax
-	leaq	4(%rsp), %rsi
-	movl	$.LC0, %edi
-	call	scanf
-	movl	4(%rsp), %eax
-	leal	5(%rax), %esi
-	movl	$.LC1, %edi
-	movl	$0, %eax
-	call	printf
-	movq	8(%rsp), %rdx
-	xorq	%fs:40, %rdx
-	je	.L3
-	call	__stack_chk_fail
-.L3:
-	movl	$0, %eax
-	addq	$24, %rsp
-	.cfi_def_cfa_offset 8
-	ret
+	popq	%rbp
+	retq
+.Lfunc_end0:
+	.size	main, .Lfunc_end0-main
 	.cfi_endproc
-.LFE1:
-	.size	main, .-main
-	.ident	"GCC: (Ubuntu 5.4.0-6ubuntu1~16.04.4) 5.4.0 20160609"
-	.section	.note.GNU-stack,"",@progbits
+
+
+	.ident	"clang version 3.8.0-2ubuntu4 (tags/RELEASE_380/final)"
+	.section	".note.GNU-stack","",@progbits

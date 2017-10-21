@@ -136,7 +136,7 @@ int main() {
         str[i] = buffer[i];
     int *SA = sort_suffix(str, length + 1, 256);
     for (int i = 1; i <= length; i++)
-        printf("%d ", SA[i]);
+        printf("%d ", SA[i] + 1);
 
     return 0;
 }  // function main

@@ -1,19 +1,6 @@
-#include <cstdio>
-
-int fac(int n) {
-    if (n == 0)
-        return 1;
-    return fac(n - 1) * n;
-}
-
+#define PI 3.12123    ; // hello
+int aaa(int, int);
+int bbb(int, int, double);
 int main() {
-    int n;
-    scanf("%d", &n);
-    n = fac(n);
-    
-    for (unsigned i = n; i >= 0; i--) {
-        puts("Aha!");
-    }
-
-    return 0;
+    int a = PI;
 }

@@ -1,7 +1,32 @@
+#pragma GCC optimize(3)
+
 #include <cstdio>
 #include <cstring>
+#include <cctype>
 
-#define NMAX 300
+#define NMAX 1000000
+#define _BUFFERSIZE 65536
+static int _pos = _BUFFERSIZE;
+static char _buffer[_BUFFERSIZE];
+
+inline int read_string(char *dest) {
+    int read = 0;
+    while (read <= NMAX) {
+        if (_pos == _BUFFERSIZE) {
+            _pos = 0;
+            fread(_buffer, 1, _BUFFERSIZE, stdin);
+        }
+
+        char c = _buffer[_pos++];
+        if (isalnum(c))
+            dest[read++] = c;
+        else
+            break;
+    }  // while
+
+    return read;
+}
+
 
 #define L true
 #define S false
@@ -133,17 +158,27 @@ void sais(const char *str, int n) {
 
 static int n;
 static char str[NMAX + 10];
+static char out[7 * NMAX + 10], *out_tail = out;
+
+inline void put(int x) {
+    char s_pool[6], *s_tail = s_pool;
+    while (x != 0)
+        *s_tail++ = x % 10 + '0', x /= 10;
+    while (s_tail-- != s_pool)
+        *out_tail++ = *s_tail;
+    *out_tail++ = ' ';
+}
 
 int main() {
-    scanf("%s", str);
-    n = strlen(str);
+    n = read_string(str);
 
     str[n] = '$';
     sais(str, n + 1);
-    for (int i = 1; i <= n; i++) {
-        printf("%d ", sa[i]);
-    }
-    putchar('\n');
 
+    for (int i = 1; i <= n; i++) {
+        put(sa[i]);
+    }
+
+    fwrite(out, 1, out_tail - out, stdout);
     return 0;
 }
