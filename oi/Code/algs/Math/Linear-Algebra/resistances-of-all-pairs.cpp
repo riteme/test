@@ -1,19 +1,17 @@
+/**
+ * It assumed that the graph given by you is connected.
+ * Runs in O(m^3) time complexity.
+ */
+
 #include <cmath>
 #include <cstdio>
-#include <cstring>
 
-#include <algorithm>
 #include <vector>
 
 using namespace std;
 
-#define NMAX 300
-#define MMAX 500
-#define EPS 1e-9
-
-inline bool equ(double a, double b) {
-    return fabs(a - b) < EPS;
-}
+#define NMAX 400
+#define MMAX 700
 
 struct Edge {
     Edge(int _u, int _v, int _id, int _d, double _r)
@@ -25,23 +23,18 @@ struct Edge {
 
 static int n, m;
 static vector<Edge *> G[NMAX + 10];
-static double A[MMAX + NMAX + 10][MMAX + 10];
+static double A[MMAX + 10][MMAX + NMAX + 10];
 static int dep[NMAX + 10];
 static Edge *edge[NMAX + 10];
-
-// TODO:
-//   1. Guassian elimination
-//   2. Operation on the DFS tree
 
 void dfs(int u, int f = 0) {
     static int cnt = n - 1;
 
     for (auto &e : G[u]) {
-        int v = e->v;
-
-        if (v == f)
+        if (e->id == f)  // Deal with parallel edges.
             continue;
 
+        int v = e->v;
         if (dep[v] && dep[v] < dep[u]) {
             A[++cnt][e->id] = e->dir * e->r;
             for (int x = u; x != v; x = edge[x]->u) {
@@ -50,7 +43,7 @@ void dfs(int u, int f = 0) {
         } else if (!dep[v]) {
             dep[v] = dep[u] + 1;
             edge[v] = e;
-            dfs(v, u);
+            dfs(v, e->id);
         }
     }  // foreach in G[u]
 }
@@ -85,7 +78,7 @@ void guass() {
 
         for (int j = 1; j < i; j++) {
             for (int k = m + 1; k <= c; k++) {
-                A[j][k] += A[j][i] * A[i][k];
+                A[j][k] -= A[j][i] * A[i][k];
             }  // for
         }      // for
     }          // for
@@ -111,10 +104,10 @@ double query(int s, int t) {
     double r = 0;
     Edge *e;
 
-#define EVAL(x, op)                                      \
-    for (int u = x; u != p; u = e->u) {                  \
-        e = edge[u];                                     \
-        r op(I(e->id, s) - I(e->id, t)) * e->dir * e->r; \
+#define EVAL(x, op)                                       \
+    for (int u = x; u != p; u = e->u) {                   \
+        e = edge[u];                                      \
+        r op (I(e->id, s) - I(e->id, t)) * e->dir * e->r; \
     }  // for
 
     EVAL(s, +=)
@@ -126,7 +119,6 @@ double query(int s, int t) {
 }
 
 void initialize() {
-    freopen("data.in", "r", stdin);
     scanf("%d%d", &n, &m);
 
     for (int i = 1; i <= m; i++) {
@@ -134,10 +126,15 @@ void initialize() {
         double r;
         scanf("%d%d%lf", &u, &v, &r);
 
-        Edge *e = new Edge(u, v, i, 1, r);
-        Edge *re = new Edge(v, u, i, -1, r);
-        G[u].push_back(e);
-        G[v].push_back(re);
+        if (u == v) {  // Ignore self loop.
+            m--;
+            i--;
+        } else {
+            Edge *e = new Edge(u, v, i, 1, r);
+            Edge *re = new Edge(v, u, i, -1, r);
+            G[u].push_back(e);
+            G[v].push_back(re);
+        }
     }
 
     for (int u = 1; u < n; u++) {
