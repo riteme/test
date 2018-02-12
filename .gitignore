@@ -142,3 +142,5 @@ target/
 # Binary data files
 *.profile
 *.pdf
+
+.vscode
