@@ -1,11 +1,16 @@
-inline int func(int n) __attribute__((always_inline));
-int func(int n) {
-    return n + 5;
-}
-
 int main() {
+    register unsigned long long a;
+    printf("%d\n", sizeof(a));
     int n;
     scanf("%d", &n);
-    printf("%d\n", func(n));
+
+    while (n--) {
+        a *= 123413221ULL;
+        a /= 21390ULL;
+        a /= 119ULL;
+    }
+
+    printf("%lf\n", a);
+
     return 0;
 }
