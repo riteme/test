@@ -7,7 +7,7 @@ n, m, CMAX = map(int, argv[1:])
 
 print n, m
 for i in xrange(n):
-    print randint(0, CMAX), randint(0, CMAX)
+    print randint(1, CMAX), randint(1, CMAX)
 
 for i in xrange(2, n + 1):
     print randint(1, i - 1), i

@@ -55,25 +55,40 @@ void initialize() {
     }
 }
 
-// Pairing Heap
+// Leftist Tree
+struct Node;
+extern Node hp[HEAP_MEMMAX];
+
 struct Node {
-    Node() : e(NULL), mark(0.0), head(0), nxt(0) {}
+    Node() : e(NULL), mark(0.0), height(0), lch(0), rch(0) {}
 
     Edge *e;
     double mark;
-    int head, nxt;
+    int height, lch, rch;
 
     double w() const {
-        return e->w + mark;
+        return e->w - mark;
+    }
+
+    void push() {
+        e->w -= mark;
+        hp[lch].mark += mark;
+        hp[rch].mark += mark;
+        mark = 0;
     }
 };
 
 static int _pos;
 Node hp[HEAP_MEMMAX];
 
+int alloc() {
+    return ++_pos;
+}
+
 int makehp(Edge *e) {
-    int x = ++_pos;
+    int x = alloc();
     hp[x].e = e;
+    hp[x].height = 1;
     return x;
 }
 
@@ -81,31 +96,19 @@ int hp_merge(int x, int y) {
     if (!x) return y;
     if (!y) return x;
     if (hp[x].w() > hp[y].w()) swap(x, y);
-    hp[y].mark -= hp[x].mark;
-    hp[y].nxt = hp[x].head;
-    hp[x].head = y;
+
+    hp[x].push();
+    hp[x].rch = hp_merge(hp[x].rch, y);
+
+    if (hp[hp[x].rch].height > hp[hp[x].lch].height)
+        swap(hp[x].lch, hp[x].rch);
+    hp[x].height = hp[hp[x].lch].height + 1;
     return x;
 }
 
 int extract(int h) {
-    static int tmp[HEAP_MEMMAX], cnt, last;
-    if (!hp[h].head) return 0;
-
-    last = cnt = 0;
-    for (int x = hp[h].head, y; x; x = y) {
-        hp[x].mark += hp[h].mark;
-        y = hp[x].nxt;
-        hp[x].nxt = 0;
-        if (last) {
-            tmp[cnt++] = hp_merge(last, x);
-            last = 0;
-        } else last = x;
-    }
-    
-    if (last) tmp[cnt++] = last;
-    for (int i = 1; i < cnt; i++)
-        tmp[i] = hp_merge(tmp[i - 1], tmp[i]);
-    return tmp[cnt - 1];
+    hp[h].push();
+    return hp_merge(hp[h].lch, hp[h].rch);
 }
 
 // Union-Find DS
@@ -191,18 +194,16 @@ Cycle* contract() {
     stk.push(1);
     for (int i = 1; i < n || stk.size() > 1;) {
         int x = stk.top(), &H = ptr[x]->H, u;
-        double w;
         Edge *e;
+        // O(m log m)
         do {
             assert(H);
             e = hp[H].e;
-            w = hp[H].w();
             H = extract(H);
             u = id(e->u);
         } while (u == x);
         DEBUG("edge: %d (%d) -> %d (%d) (%6lf)\n", e->u, id(e->u), e->v, id(e->v), e->w);
         in[x] = new Edge(*e);
-        in[x]->w = w;
 
         if (in[u]) {
             cnt++;
@@ -212,7 +213,7 @@ Cycle* contract() {
 
 #define ADD(x) \
             set(x, cnt); \
-            hp[ptr[x]->H].mark -= in[x]->w; \
+            hp[ptr[x]->H].mark += in[x]->w; \
             ptr[cnt]->H = hp_merge(ptr[cnt]->H, ptr[x]->H);
 
             do {
