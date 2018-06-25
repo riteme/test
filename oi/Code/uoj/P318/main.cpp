@@ -1,4 +1,3 @@
-// TODO: Hacked on UOJ
 #define NDEBUG
 
 #include <cstdio>
@@ -80,7 +79,7 @@ void initialize() {
     }
 
     for (int i = 1; i <= n; i++) {
-        if (m * X[i] >= C[i]) tm[i] = (C[i] - 1) / X[i] + 1;
+        if (static_cast<i64>(m) * X[i] >= C[i]) tm[i] = (C[i] - 1) / X[i] + 1;
         else tm[i] = m;
         sorted[i] = i;
     }

@@ -14,7 +14,7 @@ cnt = 0
 while True:
     cnt += 1
     print cnt
-    sh("./gen.py 5 5 3 20 100 10 > data.in")
+    sh("./gen.py 850 11 2 10 1000000000 1000000000 > data.in")
     sh("./a.out < data.in > a.ans")
     sh("./b.out < data.in > b.ans")
     sh("diff -Bb a.ans b.ans")
