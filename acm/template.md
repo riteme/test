@@ -22,7 +22,7 @@
 
 ### 解题报告
 
-#### A. [Careful Thief](https://codeforces.com/gym/101810/problem/A)
+#### A. [Careful](https://codeforces.com/gym/101810/problem/A)
 
 **情况**　
 

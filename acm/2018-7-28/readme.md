@@ -1,4 +1,5 @@
-<center class="subtitle">Fudan ACM-ICPC Summer Training Camp 2018</center>
+<br/><br /><center class="subtitle">Fudan ACM-ICPC Summer Training Camp 2018</center>
+
 # 第 4 场训练报告
 
 <br />
@@ -14,7 +15,7 @@
 
 初期：A（22min）、C（28min）、L（47min）、B（57min）、F（69min）、G（82min）、D（114min）、J（143min）、H（168min）。
 
-然后还剩下 E、I、K 三题。先看了 I，属于那种我不太擅长的构造/博弈类题目，想了 10 min 后决定弃疗。然后去看 E，发现是交互提，先放一边。看 K，发现比较水，在 231min 时过了，中途 WA 了一发，写了个对拍所以耗了不少时间。最后 40min 决定试一把 E，最后 3min 时写了个程序，结果第 30 个点就挂了……
+然后还剩下 E、I、K 三题。先看了 I，属于那种我不太擅长的构造/博弈类题目，想了 10min 后决定弃疗。然后去看 E，发现是交互题，先放一边。看 K，发现比较水，在 231min 时过了，中途 WA 了一发，写了个对拍所以耗了不少时间。最后 40min 决定试一把 E，倒数 3min 时写了个程序，结果第 30 个点就挂了……
 
 ### 总结
 
@@ -24,7 +25,7 @@
 
 ### 解题报告
 
-#### A. [Streets of Working Lanterns - 2](http://codeforces.com/gym/101341/problem/A)
+#### A. [Streets of Working Lanterns - 2](https://codeforces.com/gym/101341/problem/A)
 
 **情况**　AC
 
@@ -36,27 +37,27 @@
 
 <hr />
 
-#### B. [Urn with Balls](http://codeforces.com/gym/101341/problem/C)
+#### B. [Urn with Balls](https://codeforces.com/gym/101341/problem/C)
 
 **情况**　AC
 
-**题意**　有 $a$ 个红球，$b$ 个绿球，以及 $c$ 颜色未知的球。问最多从里面取出多少个球，保证取出的球中红球不超过 $n$ 个，绿球不超过 $m$ 个。$a,\,b,\,c,\,n,\,m \leqslant 10^9$。
+**题意**　有 $a$ 个红球，$b$ 个绿球，以及 $c$ 个颜色未知的球。问最多从里面取出多少个球，保证取出的球中红球不超过 $n$ 个，绿球不超过 $m$ 个。$a,\,b,\,c,\,n,\,m \leqslant 10^9$。
 
 **题解**　考虑最坏情况即可。如果 $a + c > n$，那么 $n$ 是一个取球的上界。$b + c > m$ 同理。最后需注意总共只有 $a + b + c$ 个球。时间复杂度 $\Theta(1)$。
 
 <hr />
 
-#### C. [Jumps](http://codeforces.com/gym/101341/problem/D)
+#### C. [Jumps](https://codeforces.com/gym/101341/problem/D)
 
 **情况**　AC
 
-**题意**　给出 $n$ 种步长$A_i$，一只青蛙站在数轴上 0 的位置，每次可以跳出长度为给出的步长中的一种的一步，问能否跳到 $x$ 处。$n \leqslant 2 \times 10^5$，$A_i,\,x \leqslant 10^9$。
+**题意**　给出 $n$ 种步长 $A_i$，一只青蛙站在数轴上 0 的位置，每次可以跳出长度为给出的步长中的一种的一步，问能否跳到 $x$ 处。$n \leqslant 2 \times 10^5$，$A_i,\,x \leqslant 10^9$。
 
-**题解**　根据裴蜀定理，只需要这 $n$ 个数字的最大公约数为 $x$ 因子即可。时间复杂度 $O(n \log A)$，$A = \max\{A_i\}$。
+**题解**　根据裴蜀定理，只需要这 $n$ 个数字的最大公约数为 $x$ 的因子即可。时间复杂度 $O(n \log A)$，$A = \max\{A_i\}$。
 
 <hr />
 
-#### D. [Bonuses and Teleports](http://codeforces.com/gym/101341/problem/E)
+#### D. [Bonuses and Teleports](https://codeforces.com/gym/101341/problem/E)
 
 **情况**　AC
 
@@ -71,11 +72,11 @@
 
 <hr />
 
-#### E. [Circuits](http://codeforces.com/gym/101341/problem/F)
+#### E. [Circuits](https://codeforces.com/gym/101341/problem/F)
 
 **情况**　TLE，已补
 
-**题意**　*交互题*。$n$ 个人中有些人是好人，有些是坏人，并且坏人的数量小于 $n / 2$，但是我们并不知道哪些是好人，哪些是坏人。为了找出所有的好人，可以做至多 $4n$ 次实验。每次实验需要挑出两个人，让他们互相评价对方，说对方是不是好人。好人是诚实的，但坏人却不一定诚实，也就是说坏人可以随意评价他人。最后需要输出所有好人的编号。$n \leqslant 5000$。
+**题意**　**交互题**。$n$ 个人中有些人是好人，有些是坏人，并且坏人的数量小于 $n / 2$，但是我们并不知道哪些是好人，哪些是坏人。为了找出所有的好人，可以做至多 $4n$ 次实验。每次实验需要挑出两个人，让他们互相评价对方，说对方是不是好人。好人是诚实的，但坏人却不一定诚实，也就是说坏人可以随意评价他人。最后需要输出所有好人的编号。$n \leqslant 5000$。
 
 **题解**　首先，如果我们能找到一个好人，那么再经过 $n - 1$ 次实验就可确定每个人的身份。
 
@@ -86,13 +87,13 @@
 * `+ +`：要么两个都是好人，要么两个都是坏人。
 * `+ -`、`- +` 和 `- -`：至少有一个是坏人。
 
-由此可以看出，如果结果不是 `+ +`，那么将这两个人都舍弃掉，就能实现对消。而如果是 `+ +` 这种情况，至少说明 $x$ 和 $y$ 是同一类人，那么可以使用并查集来维护这种信息。最后剩下的人中会分为两部分，一部分都是好人，一部分都是坏人。虽然不知道具体情况，但是我们知道好人数量一定比坏人多，所以由此就可以确定剩下的人中哪些是好人。
+由此可以看出，如果结果不是 `+ +`，那么将这两个人都舍弃掉，就能实现对消。而如果是 `+ +` 这种情况，至少说明 $x$ 和 $y$ 是同一类人，那么可以使用并查集来维护这种信息。最后剩下的人中会分为两部分，一部分都是好人，一部分都是坏人。虽然不能直接知道具体情况，但是我们知道好人数量一定比坏人多，所以由此就可以确定剩下的人中哪些是好人。
 
 暴力实现就是 $\Theta(n^2)$ 地枚举 $x$ 和 $y$，但实际实验的次数并不多。假设最后留下了 $a$ 个好人和 $b$ 个坏人，那么一共进行了 $(a - 1) + (b - 1) + (n - a - b) / 2 \leqslant n - 1$ 次实验。加上最后一遍总的测试，总实验次数上界为 $2n - 2$。暴力的实现使用队列可以优化到 $O(n \alpha(n))$ 的时间复杂度。
 
 <hr />
 
-#### F. [I love Codeforces](http://codeforces.com/gym/101341/problem/G)
+#### F. [I love Codeforces](https://codeforces.com/gym/101341/problem/G)
 
 **情况**　AC
 
@@ -102,7 +103,7 @@
 
 <hr />
 
-#### G. [Perfect Ban](http://codeforces.com/gym/101341/problem/H)
+#### G. [Perfect Ban](https://codeforces.com/gym/101341/problem/H)
 
 **情况**　AC
 
@@ -110,9 +111,9 @@
 
 **题解**　求出左上、右上、左下、右下四个方向上前缀子矩阵中的最大值，然后枚举删除的行和列即可。时间复杂度 $\Theta(nm)$。
 
-<hr />
+<br />
 
-#### H. [[Matrix God](https://vjudge.net/problem/Gym-101341I)](http://codeforces.com/gym/101341/problem/I)
+#### H. [Matrix God](https://codeforces.com/gym/101341/problem/I)
 
 **情况**　AC
 
@@ -122,7 +123,7 @@
 
 <hr />
 
-#### I. [Catch the Monster](http://codeforces.com/gym/101341/problem/J)
+#### I. [Catch the Monster](https://codeforces.com/gym/101341/problem/J)
 
 **情况**　已补
 
@@ -130,13 +131,13 @@
 
 **题解**　首先注意到，如果是一棵菊花树，那么一个人站在中心，另外一个人对分叉进行搜索，一定可以抓住怪兽。
 
-其次，如果树可以由多个这样的菊花树构成，并且中心均在一条链上，那么可以拓展之前的操作依次搜索每棵子菊花树。如果中心不在同一条链上，那么怪兽就可以利用自己的先知能力到处躲避。
+其次，如果树由多个这样的菊花树构成，并且中心均在一条链上，那么可以拓展之前的操作：依次搜索每棵子菊花树。如果中心不在同一条链上，那么怪兽就可以利用自己的先知能力到处躲避。
 
 因此只需要将树上所有度数大于 $2$ 的点标记出来，判断能否用一条路径将它们全部覆盖即可。这条路径最好是以被标记的点为端点的一条直径。时间复杂度为 $\Theta(n)$。
 
 <hr />
 
-#### J. [Competitions](http://codeforces.com/gym/101341/problem/K)
+#### J. [Competitions](https://codeforces.com/gym/101341/problem/K)
 
 **情况**　AC
 
@@ -146,20 +147,20 @@
 
 <hr />
 
-#### K. [High Probability Cast](http://codeforces.com/gym/101341/problem/L)
+#### K. [High Probability Cast](https://codeforces.com/gym/101341/problem/L)
 
 **情况**　AC
 
-**题意**　有 $n$ 个武器，每个武器制造的伤害在范围 $[l_i,\,r_i]$ 内均匀随机（$l_i \leqslant r_i$）。然后有 $m$ 个怪兽迎面走来，血量为 $x$。问能够将其一击必杀的概率最高的武器是哪一件。$n \leqslant 2 \times 10^5$，$l_i,\,r_i,\,x \leqslant 10^9$。
+**题意**　有 $n$ 个武器，每个武器制造的伤害在范围 $[l_i,\,r_i]$ 内均匀随机（$l_i \leqslant r_i$）。然后有 $m$ 个怪兽依次迎面走来，血量为 $x$。问能够将其一击必杀的概率最高的武器是哪一件。$n \leqslant 2 \times 10^5$，$l_i,\,r_i,\,x \leqslant 10^9$。
 
 **题解**　考虑每个武器一击必杀的概率密度曲线，是一个折线型：$l_i$ 左边均为 1，$r_i$ 右边均为 0，中间用一条线段连接。那么 $n$ 个武器的概率最大值就构成了一个下凸包。答案直接在凸包上二分即可。时间复杂度 $O((n + m) \log n)$。
 
 <hr />
 
-#### L. [Last Man Standing](http://codeforces.com/gym/101341/problem/M)
+#### L. [Last Man Standing](https://codeforces.com/gym/101341/problem/M)
 
 **情况**　AC
 
 **题意**　有 $n$ 个人在玩枪战游戏，每局游戏中不能重生。在某一局游戏中，给出每个人的杀人数，构造杀人记录，满足给定的战绩。$n \leqslant 2 \times 10^5$。
 
-**题解**　按战绩从大到小排序，先杀战绩差的。具体实现时用两个指针分别表示枪机者和 GG 的人。时间复杂度 $O(n \log n)$.
+**题解**　按战绩从大到小排序，先杀战绩差的。具体实现时用两个指针分别表示开枪者和 GG 的人。时间复杂度 $O(n \log n)$.
