@@ -108,7 +108,7 @@ inline LD on_cir(const P &a,const P &b,const C &c) {
 int main() {
     n=rd();
     for(int i=1;i<=n;i++) 
-        cir[i].a.x=rd(), cir[i].a.y=rd(), cir[i].R=rd()+10;
+        cir[i].a.x=rd(), cir[i].a.y=rd(), cir[i].R=rd()/*+10*/;
     sort(cir+1,cir+n+1);
     n=unique(cir+1,cir+n+1)-cir-1;
     for(int i=1;i<=n;i++) 
@@ -137,6 +137,6 @@ int main() {
             if(t) rs+=on_cir(p[i],p[i+1],cir[t]);
             else rs+=(p[i]-p[i+1]).dis();
         }
-        printf("%.7f",(double)rs);
+        printf("%.9f",(double)rs);
     }
 }

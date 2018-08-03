@@ -16,7 +16,8 @@ typedef long double ld;
 
 #define NMAX 100
 #define MMAX 20
-#define EPS 1e-10L
+#define EPS 1e-7L
+#define SIMPSON_EPS 1e-12L
 #define INF 1e9L
 
 inline bool eq(const ld &x, const ld &y) {
@@ -65,10 +66,9 @@ inline ld secty(const Segmemt &S, const ld &x) {
     return S.p.y + (S.q.y - S.p.y) / (S.q.x - S.p.x) * (x - S.p.x);
 }
 
-static int n, st;
+static int n;
 static ld ans, L[NMAX + 10], R[NMAX + 10];
 static vector<Segmemt> poly[NMAX + 10];
-static ld scan[NMAX * MMAX + 10];
 
 void initialize() {
     static Vector seq[MMAX + 10];
@@ -80,7 +80,6 @@ void initialize() {
         R[i] = -INF;
         for (int j = 1; j <= m; j++) {
             scanf("%Lf%Lf", &seq[j].x, &seq[j].y);
-            scan[st++] = seq[j].x;
             L[i] = min(L[i], seq[j].x);
             R[i] = max(R[i], seq[j].x);
         }
@@ -114,47 +113,16 @@ static int cnt, m;
 static ld P[MMAX * 2 + 10];
 static Interval S[NMAX * MMAX + 10];
 
-#define CROSS 1
-#define REFLECT 2
-#define VERTICAL 3
-
-inline bool same(const Vector &u, const Vector &v) {
-    return eq(u.x, v.x) && eq(u.y, v.y);
-}
-
-inline int sgn(ld x) {
-    if (x >= EPS) return 1;
-    if (x <= -EPS) return -1;
-    return 0;
-}
-
-inline void consider(const Segmemt &s1, const Segmemt &s2, ld x) {
-    if (eq(s1.p.x, s1.q.x) || eq(s2.p.x, s2.q.x)) return;
-    Vector mid = same(s1.p, s2.p) ? s2.p : s2.q;
-    if (!eq(mid.x, x)) return;
-
-    Vector p1 = same(s1.p, mid) ? s1.q : s1.p;
-    Vector p2 = same(s2.p, mid) ? s2.q : s2.p;
-    const Vector right(1, 0);
-    if (sgn(dot(right, p1 - mid)) == sgn(dot(right, p2 - mid))) return;
-    P[cnt++] = mid.y;
-}
-
 void cut(int i, const ld &x) {
     cnt = 0;
     for (auto &seg : poly[i]) {
-        if (eq(seg.p.x, x) && eq(seg.q.x, x)) {
-            P[cnt++] = seg.p.y;
-            P[cnt++] = seg.q.y;
-        } else if (eq(seg.p.x, x) || eq(seg.q.x, x))
+        if (eq(seg.p.x, x) && eq(seg.q.x, x))
+            S[m++] = Interval(seg.p.y, seg.q.y);
+        else if (eq(seg.p.x, x) || eq(seg.q.x, x))
             continue;
         else if (seg.p.x <= x && x <= seg.q.x)
             P[cnt++] = secty(seg, x);
     }
-
-    consider(poly[i][0], poly[i].back(), x);
-    for (int j = 0; j < poly[i].size() - 1; j++)
-        consider(poly[i][j], poly[i][j + 1], x);
 
     sort(P, P + cnt);
     for  (int i = 0; i < cnt; i += 2)
@@ -180,20 +148,32 @@ ld eval(ld x) {
     return ret;
 }
 
+ld obtain(ld l, ld r, ld lf, ld rf, ld &mf) {
+    ld m = (l + r) * 0.5L;
+    mf = eval(m);
+    return (r - l) / 6.0L * (lf + rf + mf * 4.0L);
+}
+
+ld simpson(ld l, ld r, ld lf, ld rf, ld mf, ld eps) {
+    if (r - l < eps) return mf * eps;
+    ld lmf, rmf, m = (l + r) * 0.5L;
+    ld cur = (r - l) / 6.0L * (lf + rf + mf * 4.0L);
+    ld nxt = obtain(l, m, lf, mf, lmf) + obtain(m, r, mf, rf, rmf);
+    if (fabs(cur - nxt) < eps) return nxt;
+    return simpson(l, m, lf, mf, lmf, eps * 0.5L) +
+           simpson(m, r, mf, rf, rmf, eps * 0.5L);
+}
 
 int main() {
     initialize();
 
-    sort(scan, scan + st);
-    ld ans2 = 0;
-    for (int i = 0; i < st - 1; i++) {
-        if (eq(scan[i], scan[i + 1])) continue;
-        ld l = scan[i] + EPS, r = scan[i + 1] - EPS;
-        ld lf = eval(l), rf = eval(r);
-        ans2 += (lf + rf) * 0.5 * (r - l + 2 * EPS);
+    ld l = INF, r = -INF;
+    for (int i = 1; i <= n; i++) {
+        l = min(l, L[i]);
+        r = max(r, R[i]);
     }
-
-    printf("%.10Lf %.10Lf\n", ans, ans2);
+    printf("%.9Lf %.8Lf\n",
+            ans, simpson(l, r, eval(l), eval(r), eval((l + r) * 0.5L), SIMPSON_EPS));
 
     return 0;
 }

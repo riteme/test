@@ -12,7 +12,7 @@ using namespace std;
 
 #define NMAX 200
 #define INF 1e9
-#define EPS 1e-10
+#define EPS 1e-9
 
 inline bool eq(double x, double y) {
     return x - EPS < y && y < x + EPS;
@@ -86,15 +86,16 @@ void filter() {
     sort(C + 1, C + n + 1);
     for (int i = 2; i <= n; i++) {
         for (int j = 1; j < i; j++) {
-            if (C[i].r - C[j].r >= hypot(C[i].x - C[j].x, C[i].y - C[j].y))
+            if (C[i].r - C[j].r > hypot(C[i].x - C[j].x, C[i].y - C[j].y) - EPS)
                 C[j].r = INF;
         }
     }
 
     int i = 0;
     for (int j = 1; j <= n; j++) {
-        if (C[j].r < INF)
+        if (C[j].r < INF - EPS)
             C[++i] = C[j];
+        // else printf("Circle (%.2lf, %.2lf) removed.\n", C[j].x, C[j].y);
     }
     n = i;
 }
@@ -143,11 +144,16 @@ inline double arc(const Point &u, const Point &v) {
     } else return len(u - v);
 }
 
+static int t;
+static Point seq[4 * NMAX * NMAX + 10];
+
 double eval() {
     int p = 1;
     for (int i = 2; i <= m; i++)
-        if (P[i].x < P[p].x || (eq(P[i].x, P[p].x) && P[i].y < P[p].y))
+        if ((eq(P[i].x, P[p].x) && P[i].y < P[p].y) ||
+            (!eq(P[i].x, P[p].x) && P[i].x < P[p].x))
             p = i;
+    // printf("%.2lf, %.2lf\n", P[p].x, P[p].y);
     swap(P[1], P[p]);
     Point loc = P[1];
     sort(P + 2, P + m + 1, [loc](const Point &u, const Point &v) {
@@ -165,11 +171,28 @@ double eval() {
         q.push_front(u);
     }
 
-    double ret = arc(q.back(), q[0]);
-    // printf("%.5lf\n", arc(q.back(), q[0]));
-    for (int i = 0; i < q.size() - 1; i++) {
-        // printf("%.5lf\n", arc(q[i], q[i + 1]));
-        ret += arc(q[i], q[i + 1]);
+    // for (auto p : q)
+    //     printf("%d: %.2lf, %.2lf\n", p.id, p.x, p.y);
+
+    for (int i = 0; i < q.size(); i++) {
+        int k = q[i].id;
+        bool fucked = false;
+        for (int j = 1; !fucked && j <= n; j++) {
+            if (j == k) continue;
+            if (len(q[i] - Point(C[j].x, C[j].y)) < C[j].r + EPS)
+                fucked = true;
+        }
+        if (!fucked) seq[t++] = q[i];
+    }
+
+    // for (int i = 0; i < t; i++)
+    //     printf("%d: %.2lf, %.2lf\n", seq[i].id, seq[i].x, seq[i].y);
+
+    double ret = arc(seq[t - 1], seq[0]);
+    // printf("%.10lf\n", arc(seq[t - 1], seq[0]));
+    for (int i = 0; i < t - 1; i++) {
+        ret += arc(seq[i], seq[i + 1]);
+        // printf("%.10lf\n", arc(seq[i], seq[i + 1]));
     }
     return ret;
 }
