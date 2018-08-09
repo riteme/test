@@ -1,4 +1,4 @@
-<center class="subtitle">Fudan ACM-ICPC Summer Training Camp 2018</center>
+<br /><center class="subtitle">Fudan ACM-ICPC Summer Training Camp 2018</center>
 # 第 1 场训练报告
 
 <br />

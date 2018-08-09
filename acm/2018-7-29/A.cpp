@@ -16,8 +16,8 @@ typedef long double ld;
 
 #define NMAX 100
 #define MMAX 20
-#define EPS 1e-10L
-#define INF 1e9L
+#define EPS 1e-10
+#define INF 1e9
 
 inline bool eq(const ld &x, const ld &y) {
     return x - EPS < y && y < x + EPS;
@@ -114,47 +114,14 @@ static int cnt, m;
 static ld P[MMAX * 2 + 10];
 static Interval S[NMAX * MMAX + 10];
 
-#define CROSS 1
-#define REFLECT 2
-#define VERTICAL 3
-
-inline bool same(const Vector &u, const Vector &v) {
-    return eq(u.x, v.x) && eq(u.y, v.y);
-}
-
-inline int sgn(ld x) {
-    if (x >= EPS) return 1;
-    if (x <= -EPS) return -1;
-    return 0;
-}
-
-inline void consider(const Segmemt &s1, const Segmemt &s2, ld x) {
-    if (eq(s1.p.x, s1.q.x) || eq(s2.p.x, s2.q.x)) return;
-    Vector mid = same(s1.p, s2.p) ? s2.p : s2.q;
-    if (!eq(mid.x, x)) return;
-
-    Vector p1 = same(s1.p, mid) ? s1.q : s1.p;
-    Vector p2 = same(s2.p, mid) ? s2.q : s2.p;
-    const Vector right(1, 0);
-    if (sgn(dot(right, p1 - mid)) == sgn(dot(right, p2 - mid))) return;
-    P[cnt++] = mid.y;
-}
-
 void cut(int i, const ld &x) {
     cnt = 0;
     for (auto &seg : poly[i]) {
-        if (eq(seg.p.x, x) && eq(seg.q.x, x)) {
-            P[cnt++] = seg.p.y;
-            P[cnt++] = seg.q.y;
-        } else if (eq(seg.p.x, x) || eq(seg.q.x, x))
-            continue;
-        else if (seg.p.x <= x && x <= seg.q.x)
+        assert(!eq(x, seg.p.x));
+        assert(!eq(x, seg.q.x));
+        if (seg.p.x < x && x < seg.q.x)
             P[cnt++] = secty(seg, x);
     }
-
-    consider(poly[i][0], poly[i].back(), x);
-    for (int j = 0; j < poly[i].size() - 1; j++)
-        consider(poly[i][j], poly[i][j + 1], x);
 
     sort(P, P + cnt);
     for  (int i = 0; i < cnt; i += 2)
