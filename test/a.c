@@ -1,16 +1,7 @@
 int main() {
-    register unsigned long long a;
-    printf("%d\n", sizeof(a));
-    int n;
-    scanf("%d", &n);
-
-    while (n--) {
-        a *= 123413221ULL;
-        a /= 21390ULL;
-        a /= 119ULL;
-    }
-
-    printf("%lf\n", a);
-
+    long long a = 1 + (2LL << 32);
+    printf("%d %d", a);
+//    printf("%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", 
+//            a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a, a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a);
     return 0;
 }
