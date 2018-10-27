@@ -1,5 +1,9 @@
 #include <cstdio>
 #include <cstring>
+#include <cstdio>
+
+using namespace std;
+using namespace std;
 
 #include <algorithm>
 
