@@ -1,19 +1,8 @@
-#include <cstdio>
-#include <cstring>
-#include <cstdio>
-
-using namespace std;
-using namespace std;
-
-#include <algorithm>
-
-using namespace std;
-
-#include <random>
-
-static random_device rd;
+struct node{
+    int a, b, c, d;
+};
 
 int main() {
-    int a;
-    int b = a == 1 ? a = 1 : 2;
+    auto a = (node){1,2,3,4};
+    return 0;
 }
