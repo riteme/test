@@ -1,8 +1,12 @@
-struct node{
-    int a, b, c, d;
-};
+#include <map>
+#include <iostream>
 
 int main() {
-    auto a = (node){1,2,3,4};
+    std::map<int, int> a;
+    a[1]=2;
+    a[2]=3;
+    for (int v : a) {
+        std::cout << a[v] << std::endl;
+    }
     return 0;
 }
