@@ -144,3 +144,4 @@ target/
 *.pdf
 
 .vscode
+*.class
