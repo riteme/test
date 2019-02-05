@@ -63,7 +63,7 @@ Node *parse() {
     while (!q.empty()) {
         int u = q.front();
         q.pop();
-        if (G[u].size() < 2) {
+        if (G[u].size() < 2 || u == 1 || u == 5) {
             mark[u] = false;
             continue;
         }
