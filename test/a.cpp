@@ -1,10 +1,8 @@
-// Example program
-#include <iostream>
-#include <string>
-using namespace std;
-int main()
-{
+#include <cstdio>
+int main() {
+    char buf[] ="1 2";
     int a, b;
-    cin >> a >> b;
-    cout << a << " + " << b << " = " << a + b << endl;
+    sscanf_s(buf, "%d%d", &a, &b);
+    printf("%d\n", a + b);
+    return 0;
 }
