@@ -1,0 +1,212 @@
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls  ms/call  ms/call  name    
+ 22.46     13.31    13.31 99996365     0.00     0.00  SegmentTree::modify(SegmentTree::Node*, int, int)
+ 22.09     26.39    13.09 202910254     0.00     0.00  std::priority_queue<Heap::Node, std::vector<Heap::Node, std::allocator<Heap::Node> >, std::less<Heap::Node> >::pop()
+ 18.39     37.29    10.90                             main
+ 12.55     44.72     7.43  3000000     0.00     0.00  SegmentTree::modify(SegmentTree::Node*, int, int, int)
+ 10.20     50.77     6.04      100    60.43    61.73  SegmentTree::clear()
+  5.35     53.94     3.17  3000000     0.00     0.00  IntervalTree::remove(IntervalTree::Node*, int)
+  4.64     56.69     2.75 202985204     0.00     0.00  std::priority_queue<Heap::Node, std::vector<Heap::Node, std::allocator<Heap::Node> >, std::less<Heap::Node> >::push(Heap::Node&&)
+  3.44     58.73     2.04  3000000     0.00     0.00  IntervalTree::insert(IntervalTree::Node*, int)
+  0.68     59.13     0.40  1604104     0.00     0.00  IntervalTree::min(IntervalTree::Node*, IntervalTree::Node*)
+  0.22     59.26     0.13      100     1.30     1.30  std::_Deque_base<SegmentTree::Node*, std::allocator<SegmentTree::Node*> >::_M_initialize_map(unsigned long)
+  0.03     59.28     0.02  3000000     0.00     0.00  std::_Hashtable<unsigned long long, unsigned long long, std::allocator<unsigned long long>, std::__detail::_Identity, std::equal_to<unsigned long long>, std::hash<unsigned long long>, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<false, true, true> >::_M_insert_unique_node(unsigned long, unsigned long, std::__detail::_Hash_node<unsigned long long, false>*)
+  0.00     59.28     0.00        1     0.00     0.00  SegmentTree::build(int, int)
+
+ %         the percentage of the total running time of the
+time       program used by this function.
+
+cumulative a running sum of the number of seconds accounted
+ seconds   for by this function and those listed above it.
+
+ self      the number of seconds accounted for by this
+seconds    function alone.  This is the major sort for this
+           listing.
+
+calls      the number of times this function was invoked, if
+           this function is profiled, else blank.
+
+ self      the average number of milliseconds spent in this
+ms/call    function per call, if this function is profiled,
+	   else blank.
+
+ total     the average number of milliseconds spent in this
+ms/call    function and its descendents per call, if this
+	   function is profiled, else blank.
+
+name       the name of the function.  This is the minor sort
+           for this listing. The index shows the location of
+	   the function in the gprof listing. If the index is
+	   in parenthesis it shows where it would appear in
+	   the gprof listing if it were to be printed.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+		     Call graph (explanation follows)
+
+
+granularity: each sample hit covers 2 byte(s) for 0.02% of 59.28 seconds
+
+index % time    self  children    called     name
+                             416070820             main [1]
+[1]    100.0   10.90   48.38       0+416070820 main [1]
+               13.31    0.00 99996365/99996365     SegmentTree::modify(SegmentTree::Node*, int, int) [2]
+               13.09    0.00 202910254/202910254     std::priority_queue<Heap::Node, std::vector<Heap::Node, std::allocator<Heap::Node> >, std::less<Heap::Node> >::pop() [3]
+                7.43    0.00 3000000/3000000     SegmentTree::modify(SegmentTree::Node*, int, int, int) [4]
+                6.04    0.13     100/100         SegmentTree::clear() [5]
+                3.17    0.40 3000000/3000000     IntervalTree::remove(IntervalTree::Node*, int) [6]
+                2.75    0.00 202985204/202985204     std::priority_queue<Heap::Node, std::vector<Heap::Node, std::allocator<Heap::Node> >, std::less<Heap::Node> >::push(Heap::Node&&) [7]
+                2.04    0.00 3000000/3000000     IntervalTree::insert(IntervalTree::Node*, int) [8]
+                0.02    0.00 3000000/3000000     std::_Hashtable<unsigned long long, unsigned long long, std::allocator<unsigned long long>, std::__detail::_Identity, std::equal_to<unsigned long long>, std::hash<unsigned long long>, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<false, true, true> >::_M_insert_unique_node(unsigned long, unsigned long, std::__detail::_Hash_node<unsigned long long, false>*) [11]
+                0.00    0.00       1/1           SegmentTree::build(int, int) [18]
+                             416070820             main [1]
+-----------------------------------------------
+                             1995069841             SegmentTree::modify(SegmentTree::Node*, int, int) [2]
+               13.31    0.00 99996365/99996365     main [1]
+[2]     22.4   13.31    0.00 99996365+1995069841 SegmentTree::modify(SegmentTree::Node*, int, int) [2]
+                             1995069841             SegmentTree::modify(SegmentTree::Node*, int, int) [2]
+-----------------------------------------------
+               13.09    0.00 202910254/202910254     main [1]
+[3]     22.1   13.09    0.00 202910254         std::priority_queue<Heap::Node, std::vector<Heap::Node, std::allocator<Heap::Node> >, std::less<Heap::Node> >::pop() [3]
+-----------------------------------------------
+                             154317793             SegmentTree::modify(SegmentTree::Node*, int, int, int) [4]
+                7.43    0.00 3000000/3000000     main [1]
+[4]     12.5    7.43    0.00 3000000+154317793 SegmentTree::modify(SegmentTree::Node*, int, int, int) [4]
+                             154317793             SegmentTree::modify(SegmentTree::Node*, int, int, int) [4]
+-----------------------------------------------
+                6.04    0.13     100/100         main [1]
+[5]     10.4    6.04    0.13     100         SegmentTree::clear() [5]
+                0.13    0.00     100/100         std::_Deque_base<SegmentTree::Node*, std::allocator<SegmentTree::Node*> >::_M_initialize_map(unsigned long) [10]
+-----------------------------------------------
+                             45309149             IntervalTree::remove(IntervalTree::Node*, int) [6]
+                3.17    0.40 3000000/3000000     main [1]
+[6]      6.0    3.17    0.40 3000000+45309149 IntervalTree::remove(IntervalTree::Node*, int) [6]
+                0.40    0.00 1604104/1604104     IntervalTree::min(IntervalTree::Node*, IntervalTree::Node*) [9]
+                             45309149             IntervalTree::remove(IntervalTree::Node*, int) [6]
+-----------------------------------------------
+                2.75    0.00 202985204/202985204     main [1]
+[7]      4.6    2.75    0.00 202985204         std::priority_queue<Heap::Node, std::vector<Heap::Node, std::allocator<Heap::Node> >, std::less<Heap::Node> >::push(Heap::Node&&) [7]
+-----------------------------------------------
+                             53349942             IntervalTree::insert(IntervalTree::Node*, int) [8]
+                2.04    0.00 3000000/3000000     main [1]
+[8]      3.4    2.04    0.00 3000000+53349942 IntervalTree::insert(IntervalTree::Node*, int) [8]
+                             53349942             IntervalTree::insert(IntervalTree::Node*, int) [8]
+-----------------------------------------------
+                             2528145             IntervalTree::min(IntervalTree::Node*, IntervalTree::Node*) [9]
+                0.40    0.00 1604104/1604104     IntervalTree::remove(IntervalTree::Node*, int) [6]
+[9]      0.7    0.40    0.00 1604104+2528145 IntervalTree::min(IntervalTree::Node*, IntervalTree::Node*) [9]
+                             2528145             IntervalTree::min(IntervalTree::Node*, IntervalTree::Node*) [9]
+-----------------------------------------------
+                0.13    0.00     100/100         SegmentTree::clear() [5]
+[10]     0.2    0.13    0.00     100         std::_Deque_base<SegmentTree::Node*, std::allocator<SegmentTree::Node*> >::_M_initialize_map(unsigned long) [10]
+-----------------------------------------------
+                0.02    0.00 3000000/3000000     main [1]
+[11]     0.0    0.02    0.00 3000000         std::_Hashtable<unsigned long long, unsigned long long, std::allocator<unsigned long long>, std::__detail::_Identity, std::equal_to<unsigned long long>, std::hash<unsigned long long>, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<false, true, true> >::_M_insert_unique_node(unsigned long, unsigned long, std::__detail::_Hash_node<unsigned long long, false>*) [11]
+-----------------------------------------------
+                             1999998             SegmentTree::build(int, int) [18]
+                0.00    0.00       1/1           main [1]
+[18]     0.0    0.00    0.00       1+1999998 SegmentTree::build(int, int) [18]
+                             1999998             SegmentTree::build(int, int) [18]
+-----------------------------------------------
+
+ This table describes the call tree of the program, and was sorted by
+ the total amount of time spent in each function and its children.
+
+ Each entry in this table consists of several lines.  The line with the
+ index number at the left hand margin lists the current function.
+ The lines above it list the functions that called this function,
+ and the lines below it list the functions this one called.
+ This line lists:
+     index	A unique number given to each element of the table.
+		Index numbers are sorted numerically.
+		The index number is printed next to every function name so
+		it is easier to look up where the function is in the table.
+
+     % time	This is the percentage of the `total' time that was spent
+		in this function and its children.  Note that due to
+		different viewpoints, functions excluded by options, etc,
+		these numbers will NOT add up to 100%.
+
+     self	This is the total amount of time spent in this function.
+
+     children	This is the total amount of time propagated into this
+		function by its children.
+
+     called	This is the number of times the function was called.
+		If the function called itself recursively, the number
+		only includes non-recursive calls, and is followed by
+		a `+' and the number of recursive calls.
+
+     name	The name of the current function.  The index number is
+		printed after it.  If the function is a member of a
+		cycle, the cycle number is printed between the
+		function's name and the index number.
+
+
+ For the function's parents, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the function into this parent.
+
+     children	This is the amount of time that was propagated from
+		the function's children into this parent.
+
+     called	This is the number of times this parent called the
+		function `/' the total number of times the function
+		was called.  Recursive calls to the function are not
+		included in the number after the `/'.
+
+     name	This is the name of the parent.  The parent's index
+		number is printed after it.  If the parent is a
+		member of a cycle, the cycle number is printed between
+		the name and the index number.
+
+ If the parents of the function cannot be determined, the word
+ `<spontaneous>' is printed in the `name' field, and all the other
+ fields are blank.
+
+ For the function's children, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the child into the function.
+
+     children	This is the amount of time that was propagated from the
+		child's children to the function.
+
+     called	This is the number of times the function called
+		this child `/' the total number of times the child
+		was called.  Recursive calls by the child are not
+		listed in the number after the `/'.
+
+     name	This is the name of the child.  The child's index
+		number is printed after it.  If the child is a
+		member of a cycle, the cycle number is printed
+		between the name and the index number.
+
+ If there are any cycles (circles) in the call graph, there is an
+ entry for the cycle-as-a-whole.  This entry shows who called the
+ cycle (as parents) and the members of the cycle (as children.)
+ The `+' recursive calls entry shows the number of function calls that
+ were internal to the cycle, and the calls entry for each member shows,
+ for that member, how many times it was called from other members of
+ the cycle.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+Index by function name
+
+  [18] SegmentTree::build(int, int) [9] IntervalTree::min(IntervalTree::Node*, IntervalTree::Node*) [10] std::_Deque_base<SegmentTree::Node*, std::allocator<SegmentTree::Node*> >::_M_initialize_map(unsigned long)
+   [5] SegmentTree::clear()    [8] IntervalTree::insert(IntervalTree::Node*, int) [3] std::priority_queue<Heap::Node, std::vector<Heap::Node, std::allocator<Heap::Node> >, std::less<Heap::Node> >::pop()
+   [2] SegmentTree::modify(SegmentTree::Node*, int, int) [6] IntervalTree::remove(IntervalTree::Node*, int) [7] std::priority_queue<Heap::Node, std::vector<Heap::Node, std::allocator<Heap::Node> >, std::less<Heap::Node> >::push(Heap::Node&&)
+   [4] SegmentTree::modify(SegmentTree::Node*, int, int, int) [11] std::_Hashtable<unsigned long long, unsigned long long, std::allocator<unsigned long long>, std::__detail::_Identity, std::equal_to<unsigned long long>, std::hash<unsigned long long>, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<false, true, true> >::_M_insert_unique_node(unsigned long, unsigned long, std::__detail::_Hash_node<unsigned long long, false>*) [1] main

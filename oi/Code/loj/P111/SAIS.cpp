@@ -10,6 +10,7 @@ using namespace std;
 
 #define NMAX 1000000
 
+#define ACM_BEGIN
 #define rep(i, l, r) for (register int i = (l); i <= (r); ++i)
 #define rrep(i, r, l) for (register int i = (r); i >= (l); --i)
 #define PUTS(x) sa[cur[str[x]]--] = x
@@ -49,6 +50,7 @@ void sais(int n, int m, int *str, int *sa) {
     RESET rrep(i, len + 1, 1) PUTS(pos[nsa[i]]); INDUCE
 }
 static int str[NMAX * 3 + 10], sa[NMAX * 3 + 10];
+#define ACM_END
 
 int main() {
     ios::sync_with_stdio(false);
