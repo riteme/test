@@ -1,8 +1,9 @@
 #include <cstdio>
+static int arr[2][100];
+static auto p = arr[1];
 int main() {
-    char buf[] ="1 2";
-    int a, b;
-    sscanf_s(buf, "%d%d", &a, &b);
-    printf("%d\n", a + b);
+    for (int i = -50; i <= 50; i++) p[i] = i;
+    int x = p[-25] + p[26];
+    printf("%d\n", x);
     return 0;
 }

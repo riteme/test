@@ -1,0 +1,732 @@
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls  ms/call  ms/call  name    
+ 13.92      0.59     0.59                             main
+  7.90      0.93     0.34 205381904     0.00     0.00  std::_List_iterator<Item>::operator->() const
+  7.55      1.25     0.32 144445482     0.00     0.00  Item::operator<(Item const&) const
+  7.08      1.55     0.30 49995000     0.00     0.00  int const& std::max<int>(int const&, int const&)
+  6.61      1.83     0.28 215401904     0.00     0.00  std::_List_node<Item>::_M_valptr()
+  5.31      2.05     0.23 215401904     0.00     0.00  __gnu_cxx::__aligned_membuf<Item>::_M_ptr()
+  4.48      2.24     0.19 67725952     0.00     0.00  std::__cxx11::list<Item, std::allocator<Item> >::end()
+  4.25      2.42     0.18 215401904     0.00     0.00  __gnu_cxx::__aligned_membuf<Item>::_M_addr()
+  4.25      2.60     0.18 125986406     0.00     0.00  bool __gnu_cxx::__ops::_Iter_less_iter::operator()<Item*, Item*>(Item*, Item*) const
+  3.66      2.76     0.16 49995000     0.00     0.00  submit(int, int, int, int)
+  2.48      2.86     0.11 62715952     0.00     0.00  std::_List_iterator<Item>::operator!=(std::_List_iterator<Item> const&) const
+  1.89      2.94     0.08 91026216     0.00     0.00  std::remove_reference<Item&>::type&& std::move<Item&>(Item&)
+  1.89      3.02     0.08 83147856     0.00     0.00  std::_List_iterator<Item>::_List_iterator(std::__detail::_List_node_base*)
+  1.89      3.10     0.08     2040     0.04     0.06  std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_clear()
+  1.65      3.17     0.07 18459076     0.00     0.00  bool __gnu_cxx::__ops::_Val_less_iter::operator()<Item, Item*>(Item&, Item*) const
+  1.65      3.24     0.07 18351652     0.00     0.00  bool __gnu_cxx::__ops::_Val_less_iter::operator()<int, int*>(int&, int*) const
+  1.53      3.31     0.07 44063979     0.00     0.00  std::remove_reference<int&>::type&& std::move<int&>(int&)
+  1.42      3.37     0.06 22519047     0.00     0.00  _ZSt4swapI4ItemENSt9enable_ifIXsr6__and_ISt6__not_ISt15__is_tuple_likeIT_EESt21is_move_constructibleIS4_ESt18is_move_assignableIS4_EEE5valueEvE4typeERS4_SD_
+  1.30      3.42     0.06  5010000     0.00     0.00  std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_put_node(std::_List_node<Item>*)
+  1.18      3.47     0.05   521154     0.00     0.00  Item* std::__unguarded_partition<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter)
+  1.18      3.52     0.05                             void std::__pop_heap<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter&)
+  1.06      3.57     0.05 49995000     0.00     0.00  std::_List_iterator<Item>::operator++(int)
+  1.06      3.61     0.05 35182689     0.00     0.00  bool __gnu_cxx::__ops::_Iter_less_iter::operator()<int*, int*>(int*, int*) const
+  1.06      3.66     0.05   509130     0.00     0.00  int* std::__unguarded_partition<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, int*, __gnu_cxx::__ops::_Iter_less_iter)
+  0.94      3.70     0.04  5010000     0.00     0.00  std::__cxx11::list<Item, std::allocator<Item> >::push_back(Item const&)
+  0.94      3.74     0.04  4962669     0.00     0.00  void std::__unguarded_linear_insert<int*, __gnu_cxx::__ops::_Val_less_iter>(int*, __gnu_cxx::__ops::_Val_less_iter)
+  0.94      3.78     0.04                             void std::__make_heap<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter&)
+  0.71      3.81     0.03 20040000     0.00     0.00  Item const& std::forward<Item const&>(std::remove_reference<Item const&>::type&)
+  0.71      3.84     0.03 10020000     0.00     0.00  std::__cxx11::list<Item, std::allocator<Item> >::begin()
+  0.71      3.87     0.03        1    30.01   668.65  void std::__introsort_loop<Item*, long, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, long, __gnu_cxx::__ops::_Iter_less_iter)
+  0.71      3.90     0.03  7712992     0.00     0.00  std::_List_node<unsigned long>::_M_valptr()
+  0.47      3.92     0.02  5010000     0.00     0.00  void __gnu_cxx::new_allocator<std::_List_node<Item> >::construct<Item, Item const&>(Item*, Item const&)
+  0.47      3.94     0.02  5010000     0.00     0.00  std::__allocated_ptr<std::allocator<std::_List_node<Item> > >::~__allocated_ptr()
+  0.47      3.96     0.02  5010000     0.00     0.00  std::allocator_traits<std::allocator<std::_List_node<Item> > >::allocate(std::allocator<std::_List_node<Item> >&, unsigned long)
+  0.47      3.98     0.02  5009999     0.00     0.00  void std::__unguarded_linear_insert<Item*, __gnu_cxx::__ops::_Val_less_iter>(Item*, __gnu_cxx::__ops::_Val_less_iter)
+  0.47      4.00     0.02  2700952     0.00     0.00  std::_List_const_iterator<Item>::_M_const_cast() const
+  0.47      4.02     0.02   509130     0.00     0.00  int* std::__unguarded_partition_pivot<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter)
+  0.35      4.03     0.02   509130     0.00     0.00  void std::__move_median_to_first<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, int*, int*, __gnu_cxx::__ops::_Iter_less_iter)
+  0.24      4.04     0.01 10020000     0.00     0.00  std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_get_Node_allocator()
+  0.24      4.05     0.01  6898332     0.00     0.00  _ZSt4swapIiENSt9enable_ifIXsr6__and_ISt6__not_ISt15__is_tuple_likeIT_EESt21is_move_constructibleIS3_ESt18is_move_assignableIS3_EEE5valueEvE4typeERS3_SC_
+  0.24      4.06     0.01  6898332     0.00     0.00  void std::iter_swap<int*, int*>(int*, int*)
+  0.24      4.07     0.01  5010000     0.00     0.00  __gnu_cxx::new_allocator<std::_List_node<Item> >::deallocate(std::_List_node<Item>*, unsigned long)
+  0.24      4.08     0.01  5010000     0.00     0.00  void __gnu_cxx::new_allocator<std::_List_node<Item> >::destroy<Item>(Item*)
+  0.24      4.09     0.01  5010000     0.00     0.00  __gnu_cxx::new_allocator<std::_List_node<Item> >::allocate(unsigned long, void const*)
+  0.24      4.10     0.01  5010000     0.00     0.00  __gnu_cxx::new_allocator<std::_List_node<Item> >::max_size() const
+  0.24      4.11     0.01  5010000     0.00     0.00  std::__allocated_ptr<std::allocator<std::_List_node<Item> > >::__allocated_ptr(std::allocator<std::_List_node<Item> >&, std::_List_node<Item>*)
+  0.24      4.12     0.01  5010000     0.00     0.00  std::__allocated_ptr<std::allocator<std::_List_node<Item> > >::operator=(decltype(nullptr))
+  0.24      4.13     0.01  5010000     0.00     0.00  void std::allocator_traits<std::allocator<std::_List_node<Item> > >::construct<Item, Item const&>(std::allocator<std::_List_node<Item> >&, Item*, Item const&)
+  0.24      4.14     0.01  5010000     0.00     0.00  std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_inc_size(unsigned long)
+  0.24      4.15     0.01  5010000     0.00     0.00  std::_List_node<Item>* std::__cxx11::list<Item, std::allocator<Item> >::_M_create_node<Item const&>(Item const&)
+  0.24      4.16     0.01  5010000     0.00     0.00  std::allocator<std::_List_node<Item> >* std::__addressof<std::allocator<std::_List_node<Item> > >(std::allocator<std::_List_node<Item> >&)
+  0.24      4.17     0.01  2700952     0.00     0.00  std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_dec_size(unsigned long)
+  0.24      4.18     0.01  2700952     0.00     0.00  std::__cxx11::list<Item, std::allocator<Item> >::_M_erase(std::_List_iterator<Item>)
+  0.24      4.19     0.01   521154     0.00     0.00  Item* std::__unguarded_partition_pivot<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter)
+  0.24      4.20     0.01    10000     0.00     0.02  void std::__unguarded_insertion_sort<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter)
+  0.24      4.21     0.01                             bool __gnu_cxx::__ops::_Iter_less_val::operator()<Item*, Item>(Item*, Item&) const
+  0.24      4.22     0.01                             Item* std::__copy_move_backward<true, true, std::random_access_iterator_tag>::__copy_move_b<Item>(Item const*, Item const*, Item*)
+  0.12      4.23     0.01  7712992     0.00     0.00  __gnu_cxx::__aligned_membuf<unsigned long>::_M_ptr()
+  0.12      4.23     0.01     2040     0.00     0.00  std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_set_size(unsigned long)
+  0.12      4.24     0.01                             void std::__pop_heap<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, int*, __gnu_cxx::__ops::_Iter_less_iter&)
+  0.12      4.24     0.01                             void std::__make_heap<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter&)
+  0.00      4.24     0.00 22519047     0.00     0.00  void std::iter_swap<Item*, Item*>(Item*, Item*)
+  0.00      4.24     0.00  9972668     0.00     0.00  __gnu_cxx::__ops::__val_comp_iter(__gnu_cxx::__ops::_Iter_less_iter)
+  0.00      4.24     0.00  7712992     0.00     0.00  __gnu_cxx::__aligned_membuf<unsigned long>::_M_addr()
+  0.00      4.24     0.00  5010000     0.00     0.00  std::allocator_traits<std::allocator<std::_List_node<Item> > >::deallocate(std::allocator<std::_List_node<Item> >&, std::_List_node<Item>*, unsigned long)
+  0.00      4.24     0.00  5010000     0.00     0.00  void std::allocator_traits<std::allocator<std::_List_node<Item> > >::destroy<Item>(std::allocator<std::_List_node<Item> >&, Item*)
+  0.00      4.24     0.00  5010000     0.00     0.00  std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_get_node()
+  0.00      4.24     0.00  5010000     0.00     0.00  void std::__cxx11::list<Item, std::allocator<Item> >::_M_insert<Item const&>(std::_List_iterator<Item>, Item const&)
+  0.00      4.24     0.00  2700952     0.00     0.00  std::_List_const_iterator<Item>::_List_const_iterator(std::_List_iterator<Item> const&)
+  0.00      4.24     0.00  2700952     0.00     0.00  std::__cxx11::list<Item, std::allocator<Item> >::erase(std::_List_const_iterator<Item>)
+  0.00      4.24     0.00   521154     0.00     0.00  void std::__move_median_to_first<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter)
+  0.00      4.24     0.00    81993     0.00     0.00  int* std::__niter_base<int*>(int*)
+  0.00      4.24     0.00    54662     0.00     0.00  int* std::__miter_base<int*>(int*)
+  0.00      4.24     0.00    27331     0.00     0.00  int* std::__copy_move_backward<true, true, std::random_access_iterator_tag>::__copy_move_b<int>(int const*, int const*, int*)
+  0.00      4.24     0.00    27331     0.00     0.00  int* std::move_backward<int*, int*>(int*, int*, int*)
+  0.00      4.24     0.00    27331     0.00     0.00  int* std::__copy_move_backward_a<true, int*, int*>(int*, int*, int*)
+  0.00      4.24     0.00    27331     0.00     0.00  int* std::__copy_move_backward_a2<true, int*, int*>(int*, int*, int*)
+  0.00      4.24     0.00    10001     0.00     0.00  __gnu_cxx::__ops::__iter_less_iter()
+  0.00      4.24     0.00    10001     0.00     0.00  std::__lg(long)
+  0.00      4.24     0.00    10000     0.00     0.00  void std::__insertion_sort<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter)
+  0.00      4.24     0.00    10000     0.00     0.02  void std::__introsort_loop<int*, long, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, long, __gnu_cxx::__ops::_Iter_less_iter)
+  0.00      4.24     0.00    10000     0.00     0.02  void std::__final_insertion_sort<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter)
+  0.00      4.24     0.00    10000     0.00     0.03  void std::sort<int*>(int*, int*)
+  0.00      4.24     0.00    10000     0.00     0.03  void std::__sort<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter)
+  0.00      4.24     0.00     2040     0.00     0.00  __gnu_cxx::new_allocator<std::_List_node<Item> >::new_allocator()
+  0.00      4.24     0.00     2040     0.00     0.00  __gnu_cxx::new_allocator<std::_List_node<Item> >::~new_allocator()
+  0.00      4.24     0.00     2040     0.00     0.00  std::allocator<std::_List_node<Item> >::allocator()
+  0.00      4.24     0.00     2040     0.00     0.00  std::allocator<std::_List_node<Item> >::~allocator()
+  0.00      4.24     0.00     2040     0.00     0.00  std::__cxx11::_List_base<Item, std::allocator<Item> >::_List_impl::_List_impl()
+  0.00      4.24     0.00     2040     0.00     0.00  std::__cxx11::_List_base<Item, std::allocator<Item> >::_List_impl::~_List_impl()
+  0.00      4.24     0.00     2040     0.00     0.00  std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_init()
+  0.00      4.24     0.00     2040     0.00     0.00  std::__cxx11::_List_base<Item, std::allocator<Item> >::_List_base()
+  0.00      4.24     0.00     2040     0.00     0.06  std::__cxx11::_List_base<Item, std::allocator<Item> >::~_List_base()
+  0.00      4.24     0.00        1     0.00     0.00  void std::__insertion_sort<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter)
+  0.00      4.24     0.00        1     0.00   151.56  void std::__final_insertion_sort<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter)
+  0.00      4.24     0.00        1     0.00   151.56  void std::__unguarded_insertion_sort<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter)
+  0.00      4.24     0.00        1     0.00   820.21  void std::sort<Item*>(Item*, Item*)
+  0.00      4.24     0.00        1     0.00   820.21  void std::__sort<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter)
+  0.00      4.24     0.00        1     0.00     0.00  __cxx_global_array_dtor
+
+ %         the percentage of the total running time of the
+time       program used by this function.
+
+cumulative a running sum of the number of seconds accounted
+ seconds   for by this function and those listed above it.
+
+ self      the number of seconds accounted for by this
+seconds    function alone.  This is the major sort for this
+           listing.
+
+calls      the number of times this function was invoked, if
+           this function is profiled, else blank.
+
+ self      the average number of milliseconds spent in this
+ms/call    function per call, if this function is profiled,
+	   else blank.
+
+ total     the average number of milliseconds spent in this
+ms/call    function and its descendents per call, if this
+	   function is profiled, else blank.
+
+name       the name of the function.  This is the minor sort
+           for this listing. The index shows the location of
+	   the function in the gprof listing. If the index is
+	   in parenthesis it shows where it would appear in
+	   the gprof listing if it were to be printed.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+		     Call graph (explanation follows)
+
+
+granularity: each sample hit covers 2 byte(s) for 0.24% of 4.24 seconds
+
+index % time    self  children    called     name
+                                                 <spontaneous>
+[1]     94.1    0.59    3.40                 main [1]
+                0.34    0.65 205381904/205381904     std::_List_iterator<Item>::operator->() const [2]
+                0.00    0.82       1/1           void std::sort<Item*>(Item*, Item*) [3]
+                0.16    0.30 49995000/49995000     submit(int, int, int, int) [10]
+                0.00    0.33   10000/10000       void std::sort<int*>(int*, int*) [12]
+                0.04    0.23 5010000/5010000     std::__cxx11::list<Item, std::allocator<Item> >::push_back(Item const&) [16]
+                0.18    0.06 62715952/67725952     std::__cxx11::list<Item, std::allocator<Item> >::end() [17]
+                0.00    0.11 2700952/2700952     std::__cxx11::list<Item, std::allocator<Item> >::erase(std::_List_const_iterator<Item>) [36]
+                0.11    0.00 62715952/62715952     std::_List_iterator<Item>::operator!=(std::_List_iterator<Item> const&) const [37]
+                0.05    0.00 49995000/49995000     std::_List_iterator<Item>::operator++(int) [46]
+                0.03    0.01 10020000/10020000     std::__cxx11::list<Item, std::allocator<Item> >::begin() [53]
+                0.00    0.00 2700952/2700952     std::_List_const_iterator<Item>::_List_const_iterator(std::_List_iterator<Item> const&) [92]
+-----------------------------------------------
+                0.34    0.65 205381904/205381904     main [1]
+[2]     23.3    0.34    0.65 205381904         std::_List_iterator<Item>::operator->() const [2]
+                0.27    0.39 205381904/215401904     std::_List_node<Item>::_M_valptr() [5]
+-----------------------------------------------
+                0.00    0.82       1/1           main [1]
+[3]     19.3    0.00    0.82       1         void std::sort<Item*>(Item*, Item*) [3]
+                0.00    0.82       1/1           void std::__sort<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter) [4]
+                0.00    0.00       1/10001       __gnu_cxx::__ops::__iter_less_iter() [99]
+-----------------------------------------------
+                0.00    0.82       1/1           void std::sort<Item*>(Item*, Item*) [3]
+[4]     19.3    0.00    0.82       1         void std::__sort<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter) [4]
+                0.03    0.64       1/1           void std::__introsort_loop<Item*, long, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, long, __gnu_cxx::__ops::_Iter_less_iter) [6]
+                0.00    0.15       1/1           void std::__final_insertion_sort<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter) [24]
+                0.00    0.00       1/10001       std::__lg(long) [100]
+-----------------------------------------------
+                0.00    0.00 2309048/215401904     std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_clear() [30]
+                0.00    0.01 2700952/215401904     std::__cxx11::list<Item, std::allocator<Item> >::_M_erase(std::_List_iterator<Item>) [38]
+                0.01    0.01 5010000/215401904     std::_List_node<Item>* std::__cxx11::list<Item, std::allocator<Item> >::_M_create_node<Item const&>(Item const&) [22]
+                0.27    0.39 205381904/215401904     std::_List_iterator<Item>::operator->() const [2]
+[5]     16.2    0.28    0.41 215401904         std::_List_node<Item>::_M_valptr() [5]
+                0.23    0.18 215401904/215401904     __gnu_cxx::__aligned_membuf<Item>::_M_ptr() [11]
+-----------------------------------------------
+                              521154             void std::__introsort_loop<Item*, long, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, long, __gnu_cxx::__ops::_Iter_less_iter) [6]
+                0.03    0.64       1/1           void std::__sort<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter) [4]
+[6]     15.8    0.03    0.64       1+521154  void std::__introsort_loop<Item*, long, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, long, __gnu_cxx::__ops::_Iter_less_iter) [6]
+                0.01    0.63  521154/521154      Item* std::__unguarded_partition_pivot<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter) [7]
+                              521154             void std::__introsort_loop<Item*, long, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, long, __gnu_cxx::__ops::_Iter_less_iter) [6]
+-----------------------------------------------
+                0.01    0.63  521154/521154      void std::__introsort_loop<Item*, long, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, long, __gnu_cxx::__ops::_Iter_less_iter) [6]
+[7]     15.1    0.01    0.63  521154         Item* std::__unguarded_partition_pivot<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter) [7]
+                0.05    0.57  521154/521154      Item* std::__unguarded_partition<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter) [8]
+                0.00    0.01  521154/521154      void std::__move_median_to_first<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter) [74]
+-----------------------------------------------
+                0.05    0.57  521154/521154      Item* std::__unguarded_partition_pivot<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter) [7]
+[8]     14.6    0.05    0.57  521154         Item* std::__unguarded_partition<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter) [8]
+                0.18    0.28 124664556/125986406     bool __gnu_cxx::__ops::_Iter_less_iter::operator()<Item*, Item*>(Item*, Item*) const [9]
+                0.00    0.12 21997893/22519047     void std::iter_swap<Item*, Item*>(Item*, Item*) [34]
+-----------------------------------------------
+                0.00    0.00      15/125986406     void std::__insertion_sort<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter) [83]
+                0.00    0.00 1321835/125986406     void std::__move_median_to_first<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter) [74]
+                0.18    0.28 124664556/125986406     Item* std::__unguarded_partition<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter) [8]
+[9]     10.8    0.18    0.28 125986406         bool __gnu_cxx::__ops::_Iter_less_iter::operator()<Item*, Item*>(Item*, Item*) const [9]
+                0.28    0.00 125986406/144445482     Item::operator<(Item const&) const [14]
+-----------------------------------------------
+                0.16    0.30 49995000/49995000     main [1]
+[10]    10.7    0.16    0.30 49995000         submit(int, int, int, int) [10]
+                0.30    0.00 49995000/49995000     int const& std::max<int>(int const&, int const&) [15]
+-----------------------------------------------
+                0.23    0.18 215401904/215401904     std::_List_node<Item>::_M_valptr() [5]
+[11]     9.6    0.23    0.18 215401904         __gnu_cxx::__aligned_membuf<Item>::_M_ptr() [11]
+                0.18    0.00 215401904/215401904     __gnu_cxx::__aligned_membuf<Item>::_M_addr() [19]
+-----------------------------------------------
+                0.00    0.33   10000/10000       main [1]
+[12]     7.8    0.00    0.33   10000         void std::sort<int*>(int*, int*) [12]
+                0.00    0.33   10000/10000       void std::__sort<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [13]
+                0.00    0.00   10000/10001       __gnu_cxx::__ops::__iter_less_iter() [99]
+-----------------------------------------------
+                0.00    0.33   10000/10000       void std::sort<int*>(int*, int*) [12]
+[13]     7.8    0.00    0.33   10000         void std::__sort<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [13]
+                0.00    0.18   10000/10000       void std::__introsort_loop<int*, long, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, long, __gnu_cxx::__ops::_Iter_less_iter) [21]
+                0.00    0.15   10000/10000       void std::__final_insertion_sort<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [23]
+                0.00    0.00   10000/10001       std::__lg(long) [100]
+-----------------------------------------------
+                0.04    0.00 18459076/144445482     bool __gnu_cxx::__ops::_Val_less_iter::operator()<Item, Item*>(Item&, Item*) const [35]
+                0.28    0.00 125986406/144445482     bool __gnu_cxx::__ops::_Iter_less_iter::operator()<Item*, Item*>(Item*, Item*) const [9]
+[14]     7.5    0.32    0.00 144445482         Item::operator<(Item const&) const [14]
+-----------------------------------------------
+                0.30    0.00 49995000/49995000     submit(int, int, int, int) [10]
+[15]     7.1    0.30    0.00 49995000         int const& std::max<int>(int const&, int const&) [15]
+-----------------------------------------------
+                0.04    0.23 5010000/5010000     main [1]
+[16]     6.4    0.04    0.23 5010000         std::__cxx11::list<Item, std::allocator<Item> >::push_back(Item const&) [16]
+                0.00    0.21 5010000/5010000     void std::__cxx11::list<Item, std::allocator<Item> >::_M_insert<Item const&>(std::_List_iterator<Item>, Item const&) [18]
+                0.01    0.00 5010000/67725952     std::__cxx11::list<Item, std::allocator<Item> >::end() [17]
+-----------------------------------------------
+                0.01    0.00 5010000/67725952     std::__cxx11::list<Item, std::allocator<Item> >::push_back(Item const&) [16]
+                0.18    0.06 62715952/67725952     main [1]
+[17]     6.0    0.19    0.07 67725952         std::__cxx11::list<Item, std::allocator<Item> >::end() [17]
+                0.07    0.00 67725952/83147856     std::_List_iterator<Item>::_List_iterator(std::__detail::_List_node_base*) [40]
+-----------------------------------------------
+                0.00    0.21 5010000/5010000     std::__cxx11::list<Item, std::allocator<Item> >::push_back(Item const&) [16]
+[18]     5.0    0.00    0.21 5010000         void std::__cxx11::list<Item, std::allocator<Item> >::_M_insert<Item const&>(std::_List_iterator<Item>, Item const&) [18]
+                0.01    0.16 5010000/5010000     std::_List_node<Item>* std::__cxx11::list<Item, std::allocator<Item> >::_M_create_node<Item const&>(Item const&) [22]
+                0.01    0.02 5010000/5010000     std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_inc_size(unsigned long) [55]
+                0.01    0.00 5010000/20040000     Item const& std::forward<Item const&>(std::remove_reference<Item const&>::type&) [56]
+-----------------------------------------------
+                0.18    0.00 215401904/215401904     __gnu_cxx::__aligned_membuf<Item>::_M_ptr() [11]
+[19]     4.2    0.18    0.00 215401904         __gnu_cxx::__aligned_membuf<Item>::_M_addr() [19]
+-----------------------------------------------
+                0.02    0.16  509130/509130      void std::__introsort_loop<int*, long, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, long, __gnu_cxx::__ops::_Iter_less_iter) [21]
+[20]     4.1    0.02    0.16  509130         int* std::__unguarded_partition_pivot<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [20]
+                0.05    0.09  509130/509130      int* std::__unguarded_partition<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [29]
+                0.02    0.01  509130/509130      void std::__move_median_to_first<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [60]
+-----------------------------------------------
+                              509130             void std::__introsort_loop<int*, long, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, long, __gnu_cxx::__ops::_Iter_less_iter) [21]
+                0.00    0.18   10000/10000       void std::__sort<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [13]
+[21]     4.1    0.00    0.18   10000+509130  void std::__introsort_loop<int*, long, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, long, __gnu_cxx::__ops::_Iter_less_iter) [21]
+                0.02    0.16  509130/509130      int* std::__unguarded_partition_pivot<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [20]
+                              509130             void std::__introsort_loop<int*, long, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, long, __gnu_cxx::__ops::_Iter_less_iter) [21]
+-----------------------------------------------
+                0.01    0.16 5010000/5010000     void std::__cxx11::list<Item, std::allocator<Item> >::_M_insert<Item const&>(std::_List_iterator<Item>, Item const&) [18]
+[22]     4.1    0.01    0.16 5010000         std::_List_node<Item>* std::__cxx11::list<Item, std::allocator<Item> >::_M_create_node<Item const&>(Item const&) [22]
+                0.01    0.04 5010000/5010000     void std::allocator_traits<std::allocator<std::_List_node<Item> > >::construct<Item, Item const&>(std::allocator<std::_List_node<Item> >&, Item*, Item const&) [47]
+                0.00    0.04 5010000/5010000     std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_get_node() [51]
+                0.01    0.01 5010000/5010000     std::__allocated_ptr<std::allocator<std::_List_node<Item> > >::__allocated_ptr(std::allocator<std::_List_node<Item> >&, std::_List_node<Item>*) [62]
+                0.02    0.00 5010000/5010000     std::__allocated_ptr<std::allocator<std::_List_node<Item> > >::~__allocated_ptr() [63]
+                0.01    0.01 5010000/215401904     std::_List_node<Item>::_M_valptr() [5]
+                0.01    0.00 5010000/5010000     std::__allocated_ptr<std::allocator<std::_List_node<Item> > >::operator=(decltype(nullptr)) [68]
+                0.01    0.00 5010000/20040000     Item const& std::forward<Item const&>(std::remove_reference<Item const&>::type&) [56]
+                0.01    0.00 5010000/10020000     std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_get_Node_allocator() [64]
+-----------------------------------------------
+                0.00    0.15   10000/10000       void std::__sort<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [13]
+[23]     3.6    0.00    0.15   10000         void std::__final_insertion_sort<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [23]
+                0.01    0.14   10000/10000       void std::__unguarded_insertion_sort<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [27]
+                0.00    0.00   10000/10000       void std::__insertion_sort<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [82]
+-----------------------------------------------
+                0.00    0.15       1/1           void std::__sort<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter) [4]
+[24]     3.6    0.00    0.15       1         void std::__final_insertion_sort<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter) [24]
+                0.00    0.15       1/1           void std::__unguarded_insertion_sort<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter) [26]
+                0.00    0.00       1/1           void std::__insertion_sort<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter) [83]
+-----------------------------------------------
+                0.00    0.00      15/5009999     void std::__insertion_sort<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter) [83]
+                0.02    0.13 5009984/5009999     void std::__unguarded_insertion_sort<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter) [26]
+[25]     3.6    0.02    0.13 5009999         void std::__unguarded_linear_insert<Item*, __gnu_cxx::__ops::_Val_less_iter>(Item*, __gnu_cxx::__ops::_Val_less_iter) [25]
+                0.07    0.04 18459076/18459076     bool __gnu_cxx::__ops::_Val_less_iter::operator()<Item, Item*>(Item&, Item*) const [35]
+                0.02    0.00 23469075/91026216     std::remove_reference<Item&>::type&& std::move<Item&>(Item&) [39]
+-----------------------------------------------
+                0.00    0.15       1/1           void std::__final_insertion_sort<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter) [24]
+[26]     3.6    0.00    0.15       1         void std::__unguarded_insertion_sort<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter) [26]
+                0.02    0.13 5009984/5009999     void std::__unguarded_linear_insert<Item*, __gnu_cxx::__ops::_Val_less_iter>(Item*, __gnu_cxx::__ops::_Val_less_iter) [25]
+                0.00    0.00 5009984/9972668     __gnu_cxx::__ops::__val_comp_iter(__gnu_cxx::__ops::_Iter_less_iter) [90]
+-----------------------------------------------
+                0.01    0.14   10000/10000       void std::__final_insertion_sort<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [23]
+[27]     3.6    0.01    0.14   10000         void std::__unguarded_insertion_sort<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [27]
+                0.04    0.10 4840000/4962669     void std::__unguarded_linear_insert<int*, __gnu_cxx::__ops::_Val_less_iter>(int*, __gnu_cxx::__ops::_Val_less_iter) [28]
+                0.00    0.00 4840000/9972668     __gnu_cxx::__ops::__val_comp_iter(__gnu_cxx::__ops::_Iter_less_iter) [90]
+-----------------------------------------------
+                0.00    0.00  122669/4962669     void std::__insertion_sort<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [82]
+                0.04    0.10 4840000/4962669     void std::__unguarded_insertion_sort<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [27]
+[28]     3.4    0.04    0.10 4962669         void std::__unguarded_linear_insert<int*, __gnu_cxx::__ops::_Val_less_iter>(int*, __gnu_cxx::__ops::_Val_less_iter) [28]
+                0.07    0.00 18351652/18351652     bool __gnu_cxx::__ops::_Val_less_iter::operator()<int, int*>(int&, int*) const [41]
+                0.03    0.00 23314321/44063979     std::remove_reference<int&>::type&& std::move<int&>(int&) [42]
+-----------------------------------------------
+                0.05    0.09  509130/509130      int* std::__unguarded_partition_pivot<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [20]
+[29]     3.2    0.05    0.09  509130         int* std::__unguarded_partition<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [29]
+                0.01    0.04 6389202/6898332     void std::iter_swap<int*, int*>(int*, int*) [44]
+                0.04    0.00 33731531/35182689     bool __gnu_cxx::__ops::_Iter_less_iter::operator()<int*, int*>(int*, int*) const [48]
+-----------------------------------------------
+                0.08    0.04    2040/2040        std::__cxx11::_List_base<Item, std::allocator<Item> >::~_List_base() [31]
+[30]     2.9    0.08    0.04    2040         std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_clear() [30]
+                0.03    0.00 2309048/5010000     std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_put_node(std::_List_node<Item>*) [43]
+                0.00    0.00 2309048/215401904     std::_List_node<Item>::_M_valptr() [5]
+                0.00    0.00 2309048/5010000     void std::allocator_traits<std::allocator<std::_List_node<Item> > >::destroy<Item>(std::allocator<std::_List_node<Item> >&, Item*) [70]
+                0.00    0.00 2309048/10020000     std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_get_Node_allocator() [64]
+-----------------------------------------------
+                0.00    0.12    2040/2040        std::__cxx11::list<Item, std::allocator<Item> >::~list() [32]
+[31]     2.9    0.00    0.12    2040         std::__cxx11::_List_base<Item, std::allocator<Item> >::~_List_base() [31]
+                0.08    0.04    2040/2040        std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_clear() [30]
+                0.00    0.00    2040/2040        std::__cxx11::_List_base<Item, std::allocator<Item> >::_List_impl::~_List_impl() [106]
+-----------------------------------------------
+                                                 <spontaneous>
+[32]     2.9    0.00    0.12                 std::__cxx11::list<Item, std::allocator<Item> >::~list() [32]
+                0.00    0.12    2040/2040        std::__cxx11::_List_base<Item, std::allocator<Item> >::~_List_base() [31]
+-----------------------------------------------
+                0.06    0.06 22519047/22519047     void std::iter_swap<Item*, Item*>(Item*, Item*) [34]
+[33]     2.8    0.06    0.06 22519047         _ZSt4swapI4ItemENSt9enable_ifIXsr6__and_ISt6__not_ISt15__is_tuple_likeIT_EESt21is_move_constructibleIS4_ESt18is_move_assignableIS4_EEE5valueEvE4typeERS4_SD_ [33]
+                0.06    0.00 67557141/91026216     std::remove_reference<Item&>::type&& std::move<Item&>(Item&) [39]
+-----------------------------------------------
+                0.00    0.00  521154/22519047     void std::__move_median_to_first<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter) [74]
+                0.00    0.12 21997893/22519047     Item* std::__unguarded_partition<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter) [8]
+[34]     2.8    0.00    0.12 22519047         void std::iter_swap<Item*, Item*>(Item*, Item*) [34]
+                0.06    0.06 22519047/22519047     _ZSt4swapI4ItemENSt9enable_ifIXsr6__and_ISt6__not_ISt15__is_tuple_likeIT_EESt21is_move_constructibleIS4_ESt18is_move_assignableIS4_EEE5valueEvE4typeERS4_SD_ [33]
+-----------------------------------------------
+                0.07    0.04 18459076/18459076     void std::__unguarded_linear_insert<Item*, __gnu_cxx::__ops::_Val_less_iter>(Item*, __gnu_cxx::__ops::_Val_less_iter) [25]
+[35]     2.6    0.07    0.04 18459076         bool __gnu_cxx::__ops::_Val_less_iter::operator()<Item, Item*>(Item&, Item*) const [35]
+                0.04    0.00 18459076/144445482     Item::operator<(Item const&) const [14]
+-----------------------------------------------
+                0.00    0.11 2700952/2700952     main [1]
+[36]     2.6    0.00    0.11 2700952         std::__cxx11::list<Item, std::allocator<Item> >::erase(std::_List_const_iterator<Item>) [36]
+                0.01    0.07 2700952/2700952     std::__cxx11::list<Item, std::allocator<Item> >::_M_erase(std::_List_iterator<Item>) [38]
+                0.02    0.00 2700952/2700952     std::_List_const_iterator<Item>::_M_const_cast() const [58]
+                0.00    0.00 2700952/83147856     std::_List_iterator<Item>::_List_iterator(std::__detail::_List_node_base*) [40]
+-----------------------------------------------
+                0.11    0.00 62715952/62715952     main [1]
+[37]     2.5    0.11    0.00 62715952         std::_List_iterator<Item>::operator!=(std::_List_iterator<Item> const&) const [37]
+-----------------------------------------------
+                0.01    0.07 2700952/2700952     std::__cxx11::list<Item, std::allocator<Item> >::erase(std::_List_const_iterator<Item>) [36]
+[38]     2.0    0.01    0.07 2700952         std::__cxx11::list<Item, std::allocator<Item> >::_M_erase(std::_List_iterator<Item>) [38]
+                0.03    0.01 2700952/5010000     std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_put_node(std::_List_node<Item>*) [43]
+                0.01    0.01 2700952/2700952     std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_dec_size(unsigned long) [59]
+                0.00    0.01 2700952/215401904     std::_List_node<Item>::_M_valptr() [5]
+                0.00    0.01 2700952/5010000     void std::allocator_traits<std::allocator<std::_List_node<Item> > >::destroy<Item>(std::allocator<std::_List_node<Item> >&, Item*) [70]
+                0.00    0.00 2700952/10020000     std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_get_Node_allocator() [64]
+-----------------------------------------------
+                0.02    0.00 23469075/91026216     void std::__unguarded_linear_insert<Item*, __gnu_cxx::__ops::_Val_less_iter>(Item*, __gnu_cxx::__ops::_Val_less_iter) [25]
+                0.06    0.00 67557141/91026216     _ZSt4swapI4ItemENSt9enable_ifIXsr6__and_ISt6__not_ISt15__is_tuple_likeIT_EESt21is_move_constructibleIS4_ESt18is_move_assignableIS4_EEE5valueEvE4typeERS4_SD_ [33]
+[39]     1.9    0.08    0.00 91026216         std::remove_reference<Item&>::type&& std::move<Item&>(Item&) [39]
+-----------------------------------------------
+                0.00    0.00 2700952/83147856     std::__cxx11::list<Item, std::allocator<Item> >::erase(std::_List_const_iterator<Item>) [36]
+                0.00    0.00 2700952/83147856     std::_List_const_iterator<Item>::_M_const_cast() const [58]
+                0.01    0.00 10020000/83147856     std::__cxx11::list<Item, std::allocator<Item> >::begin() [53]
+                0.07    0.00 67725952/83147856     std::__cxx11::list<Item, std::allocator<Item> >::end() [17]
+[40]     1.9    0.08    0.00 83147856         std::_List_iterator<Item>::_List_iterator(std::__detail::_List_node_base*) [40]
+-----------------------------------------------
+                0.07    0.00 18351652/18351652     void std::__unguarded_linear_insert<int*, __gnu_cxx::__ops::_Val_less_iter>(int*, __gnu_cxx::__ops::_Val_less_iter) [28]
+[41]     1.7    0.07    0.00 18351652         bool __gnu_cxx::__ops::_Val_less_iter::operator()<int, int*>(int&, int*) const [41]
+-----------------------------------------------
+                0.00    0.00   54662/44063979     void std::__insertion_sort<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [82]
+                0.03    0.00 20694996/44063979     _ZSt4swapIiENSt9enable_ifIXsr6__and_ISt6__not_ISt15__is_tuple_likeIT_EESt21is_move_constructibleIS3_ESt18is_move_assignableIS3_EEE5valueEvE4typeERS3_SC_ [49]
+                0.03    0.00 23314321/44063979     void std::__unguarded_linear_insert<int*, __gnu_cxx::__ops::_Val_less_iter>(int*, __gnu_cxx::__ops::_Val_less_iter) [28]
+[42]     1.5    0.07    0.00 44063979         std::remove_reference<int&>::type&& std::move<int&>(int&) [42]
+-----------------------------------------------
+                0.03    0.00 2309048/5010000     std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_clear() [30]
+                0.03    0.01 2700952/5010000     std::__cxx11::list<Item, std::allocator<Item> >::_M_erase(std::_List_iterator<Item>) [38]
+[43]     1.5    0.06    0.01 5010000         std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_put_node(std::_List_node<Item>*) [43]
+                0.00    0.01 5010000/5010000     std::allocator_traits<std::allocator<std::_List_node<Item> > >::deallocate(std::allocator<std::_List_node<Item> >&, std::_List_node<Item>*, unsigned long) [69]
+-----------------------------------------------
+                0.00    0.00  509130/6898332     void std::__move_median_to_first<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [60]
+                0.01    0.04 6389202/6898332     int* std::__unguarded_partition<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [29]
+[44]     1.2    0.01    0.04 6898332         void std::iter_swap<int*, int*>(int*, int*) [44]
+                0.01    0.03 6898332/6898332     _ZSt4swapIiENSt9enable_ifIXsr6__and_ISt6__not_ISt15__is_tuple_likeIT_EESt21is_move_constructibleIS3_ESt18is_move_assignableIS3_EEE5valueEvE4typeERS3_SC_ [49]
+-----------------------------------------------
+                                                 <spontaneous>
+[45]     1.2    0.05    0.00                 void std::__pop_heap<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter&) [45]
+-----------------------------------------------
+                0.05    0.00 49995000/49995000     main [1]
+[46]     1.1    0.05    0.00 49995000         std::_List_iterator<Item>::operator++(int) [46]
+-----------------------------------------------
+                0.01    0.04 5010000/5010000     std::_List_node<Item>* std::__cxx11::list<Item, std::allocator<Item> >::_M_create_node<Item const&>(Item const&) [22]
+[47]     1.1    0.01    0.04 5010000         void std::allocator_traits<std::allocator<std::_List_node<Item> > >::construct<Item, Item const&>(std::allocator<std::_List_node<Item> >&, Item*, Item const&) [47]
+                0.02    0.01 5010000/5010000     void __gnu_cxx::new_allocator<std::_List_node<Item> >::construct<Item, Item const&>(Item*, Item const&) [57]
+                0.01    0.00 5010000/20040000     Item const& std::forward<Item const&>(std::remove_reference<Item const&>::type&) [56]
+-----------------------------------------------
+                0.00    0.00  150000/35182689     void std::__insertion_sort<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [82]
+                0.00    0.00 1301158/35182689     void std::__move_median_to_first<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [60]
+                0.04    0.00 33731531/35182689     int* std::__unguarded_partition<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [29]
+[48]     1.1    0.05    0.00 35182689         bool __gnu_cxx::__ops::_Iter_less_iter::operator()<int*, int*>(int*, int*) const [48]
+-----------------------------------------------
+                0.01    0.03 6898332/6898332     void std::iter_swap<int*, int*>(int*, int*) [44]
+[49]     1.0    0.01    0.03 6898332         _ZSt4swapIiENSt9enable_ifIXsr6__and_ISt6__not_ISt15__is_tuple_likeIT_EESt21is_move_constructibleIS3_ESt18is_move_assignableIS3_EEE5valueEvE4typeERS3_SC_ [49]
+                0.03    0.00 20694996/44063979     std::remove_reference<int&>::type&& std::move<int&>(int&) [42]
+-----------------------------------------------
+                0.02    0.02 5010000/5010000     std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_get_node() [51]
+[50]     0.9    0.02    0.02 5010000         std::allocator_traits<std::allocator<std::_List_node<Item> > >::allocate(std::allocator<std::_List_node<Item> >&, unsigned long) [50]
+                0.01    0.01 5010000/5010000     __gnu_cxx::new_allocator<std::_List_node<Item> >::allocate(unsigned long, void const*) [61]
+-----------------------------------------------
+                0.00    0.04 5010000/5010000     std::_List_node<Item>* std::__cxx11::list<Item, std::allocator<Item> >::_M_create_node<Item const&>(Item const&) [22]
+[51]     0.9    0.00    0.04 5010000         std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_get_node() [51]
+                0.02    0.02 5010000/5010000     std::allocator_traits<std::allocator<std::_List_node<Item> > >::allocate(std::allocator<std::_List_node<Item> >&, unsigned long) [50]
+-----------------------------------------------
+                                                 <spontaneous>
+[52]     0.9    0.04    0.00                 void std::__make_heap<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter&) [52]
+-----------------------------------------------
+                0.03    0.01 10020000/10020000     main [1]
+[53]     0.9    0.03    0.01 10020000         std::__cxx11::list<Item, std::allocator<Item> >::begin() [53]
+                0.01    0.00 10020000/83147856     std::_List_iterator<Item>::_List_iterator(std::__detail::_List_node_base*) [40]
+-----------------------------------------------
+                0.00    0.00    2040/7712992     std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_set_size(unsigned long) [75]
+                0.01    0.00 2700952/7712992     std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_dec_size(unsigned long) [59]
+                0.02    0.00 5010000/7712992     std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_inc_size(unsigned long) [55]
+[54]     0.8    0.03    0.01 7712992         std::_List_node<unsigned long>::_M_valptr() [54]
+                0.01    0.00 7712992/7712992     __gnu_cxx::__aligned_membuf<unsigned long>::_M_ptr() [79]
+-----------------------------------------------
+                0.01    0.02 5010000/5010000     void std::__cxx11::list<Item, std::allocator<Item> >::_M_insert<Item const&>(std::_List_iterator<Item>, Item const&) [18]
+[55]     0.8    0.01    0.02 5010000         std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_inc_size(unsigned long) [55]
+                0.02    0.00 5010000/7712992     std::_List_node<unsigned long>::_M_valptr() [54]
+-----------------------------------------------
+                0.01    0.00 5010000/20040000     void std::__cxx11::list<Item, std::allocator<Item> >::_M_insert<Item const&>(std::_List_iterator<Item>, Item const&) [18]
+                0.01    0.00 5010000/20040000     std::_List_node<Item>* std::__cxx11::list<Item, std::allocator<Item> >::_M_create_node<Item const&>(Item const&) [22]
+                0.01    0.00 5010000/20040000     void std::allocator_traits<std::allocator<std::_List_node<Item> > >::construct<Item, Item const&>(std::allocator<std::_List_node<Item> >&, Item*, Item const&) [47]
+                0.01    0.00 5010000/20040000     void __gnu_cxx::new_allocator<std::_List_node<Item> >::construct<Item, Item const&>(Item*, Item const&) [57]
+[56]     0.7    0.03    0.00 20040000         Item const& std::forward<Item const&>(std::remove_reference<Item const&>::type&) [56]
+-----------------------------------------------
+                0.02    0.01 5010000/5010000     void std::allocator_traits<std::allocator<std::_List_node<Item> > >::construct<Item, Item const&>(std::allocator<std::_List_node<Item> >&, Item*, Item const&) [47]
+[57]     0.6    0.02    0.01 5010000         void __gnu_cxx::new_allocator<std::_List_node<Item> >::construct<Item, Item const&>(Item*, Item const&) [57]
+                0.01    0.00 5010000/20040000     Item const& std::forward<Item const&>(std::remove_reference<Item const&>::type&) [56]
+-----------------------------------------------
+                0.02    0.00 2700952/2700952     std::__cxx11::list<Item, std::allocator<Item> >::erase(std::_List_const_iterator<Item>) [36]
+[58]     0.5    0.02    0.00 2700952         std::_List_const_iterator<Item>::_M_const_cast() const [58]
+                0.00    0.00 2700952/83147856     std::_List_iterator<Item>::_List_iterator(std::__detail::_List_node_base*) [40]
+-----------------------------------------------
+                0.01    0.01 2700952/2700952     std::__cxx11::list<Item, std::allocator<Item> >::_M_erase(std::_List_iterator<Item>) [38]
+[59]     0.5    0.01    0.01 2700952         std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_dec_size(unsigned long) [59]
+                0.01    0.00 2700952/7712992     std::_List_node<unsigned long>::_M_valptr() [54]
+-----------------------------------------------
+                0.02    0.01  509130/509130      int* std::__unguarded_partition_pivot<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [20]
+[60]     0.5    0.02    0.01  509130         void std::__move_median_to_first<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [60]
+                0.00    0.00  509130/6898332     void std::iter_swap<int*, int*>(int*, int*) [44]
+                0.00    0.00 1301158/35182689     bool __gnu_cxx::__ops::_Iter_less_iter::operator()<int*, int*>(int*, int*) const [48]
+-----------------------------------------------
+                0.01    0.01 5010000/5010000     std::allocator_traits<std::allocator<std::_List_node<Item> > >::allocate(std::allocator<std::_List_node<Item> >&, unsigned long) [50]
+[61]     0.5    0.01    0.01 5010000         __gnu_cxx::new_allocator<std::_List_node<Item> >::allocate(unsigned long, void const*) [61]
+                0.01    0.00 5010000/5010000     __gnu_cxx::new_allocator<std::_List_node<Item> >::max_size() const [67]
+-----------------------------------------------
+                0.01    0.01 5010000/5010000     std::_List_node<Item>* std::__cxx11::list<Item, std::allocator<Item> >::_M_create_node<Item const&>(Item const&) [22]
+[62]     0.5    0.01    0.01 5010000         std::__allocated_ptr<std::allocator<std::_List_node<Item> > >::__allocated_ptr(std::allocator<std::_List_node<Item> >&, std::_List_node<Item>*) [62]
+                0.01    0.00 5010000/5010000     std::allocator<std::_List_node<Item> >* std::__addressof<std::allocator<std::_List_node<Item> > >(std::allocator<std::_List_node<Item> >&) [71]
+-----------------------------------------------
+                0.02    0.00 5010000/5010000     std::_List_node<Item>* std::__cxx11::list<Item, std::allocator<Item> >::_M_create_node<Item const&>(Item const&) [22]
+[63]     0.5    0.02    0.00 5010000         std::__allocated_ptr<std::allocator<std::_List_node<Item> > >::~__allocated_ptr() [63]
+-----------------------------------------------
+                0.00    0.00 2309048/10020000     std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_clear() [30]
+                0.00    0.00 2700952/10020000     std::__cxx11::list<Item, std::allocator<Item> >::_M_erase(std::_List_iterator<Item>) [38]
+                0.01    0.00 5010000/10020000     std::_List_node<Item>* std::__cxx11::list<Item, std::allocator<Item> >::_M_create_node<Item const&>(Item const&) [22]
+[64]     0.2    0.01    0.00 10020000         std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_get_Node_allocator() [64]
+-----------------------------------------------
+                0.01    0.00 5010000/5010000     std::allocator_traits<std::allocator<std::_List_node<Item> > >::deallocate(std::allocator<std::_List_node<Item> >&, std::_List_node<Item>*, unsigned long) [69]
+[65]     0.2    0.01    0.00 5010000         __gnu_cxx::new_allocator<std::_List_node<Item> >::deallocate(std::_List_node<Item>*, unsigned long) [65]
+-----------------------------------------------
+                0.01    0.00 5010000/5010000     void std::allocator_traits<std::allocator<std::_List_node<Item> > >::destroy<Item>(std::allocator<std::_List_node<Item> >&, Item*) [70]
+[66]     0.2    0.01    0.00 5010000         void __gnu_cxx::new_allocator<std::_List_node<Item> >::destroy<Item>(Item*) [66]
+-----------------------------------------------
+                0.01    0.00 5010000/5010000     __gnu_cxx::new_allocator<std::_List_node<Item> >::allocate(unsigned long, void const*) [61]
+[67]     0.2    0.01    0.00 5010000         __gnu_cxx::new_allocator<std::_List_node<Item> >::max_size() const [67]
+-----------------------------------------------
+                0.01    0.00 5010000/5010000     std::_List_node<Item>* std::__cxx11::list<Item, std::allocator<Item> >::_M_create_node<Item const&>(Item const&) [22]
+[68]     0.2    0.01    0.00 5010000         std::__allocated_ptr<std::allocator<std::_List_node<Item> > >::operator=(decltype(nullptr)) [68]
+-----------------------------------------------
+                0.00    0.01 5010000/5010000     std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_put_node(std::_List_node<Item>*) [43]
+[69]     0.2    0.00    0.01 5010000         std::allocator_traits<std::allocator<std::_List_node<Item> > >::deallocate(std::allocator<std::_List_node<Item> >&, std::_List_node<Item>*, unsigned long) [69]
+                0.01    0.00 5010000/5010000     __gnu_cxx::new_allocator<std::_List_node<Item> >::deallocate(std::_List_node<Item>*, unsigned long) [65]
+-----------------------------------------------
+                0.00    0.00 2309048/5010000     std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_clear() [30]
+                0.00    0.01 2700952/5010000     std::__cxx11::list<Item, std::allocator<Item> >::_M_erase(std::_List_iterator<Item>) [38]
+[70]     0.2    0.00    0.01 5010000         void std::allocator_traits<std::allocator<std::_List_node<Item> > >::destroy<Item>(std::allocator<std::_List_node<Item> >&, Item*) [70]
+                0.01    0.00 5010000/5010000     void __gnu_cxx::new_allocator<std::_List_node<Item> >::destroy<Item>(Item*) [66]
+-----------------------------------------------
+                0.01    0.00 5010000/5010000     std::__allocated_ptr<std::allocator<std::_List_node<Item> > >::__allocated_ptr(std::allocator<std::_List_node<Item> >&, std::_List_node<Item>*) [62]
+[71]     0.2    0.01    0.00 5010000         std::allocator<std::_List_node<Item> >* std::__addressof<std::allocator<std::_List_node<Item> > >(std::allocator<std::_List_node<Item> >&) [71]
+-----------------------------------------------
+                                                 <spontaneous>
+[72]     0.2    0.01    0.00                 bool __gnu_cxx::__ops::_Iter_less_val::operator()<Item*, Item>(Item*, Item&) const [72]
+-----------------------------------------------
+                                                 <spontaneous>
+[73]     0.2    0.01    0.00                 Item* std::__copy_move_backward<true, true, std::random_access_iterator_tag>::__copy_move_b<Item>(Item const*, Item const*, Item*) [73]
+-----------------------------------------------
+                0.00    0.01  521154/521154      Item* std::__unguarded_partition_pivot<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter) [7]
+[74]     0.2    0.00    0.01  521154         void std::__move_median_to_first<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter) [74]
+                0.00    0.00 1321835/125986406     bool __gnu_cxx::__ops::_Iter_less_iter::operator()<Item*, Item*>(Item*, Item*) const [9]
+                0.00    0.00  521154/22519047     void std::iter_swap<Item*, Item*>(Item*, Item*) [34]
+-----------------------------------------------
+                0.01    0.00    2040/2040        std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_init() [76]
+[75]     0.1    0.01    0.00    2040         std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_set_size(unsigned long) [75]
+                0.00    0.00    2040/7712992     std::_List_node<unsigned long>::_M_valptr() [54]
+-----------------------------------------------
+                0.00    0.01    2040/2040        std::__cxx11::_List_base<Item, std::allocator<Item> >::_List_base() [77]
+[76]     0.1    0.00    0.01    2040         std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_init() [76]
+                0.01    0.00    2040/2040        std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_set_size(unsigned long) [75]
+-----------------------------------------------
+                0.00    0.01    2040/2040        std::__cxx11::list<Item, std::allocator<Item> >::list() [78]
+[77]     0.1    0.00    0.01    2040         std::__cxx11::_List_base<Item, std::allocator<Item> >::_List_base() [77]
+                0.00    0.01    2040/2040        std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_init() [76]
+                0.00    0.00    2040/2040        std::__cxx11::_List_base<Item, std::allocator<Item> >::_List_impl::_List_impl() [105]
+-----------------------------------------------
+                                                 <spontaneous>
+[78]     0.1    0.00    0.01                 std::__cxx11::list<Item, std::allocator<Item> >::list() [78]
+                0.00    0.01    2040/2040        std::__cxx11::_List_base<Item, std::allocator<Item> >::_List_base() [77]
+-----------------------------------------------
+                0.01    0.00 7712992/7712992     std::_List_node<unsigned long>::_M_valptr() [54]
+[79]     0.1    0.01    0.00 7712992         __gnu_cxx::__aligned_membuf<unsigned long>::_M_ptr() [79]
+                0.00    0.00 7712992/7712992     __gnu_cxx::__aligned_membuf<unsigned long>::_M_addr() [91]
+-----------------------------------------------
+                                                 <spontaneous>
+[80]     0.1    0.01    0.00                 void std::__pop_heap<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, int*, __gnu_cxx::__ops::_Iter_less_iter&) [80]
+-----------------------------------------------
+                                                 <spontaneous>
+[81]     0.1    0.01    0.00                 void std::__make_heap<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter&) [81]
+-----------------------------------------------
+                0.00    0.00   10000/10000       void std::__final_insertion_sort<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [23]
+[82]     0.1    0.00    0.00   10000         void std::__insertion_sort<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [82]
+                0.00    0.00  122669/4962669     void std::__unguarded_linear_insert<int*, __gnu_cxx::__ops::_Val_less_iter>(int*, __gnu_cxx::__ops::_Val_less_iter) [28]
+                0.00    0.00  150000/35182689     bool __gnu_cxx::__ops::_Iter_less_iter::operator()<int*, int*>(int*, int*) const [48]
+                0.00    0.00   54662/44063979     std::remove_reference<int&>::type&& std::move<int&>(int&) [42]
+                0.00    0.00  122669/9972668     __gnu_cxx::__ops::__val_comp_iter(__gnu_cxx::__ops::_Iter_less_iter) [90]
+                0.00    0.00   27331/27331       int* std::move_backward<int*, int*>(int*, int*, int*) [96]
+-----------------------------------------------
+                0.00    0.00       1/1           void std::__final_insertion_sort<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter) [24]
+[83]     0.0    0.00    0.00       1         void std::__insertion_sort<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter) [83]
+                0.00    0.00      15/5009999     void std::__unguarded_linear_insert<Item*, __gnu_cxx::__ops::_Val_less_iter>(Item*, __gnu_cxx::__ops::_Val_less_iter) [25]
+                0.00    0.00      15/125986406     bool __gnu_cxx::__ops::_Iter_less_iter::operator()<Item*, Item*>(Item*, Item*) const [9]
+                0.00    0.00      15/9972668     __gnu_cxx::__ops::__val_comp_iter(__gnu_cxx::__ops::_Iter_less_iter) [90]
+-----------------------------------------------
+                0.00    0.00      15/9972668     void std::__insertion_sort<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter) [83]
+                0.00    0.00  122669/9972668     void std::__insertion_sort<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [82]
+                0.00    0.00 4840000/9972668     void std::__unguarded_insertion_sort<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [27]
+                0.00    0.00 5009984/9972668     void std::__unguarded_insertion_sort<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter) [26]
+[90]     0.0    0.00    0.00 9972668         __gnu_cxx::__ops::__val_comp_iter(__gnu_cxx::__ops::_Iter_less_iter) [90]
+-----------------------------------------------
+                0.00    0.00 7712992/7712992     __gnu_cxx::__aligned_membuf<unsigned long>::_M_ptr() [79]
+[91]     0.0    0.00    0.00 7712992         __gnu_cxx::__aligned_membuf<unsigned long>::_M_addr() [91]
+-----------------------------------------------
+                0.00    0.00 2700952/2700952     main [1]
+[92]     0.0    0.00    0.00 2700952         std::_List_const_iterator<Item>::_List_const_iterator(std::_List_iterator<Item> const&) [92]
+-----------------------------------------------
+                0.00    0.00   81993/81993       int* std::__copy_move_backward_a2<true, int*, int*>(int*, int*, int*) [98]
+[93]     0.0    0.00    0.00   81993         int* std::__niter_base<int*>(int*) [93]
+-----------------------------------------------
+                0.00    0.00   54662/54662       int* std::move_backward<int*, int*>(int*, int*, int*) [96]
+[94]     0.0    0.00    0.00   54662         int* std::__miter_base<int*>(int*) [94]
+-----------------------------------------------
+                0.00    0.00   27331/27331       int* std::__copy_move_backward_a<true, int*, int*>(int*, int*, int*) [97]
+[95]     0.0    0.00    0.00   27331         int* std::__copy_move_backward<true, true, std::random_access_iterator_tag>::__copy_move_b<int>(int const*, int const*, int*) [95]
+-----------------------------------------------
+                0.00    0.00   27331/27331       void std::__insertion_sort<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [82]
+[96]     0.0    0.00    0.00   27331         int* std::move_backward<int*, int*>(int*, int*, int*) [96]
+                0.00    0.00   54662/54662       int* std::__miter_base<int*>(int*) [94]
+                0.00    0.00   27331/27331       int* std::__copy_move_backward_a2<true, int*, int*>(int*, int*, int*) [98]
+-----------------------------------------------
+                0.00    0.00   27331/27331       int* std::__copy_move_backward_a2<true, int*, int*>(int*, int*, int*) [98]
+[97]     0.0    0.00    0.00   27331         int* std::__copy_move_backward_a<true, int*, int*>(int*, int*, int*) [97]
+                0.00    0.00   27331/27331       int* std::__copy_move_backward<true, true, std::random_access_iterator_tag>::__copy_move_b<int>(int const*, int const*, int*) [95]
+-----------------------------------------------
+                0.00    0.00   27331/27331       int* std::move_backward<int*, int*>(int*, int*, int*) [96]
+[98]     0.0    0.00    0.00   27331         int* std::__copy_move_backward_a2<true, int*, int*>(int*, int*, int*) [98]
+                0.00    0.00   81993/81993       int* std::__niter_base<int*>(int*) [93]
+                0.00    0.00   27331/27331       int* std::__copy_move_backward_a<true, int*, int*>(int*, int*, int*) [97]
+-----------------------------------------------
+                0.00    0.00       1/10001       void std::sort<Item*>(Item*, Item*) [3]
+                0.00    0.00   10000/10001       void std::sort<int*>(int*, int*) [12]
+[99]     0.0    0.00    0.00   10001         __gnu_cxx::__ops::__iter_less_iter() [99]
+-----------------------------------------------
+                0.00    0.00       1/10001       void std::__sort<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter) [4]
+                0.00    0.00   10000/10001       void std::__sort<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter) [13]
+[100]    0.0    0.00    0.00   10001         std::__lg(long) [100]
+-----------------------------------------------
+                0.00    0.00    2040/2040        std::allocator<std::_List_node<Item> >::allocator() [103]
+[101]    0.0    0.00    0.00    2040         __gnu_cxx::new_allocator<std::_List_node<Item> >::new_allocator() [101]
+-----------------------------------------------
+                0.00    0.00    2040/2040        std::allocator<std::_List_node<Item> >::~allocator() [104]
+[102]    0.0    0.00    0.00    2040         __gnu_cxx::new_allocator<std::_List_node<Item> >::~new_allocator() [102]
+-----------------------------------------------
+                0.00    0.00    2040/2040        std::__cxx11::_List_base<Item, std::allocator<Item> >::_List_impl::_List_impl() [105]
+[103]    0.0    0.00    0.00    2040         std::allocator<std::_List_node<Item> >::allocator() [103]
+                0.00    0.00    2040/2040        __gnu_cxx::new_allocator<std::_List_node<Item> >::new_allocator() [101]
+-----------------------------------------------
+                0.00    0.00    2040/2040        std::__cxx11::_List_base<Item, std::allocator<Item> >::_List_impl::~_List_impl() [106]
+[104]    0.0    0.00    0.00    2040         std::allocator<std::_List_node<Item> >::~allocator() [104]
+                0.00    0.00    2040/2040        __gnu_cxx::new_allocator<std::_List_node<Item> >::~new_allocator() [102]
+-----------------------------------------------
+                0.00    0.00    2040/2040        std::__cxx11::_List_base<Item, std::allocator<Item> >::_List_base() [77]
+[105]    0.0    0.00    0.00    2040         std::__cxx11::_List_base<Item, std::allocator<Item> >::_List_impl::_List_impl() [105]
+                0.00    0.00    2040/2040        std::allocator<std::_List_node<Item> >::allocator() [103]
+-----------------------------------------------
+                0.00    0.00    2040/2040        std::__cxx11::_List_base<Item, std::allocator<Item> >::~_List_base() [31]
+[106]    0.0    0.00    0.00    2040         std::__cxx11::_List_base<Item, std::allocator<Item> >::_List_impl::~_List_impl() [106]
+                0.00    0.00    2040/2040        std::allocator<std::_List_node<Item> >::~allocator() [104]
+-----------------------------------------------
+                0.00    0.00       1/1           __libc_csu_init [133]
+[107]    0.0    0.00    0.00       1         __cxx_global_array_dtor [107]
+-----------------------------------------------
+
+ This table describes the call tree of the program, and was sorted by
+ the total amount of time spent in each function and its children.
+
+ Each entry in this table consists of several lines.  The line with the
+ index number at the left hand margin lists the current function.
+ The lines above it list the functions that called this function,
+ and the lines below it list the functions this one called.
+ This line lists:
+     index	A unique number given to each element of the table.
+		Index numbers are sorted numerically.
+		The index number is printed next to every function name so
+		it is easier to look up where the function is in the table.
+
+     % time	This is the percentage of the `total' time that was spent
+		in this function and its children.  Note that due to
+		different viewpoints, functions excluded by options, etc,
+		these numbers will NOT add up to 100%.
+
+     self	This is the total amount of time spent in this function.
+
+     children	This is the total amount of time propagated into this
+		function by its children.
+
+     called	This is the number of times the function was called.
+		If the function called itself recursively, the number
+		only includes non-recursive calls, and is followed by
+		a `+' and the number of recursive calls.
+
+     name	The name of the current function.  The index number is
+		printed after it.  If the function is a member of a
+		cycle, the cycle number is printed between the
+		function's name and the index number.
+
+
+ For the function's parents, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the function into this parent.
+
+     children	This is the amount of time that was propagated from
+		the function's children into this parent.
+
+     called	This is the number of times this parent called the
+		function `/' the total number of times the function
+		was called.  Recursive calls to the function are not
+		included in the number after the `/'.
+
+     name	This is the name of the parent.  The parent's index
+		number is printed after it.  If the parent is a
+		member of a cycle, the cycle number is printed between
+		the name and the index number.
+
+ If the parents of the function cannot be determined, the word
+ `<spontaneous>' is printed in the `name' field, and all the other
+ fields are blank.
+
+ For the function's children, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the child into the function.
+
+     children	This is the amount of time that was propagated from the
+		child's children to the function.
+
+     called	This is the number of times the function called
+		this child `/' the total number of times the child
+		was called.  Recursive calls by the child are not
+		listed in the number after the `/'.
+
+     name	This is the name of the child.  The child's index
+		number is printed after it.  If the child is a
+		member of a cycle, the cycle number is printed
+		between the name and the index number.
+
+ If there are any cycles (circles) in the call graph, there is an
+ entry for the cycle-as-a-whole.  This entry shows who called the
+ cycle (as parents) and the members of the cycle (as children.)
+ The `+' recursive calls entry shows the number of function calls that
+ were internal to the cycle, and the calls entry for each member shows,
+ for that member, how many times it was called from other members of
+ the cycle.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+Index by function name
+
+  [10] submit(int, int, int, int) [70] void std::allocator_traits<std::allocator<std::_List_node<Item> > >::destroy<Item>(std::allocator<std::_List_node<Item> >&, Item*) [83] void std::__insertion_sort<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter)
+  [65] __gnu_cxx::new_allocator<std::_List_node<Item> >::deallocate(std::_List_node<Item>*, unsigned long) [50] std::allocator_traits<std::allocator<std::_List_node<Item> > >::allocate(std::allocator<std::_List_node<Item> >&, unsigned long) [82] void std::__insertion_sort<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter)
+  [66] void __gnu_cxx::new_allocator<std::_List_node<Item> >::destroy<Item>(Item*) [47] void std::allocator_traits<std::allocator<std::_List_node<Item> > >::construct<Item, Item const&>(std::allocator<std::_List_node<Item> >&, Item*, Item const&) [6] void std::__introsort_loop<Item*, long, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, long, __gnu_cxx::__ops::_Iter_less_iter)
+  [61] __gnu_cxx::new_allocator<std::_List_node<Item> >::allocate(unsigned long, void const*) [92] std::_List_const_iterator<Item>::_List_const_iterator(std::_List_iterator<Item> const&) [21] void std::__introsort_loop<int*, long, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, long, __gnu_cxx::__ops::_Iter_less_iter)
+  [57] void __gnu_cxx::new_allocator<std::_List_node<Item> >::construct<Item, Item const&>(Item*, Item const&) [73] Item* std::__copy_move_backward<true, true, std::random_access_iterator_tag>::__copy_move_b<Item>(Item const*, Item const*, Item*) [8] Item* std::__unguarded_partition<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter)
+ [101] __gnu_cxx::new_allocator<std::_List_node<Item> >::new_allocator() [95] int* std::__copy_move_backward<true, true, std::random_access_iterator_tag>::__copy_move_b<int>(int const*, int const*, int*) [29] int* std::__unguarded_partition<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, int*, __gnu_cxx::__ops::_Iter_less_iter)
+ [102] __gnu_cxx::new_allocator<std::_List_node<Item> >::~new_allocator() [105] std::__cxx11::_List_base<Item, std::allocator<Item> >::_List_impl::_List_impl() [97] int* std::__copy_move_backward_a<true, int*, int*>(int*, int*, int*)
+  [11] __gnu_cxx::__aligned_membuf<Item>::_M_ptr() [106] std::__cxx11::_List_base<Item, std::allocator<Item> >::_List_impl::~_List_impl() [24] void std::__final_insertion_sort<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter)
+  [19] __gnu_cxx::__aligned_membuf<Item>::_M_addr() [59] std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_dec_size(unsigned long) [23] void std::__final_insertion_sort<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter)
+  [79] __gnu_cxx::__aligned_membuf<unsigned long>::_M_ptr() [51] std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_get_node() [74] void std::__move_median_to_first<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter)
+  [91] __gnu_cxx::__aligned_membuf<unsigned long>::_M_addr() [55] std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_inc_size(unsigned long) [60] void std::__move_median_to_first<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, int*, int*, __gnu_cxx::__ops::_Iter_less_iter)
+  [90] __gnu_cxx::__ops::__val_comp_iter(__gnu_cxx::__ops::_Iter_less_iter) [43] std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_put_node(std::_List_node<Item>*) [98] int* std::__copy_move_backward_a2<true, int*, int*>(int*, int*, int*)
+  [99] __gnu_cxx::__ops::__iter_less_iter() [75] std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_set_size(unsigned long) [25] void std::__unguarded_linear_insert<Item*, __gnu_cxx::__ops::_Val_less_iter>(Item*, __gnu_cxx::__ops::_Val_less_iter)
+  [14] Item::operator<(Item const&) const [64] std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_get_Node_allocator() [28] void std::__unguarded_linear_insert<int*, __gnu_cxx::__ops::_Val_less_iter>(int*, __gnu_cxx::__ops::_Val_less_iter)
+  [67] __gnu_cxx::new_allocator<std::_List_node<Item> >::max_size() const [76] std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_init() [26] void std::__unguarded_insertion_sort<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter)
+  [72] bool __gnu_cxx::__ops::_Iter_less_val::operator()<Item*, Item>(Item*, Item&) const [30] std::__cxx11::_List_base<Item, std::allocator<Item> >::_M_clear() [27] void std::__unguarded_insertion_sort<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter)
+  [35] bool __gnu_cxx::__ops::_Val_less_iter::operator()<Item, Item*>(Item&, Item*) const [77] std::__cxx11::_List_base<Item, std::allocator<Item> >::_List_base() [7] Item* std::__unguarded_partition_pivot<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter)
+  [41] bool __gnu_cxx::__ops::_Val_less_iter::operator()<int, int*>(int&, int*) const [31] std::__cxx11::_List_base<Item, std::allocator<Item> >::~_List_base() [20] int* std::__unguarded_partition_pivot<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter)
+   [9] bool __gnu_cxx::__ops::_Iter_less_iter::operator()<Item*, Item*>(Item*, Item*) const [22] std::_List_node<Item>* std::__cxx11::list<Item, std::allocator<Item> >::_M_create_node<Item const&>(Item const&) [15] int const& std::max<int>(int const&, int const&)
+  [48] bool __gnu_cxx::__ops::_Iter_less_iter::operator()<int*, int*>(int*, int*) const [17] std::__cxx11::list<Item, std::allocator<Item> >::end() [100] std::__lg(long)
+  [37] std::_List_iterator<Item>::operator!=(std::_List_iterator<Item> const&) const [53] std::__cxx11::list<Item, std::allocator<Item> >::begin() [39] std::remove_reference<Item&>::type&& std::move<Item&>(Item&)
+   [2] std::_List_iterator<Item>::operator->() const [36] std::__cxx11::list<Item, std::allocator<Item> >::erase(std::_List_const_iterator<Item>) [42] std::remove_reference<int&>::type&& std::move<int&>(int&)
+  [58] std::_List_const_iterator<Item>::_M_const_cast() const [38] std::__cxx11::list<Item, std::allocator<Item> >::_M_erase(std::_List_iterator<Item>) [3] void std::sort<Item*>(Item*, Item*)
+ [103] std::allocator<std::_List_node<Item> >::allocator() [18] void std::__cxx11::list<Item, std::allocator<Item> >::_M_insert<Item const&>(std::_List_iterator<Item>, Item const&) [12] void std::sort<int*>(int*, int*)
+ [104] std::allocator<std::_List_node<Item> >::~allocator() [16] std::__cxx11::list<Item, std::allocator<Item> >::push_back(Item const&) [33] _ZSt4swapI4ItemENSt9enable_ifIXsr6__and_ISt6__not_ISt15__is_tuple_likeIT_EESt21is_move_constructibleIS4_ESt18is_move_assignableIS4_EEE5valueEvE4typeERS4_SD_
+   [5] std::_List_node<Item>::_M_valptr() [45] void std::__pop_heap<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter&) [49] _ZSt4swapIiENSt9enable_ifIXsr6__and_ISt6__not_ISt15__is_tuple_likeIT_EESt21is_move_constructibleIS3_ESt18is_move_assignableIS3_EEE5valueEvE4typeERS3_SC_
+  [54] std::_List_node<unsigned long>::_M_valptr() [80] void std::__pop_heap<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, int*, __gnu_cxx::__ops::_Iter_less_iter&) [4] void std::__sort<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter)
+  [40] std::_List_iterator<Item>::_List_iterator(std::__detail::_List_node_base*) [71] std::allocator<std::_List_node<Item> >* std::__addressof<std::allocator<std::_List_node<Item> > >(std::allocator<std::_List_node<Item> >&) [13] void std::__sort<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter)
+  [46] std::_List_iterator<Item>::operator++(int) [52] void std::__make_heap<Item*, __gnu_cxx::__ops::_Iter_less_iter>(Item*, Item*, __gnu_cxx::__ops::_Iter_less_iter&) [56] Item const& std::forward<Item const&>(std::remove_reference<Item const&>::type&)
+  [62] std::__allocated_ptr<std::allocator<std::_List_node<Item> > >::__allocated_ptr(std::allocator<std::_List_node<Item> >&, std::_List_node<Item>*) [81] void std::__make_heap<int*, __gnu_cxx::__ops::_Iter_less_iter>(int*, int*, __gnu_cxx::__ops::_Iter_less_iter&) [34] void std::iter_swap<Item*, Item*>(Item*, Item*)
+  [63] std::__allocated_ptr<std::allocator<std::_List_node<Item> > >::~__allocated_ptr() [94] int* std::__miter_base<int*>(int*) [44] void std::iter_swap<int*, int*>(int*, int*)
+  [68] std::__allocated_ptr<std::allocator<std::_List_node<Item> > >::operator=(decltype(nullptr)) [93] int* std::__niter_base<int*>(int*) [107] __cxx_global_array_dtor
+  [69] std::allocator_traits<std::allocator<std::_List_node<Item> > >::deallocate(std::allocator<std::_List_node<Item> >&, std::_List_node<Item>*, unsigned long) [96] int* std::move_backward<int*, int*>(int*, int*, int*) [1] main
