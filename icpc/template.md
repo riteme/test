@@ -1,9 +1,10 @@
-<br /><center class="subtitle">Fudan ACM-ICPC Summer Training Camp 2018</center>
-# 第 1 场训练报告
+<br /><center class="subtitle">Fudan ICPC Summer Training Camp 2019</center>
+
+# 训练报告
 
 <br />
 <center>薛振梁</center>
-<center>2018 年 7 月 24 日</center>
+<center>2019 年 7 月 24 日</center>
 <br />
 
 ### 概况

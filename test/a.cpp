@@ -1,9 +1,11 @@
-#include <cstdio>
-static int arr[2][100];
-static auto p = arr[1];
+#include <chrono>
+#include <iostream>
+
+using namespace std;
+using namespace std::chrono;
+
 int main() {
-    for (int i = -50; i <= 50; i++) p[i] = i;
-    int x = p[-25] + p[26];
-    printf("%d\n", x);
+    cout << (double) std::chrono::high_resolution_clock::period::num
+             / std::chrono::high_resolution_clock::period::den << endl;
     return 0;
 }
