@@ -1,4 +1,3 @@
-// WA
 #include <cassert>
 #include <cstdio>
 #include <cstring>
