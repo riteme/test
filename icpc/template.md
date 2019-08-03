@@ -3,8 +3,8 @@
 # 训练报告
 
 <br />
-<center>薛振梁</center>
-<center>2019 年 7 月 24 日</center>
+<center>[Fudan U2] 刘明君、孙亮亮、薛振梁</center>
+<center>2019 年 7 月 29 日</center>
 <br />
 
 ### 概况
@@ -13,17 +13,23 @@
 
 ### 比赛过程
 
-
+<pre class="replay">
+replay goes here.
+</pre>
 
 ### 总结
 
+**刘明君：**
 
+**孙亮亮：**
+
+**薛振梁：**
 
 ***
 
 ### 解题报告
 
-#### A. [Careful](https://codeforces.com/gym/101810/problem/A)
+#### A. Careful
 
 **情况**　
 
