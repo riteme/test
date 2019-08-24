@@ -1,0 +1,77 @@
+#include <bitset>
+#include <iostream>
+
+using namespace std;
+
+int main() {
+    cout << sizeof(bitset<1>) << endl;
+    cout << sizeof(bitset<2>) << endl;
+    cout << sizeof(bitset<3>) << endl;
+    cout << sizeof(bitset<4>) << endl;
+    cout << sizeof(bitset<5>) << endl;
+    cout << sizeof(bitset<6>) << endl;
+    cout << sizeof(bitset<7>) << endl;
+    cout << sizeof(bitset<8>) << endl;
+    cout << sizeof(bitset<9>) << endl;
+    cout << sizeof(bitset<10>) << endl;
+    cout << sizeof(bitset<11>) << endl;
+    cout << sizeof(bitset<12>) << endl;
+    cout << sizeof(bitset<13>) << endl;
+    cout << sizeof(bitset<14>) << endl;
+    cout << sizeof(bitset<15>) << endl;
+    cout << sizeof(bitset<16>) << endl;
+    cout << sizeof(bitset<17>) << endl;
+    cout << sizeof(bitset<18>) << endl;
+    cout << sizeof(bitset<19>) << endl;
+    cout << sizeof(bitset<20>) << endl;
+    cout << sizeof(bitset<21>) << endl;
+    cout << sizeof(bitset<22>) << endl;
+    cout << sizeof(bitset<23>) << endl;
+    cout << sizeof(bitset<24>) << endl;
+    cout << sizeof(bitset<25>) << endl;
+    cout << sizeof(bitset<26>) << endl;
+    cout << sizeof(bitset<27>) << endl;
+    cout << sizeof(bitset<28>) << endl;
+    cout << sizeof(bitset<29>) << endl;
+    cout << sizeof(bitset<30>) << endl;
+    cout << sizeof(bitset<31>) << endl;
+    cout << sizeof(bitset<32>) << endl;
+    cout << sizeof(bitset<33>) << endl;
+    cout << sizeof(bitset<34>) << endl;
+    cout << sizeof(bitset<35>) << endl;
+    cout << sizeof(bitset<36>) << endl;
+    cout << sizeof(bitset<37>) << endl;
+    cout << sizeof(bitset<38>) << endl;
+    cout << sizeof(bitset<39>) << endl;
+    cout << sizeof(bitset<40>) << endl;
+    cout << sizeof(bitset<41>) << endl;
+    cout << sizeof(bitset<42>) << endl;
+    cout << sizeof(bitset<43>) << endl;
+    cout << sizeof(bitset<44>) << endl;
+    cout << sizeof(bitset<45>) << endl;
+    cout << sizeof(bitset<46>) << endl;
+    cout << sizeof(bitset<47>) << endl;
+    cout << sizeof(bitset<48>) << endl;
+    cout << sizeof(bitset<49>) << endl;
+    cout << sizeof(bitset<50>) << endl;
+    cout << sizeof(bitset<51>) << endl;
+    cout << sizeof(bitset<52>) << endl;
+    cout << sizeof(bitset<53>) << endl;
+    cout << sizeof(bitset<54>) << endl;
+    cout << sizeof(bitset<55>) << endl;
+    cout << sizeof(bitset<56>) << endl;
+    cout << sizeof(bitset<57>) << endl;
+    cout << sizeof(bitset<58>) << endl;
+    cout << sizeof(bitset<59>) << endl;
+    cout << sizeof(bitset<60>) << endl;
+    cout << sizeof(bitset<61>) << endl;
+    cout << sizeof(bitset<62>) << endl;
+    cout << sizeof(bitset<63>) << endl;
+    cout << sizeof(bitset<64>) << endl;
+    cout << sizeof(bitset<65>) << endl;
+    cout << sizeof(bitset<66>) << endl;
+    cout << sizeof(bitset<67>) << endl;
+    cout << sizeof(bitset<68>) << endl;
+    cout << sizeof(bitset<69>) << endl;
+    return 0;
+}

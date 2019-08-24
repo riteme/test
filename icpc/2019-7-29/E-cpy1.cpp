@@ -158,10 +158,12 @@ int main() {
         for (int i = 1; d * pr[i] <= n; i++)
             add(ans, pw[pr[i]] * pr[i] % MOD * G(n / pr[i]) % MOD);
         if (ans < 0) ans += MOD;
-        //i64 std = 0;
-        //for (int i = 1; pr[i] <= n; i++) add(std, pw[pr[i]] * pr[i] % MOD * G(n / pr[i]) % MOD);
-        //if (std < 0) std += MOD;
-        //fprintf(stderr, "std = %lld\n", std);
+
+        i64 std = 0;
+        for (int i = 1; pr[i] <= n; i++) add(std, pw[pr[i]] * pr[i] % MOD * G(n / pr[i]) % MOD);
+        if (std < 0) std += MOD;
+        fprintf(stderr, "std = %lld\n", std);
+
         printf("%lld\n", ans);
     }
     return 0;

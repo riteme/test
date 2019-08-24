@@ -1,18 +1,28 @@
+#define NDEBUG
+
+#pragma GCC optimize(3)
+
 #include <cstdio>
 #include <cstring>
 
-#include <tr1/unordered_map>
 #include <algorithm>
 
 using namespace std;
 
-#define NMAX 10000000
+#ifndef NDEBUG
+#include <chrono>
+using namespace std::chrono;
+#endif
+
+#define NMAX 5000000
 #define HNMAX 100000
 #define KMAX 200
 #define MOD 1000000007
+#define INV2 500000004
+#define INV3 333333336
+#define INV6 166666668
 
 typedef long long i64;
-typedef tr1::unordered_map<i64, i64> Map;
 
 inline i64 qpow(i64 a, i64 k) {
     i64 r = 1;
@@ -51,7 +61,7 @@ struct PowerSeries {
         for (int i = K + 1; i >= 1; i--) _tmp[i] = _tmp[i + 1] * (n - i) % MOD;
         i64 ret = 0, pre = 1;
         for (int i = 0, b = K & 1 ? 1 : -1; i <= K + 1; i++, b = -b) {
-            add(ret, b * f[i] * pre % MOD * _tmp[i + 1] % MOD * _fi[i] % MOD * _fi[K + 1 - i] % MOD);
+            ret = (ret + b * f[i] * pre % MOD * _tmp[i + 1] % MOD * _fi[i] % MOD * _fi[K + 1 - i]) % MOD;
             pre = pre * (n - i) % MOD;
         } return ret;
     }
@@ -60,37 +70,42 @@ struct PowerSeries {
 
 static PowerSeries F[KMAX + 1];
 static bool mark[NMAX + 10];
-static int pr[NMAX + 10], cnt;
-static int mu[NMAX + 10], phi[NMAX + 10];
-static i64 pw[NMAX + 10];
+static int pr[NMAX + 10], cnt, phi[NMAX + 10];
+static signed char mu[NMAX + 10];
+static i64 pw[HNMAX + 10], n;
 
-static Map F0;
-inline i64 Fp(i64 n, int K) {
-    Map::iterator it = F0.find(n);
-    if (it != F0.end()) return it->second;
-    i64 ret = F[K](n);
-    F0[n] = ret;
-    return ret;
+static i64 F0[HNMAX + 10], F1[HNMAX + 10];
+inline i64 Fp(i64 m, int K) {
+    i64 &ret = m <= HNMAX ? F0[m] : F1[n / m];
+    if (ret) return ret;
+    return ret = F[K](m);
 }
 
-static i64 Gp[NMAX + 10];
-static Map G0;
-inline i64 G(i64 n) {
-    if (n <= NMAX) return Gp[n];
-    Map::iterator it = G0.find(n);
-    if (it != G0.end()) return it->second;
-    i64 ret = F[3](n);
-    for (i64 i = 2, l; i <= n; i = l + 1) {
-        i64 p = n / i;
-        l = n / p;
-        add(ret, ((F[2](i - 1) - F[2](l)) * G(p)) % MOD);
+static int G0[NMAX + 10], G1[NMAX + 10];
+inline i64 c2(i64 x) {
+    x %= MOD;
+    return x * (x + 1) % MOD * (2 * x + 1);
+}
+inline i64 G(i64 m) {
+    if (m <= NMAX) return G0[m];
+    int &ret = G1[n / m];
+    if (ret) return ret;
+    ret = m % MOD;
+    ret = i64(ret) * (ret + 1) % MOD * INV2 % MOD;
+    ret = i64(ret) * ret % MOD;
+    for (i64 i = 2, l; i <= m; i = l + 1) {
+        i64 p = m / i;
+        l = m / p;
+        //add(ret, (F[2](i - 1) - F[2](l)) * G(p) % MOD);
+        ret = (ret + (c2(i - 1) - c2(l)) % MOD * INV6 % MOD * G(p)) % MOD;
     }
     return ret;
 }
 
-static i64 Hp[HNMAX + 10], H[HNMAX + 10];
-
 int main() {
+#ifndef NDEBUG
+    auto t1 = high_resolution_clock::now();
+#endif
     mu[1] = phi[1] = 1;
     for (int i = 2; i <= NMAX; i++) {
         if (!mark[i]) {
@@ -112,47 +127,89 @@ int main() {
         }
     }
     for (int i = 1; i <= NMAX; i++)
-        Gp[i] = (Gp[i - 1] + i * i * phi[i]) % MOD;
+        G0[i] = (G0[i - 1] + i64(i) * i % MOD * phi[i]) % MOD;
+#ifndef NDEBUG
+    auto t2 = high_resolution_clock::now();
+    printf("setup: %.2lf\n", duration<double>(t2 - t1).count());
+#endif
+
     int T;
     scanf("%d", &T);
     while (T--) {
-        i64 n;
+#ifndef NDEBUG
+        t1 = high_resolution_clock::now();
+#endif
+        memset(G1, 0, sizeof(G1));
+        memset(F0, 0, sizeof(F0));
+        memset(F1, 0, sizeof(F1));
         int K;
         scanf("%lld%d", &n, &K);
         pw[1] = 1;
-        for (int i = 2; i <= NMAX; i++) {
-            if (!mark[i]) pw[i] = qpow(i, K);
-            for (int j = 1; pr[j] * i <= NMAX; j++) {
+        for (int i = 2; i <= HNMAX; i++) {
+            if (!mark[i]) pw[i] = qpow(i, K + 1);
+            for (int j = 1; pr[j] * i <= HNMAX; j++) {
                 int t = pr[j] * i;
                 pw[t] = pw[i] * pw[pr[j]] % MOD;
                 if (i % pr[j] == 0) break;
             }
         }
-        for (int i = 2; i <= HNMAX; i++)
-            Hp[i] = (Hp[i - 1] + (mark[i] ? 0 : pw[i] * i)) % MOD;
+#ifndef NDEBUG
+        t2 = high_resolution_clock::now();
+        printf("prepare: %.2lf\n", duration<double>(t2 - t1).count());
+#endif
 
-        F0.clear();
-        int d = 1, j = 1;
-        for ( ; i64(d) * d <= n; d++) H[d] = Fp(n / d, K + 1);
-        for (d--; pr[j] <= d; j++) ;
-        for (j--; j >= 1; j--) for (i64 i = 1; i <= d && i * pr[j] <= n; i++) {
-            int p = pr[j], t = n / (n / i / p);
-            add(H[i], -pw[p] * p % MOD * (t <= d ? H[t] : Fp(n / t, K + 1)) % MOD);
+#ifndef NDEBUG
+        t1 = high_resolution_clock::now();
+#endif
+        static i64 H0[HNMAX + 10], H1[HNMAX + 10];
+        i64 d;
+        for (d = 1; d * d <= n; d++) {
+            H0[d] = Fp(d, K + 1);
+            H1[d] = Fp(n / d, K + 1);
         }
-        for (int i = 1; i <= d; i++) add(H[i], Hp[d] - 1);
-        H[d + 1] = Hp[n / (d + 1)];
+        for (int i = 1, j; pr[i] < d; i++) {
+            i64 p2 = i64(pr[i]) * pr[i], ph = H0[pr[i] - 1];
+            for (j = 1; j * pr[i] < d; j++)
+                H1[j] = (H1[j] - pw[pr[i]] * (H1[j * pr[i]] - ph)) % MOD;
+            for ( ; j * p2 <= n && j < d; j++)
+                H1[j] = (H1[j] - pw[pr[i]] * (H0[n / j / pr[i]] - ph)) % MOD;
+            for (j = d - 1; j >= p2; j--)
+                H0[j] = (H0[j] - pw[pr[i]] * (H0[j / pr[i]] - ph)) % MOD;
+        }
+#ifndef NDEBUG
+        t2 = high_resolution_clock::now();
+        printf("eratos: %.2lf\n", duration<double>(t2 - t1).count());
+#endif
 
+#ifndef NDEBUG
+        t1 = high_resolution_clock::now();
+#endif
         i64 ans = 0;
-        for (int i = 1; i <= d; i++)
-            add(ans, (G(i) * (H[i] - H[i + 1])) % MOD);
-        for (int i = 1; i64(d + 1) * pr[i] <= n; i++)
-            add(ans, pw[pr[i]] * pr[i] % MOD * G(n / pr[i]) % MOD);
+        for (i64 i = 1; i < d; i++)
+            add(ans, (G(i) * (H1[i] - (i + 1 == d ? H0[n / d] : H1[i + 1]))) % MOD);
+#ifndef NDEBUG
+        t2 = high_resolution_clock::now();
+        printf("part 1: %.2lf\n", duration<double>(t2 - t1).count());
+#endif
+
+#ifndef NDEBUG
+        t1 = high_resolution_clock::now();
+#endif
+        for (int i = 1; d * pr[i] <= n; i++)
+            add(ans, pw[pr[i]] * G(n / pr[i]) % MOD);
         if (ans < 0) ans += MOD;
+#ifndef NDEBUG
+        t2 = high_resolution_clock::now();
+        printf("part 2: %.2lf\n", duration<double>(t2 - t1).count());
+#endif
+
+        printf("%lld\n", ans);
+        /*
         i64 std = 0;
-        for (int i = 1; pr[i] <= n; i++) add(std, pw[pr[i]] * pr[i] % MOD * G(n / pr[i]) % MOD);
+        for (int i = 1; pr[i] <= n; i++) add(std, pw[pr[i]] * G(n / pr[i]) % MOD);
         if (std < 0) std += MOD;
         fprintf(stderr, "std = %lld\n", std);
-        printf("%lld\n", ans);
+        */
     }
     return 0;
 }
