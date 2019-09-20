@@ -5,8 +5,12 @@ from random import *
 
 n, m, W, H = map(int, argv[1:])
 print n, m, W, H
-for i in xrange(n):
-    print randint(1, W), randint(1, H)
+P = set()
+while len(P) < n:
+    P.add((randint(1, W), randint(1, H)))
+P = list(P)
+shuffle(P)
+print '\n'.join('%s %s' % p for p in P)
 for i in xrange(m):
     L = randint(1, W)
     R = randint(L, W)

@@ -1,10 +1,5 @@
-// 300MB MLE
-#define NDEBUG
-
-#include <cassert>
 #include <cstdio>
 #include <cstring>
-#include <cctype>
 
 #include <queue>
 #include <vector>
@@ -12,213 +7,162 @@
 
 using namespace std;
 
-#define BUFFERSIZE 65536
-static size_t _pos = BUFFERSIZE;
-static char _buf[BUFFERSIZE];
-
-inline void _getc(char &c) {
-    if (_pos == BUFFERSIZE) {
-        _pos = 0;
-        fread(_buf, 1, BUFFERSIZE, stdin);
-    }
-    c = _buf[_pos++];
-}
-
-inline void read(int &x) {
-    x = 0;
-    char c;
-    do _getc(c); while (!isdigit(c));
-    do {
-        x = x * 10 + (c - '0');
-        _getc(c);
-    } while (isdigit(c));
-}
-
 #define NMAX 70000
-#define NODEMAX 2400000
-#define SEGMAX 270000
+#define MMAX 150000
+#define EMAX 4000000
 
-#define L(x) (x << 1)
-#define R(x) ((x << 1) | 1)
-
+static struct Node {
+    int id;
+    int lch, rch;
+    int x, y;
+} e[EMAX + 10];
 static int cnt;
 
-struct Node {
-    //Node() : id(++cnt), lch(NULL), rch(NULL) {
-    //    assert(cnt < NODEMAX);
-    //}
-
-    int id;
-    Node *lch, *rch;
-};
-
-static size_t mempos;
-static Node *mem;
-
-inline Node *alloc() {
-    Node *r = &mem[mempos++];
-    r->id = ++cnt;
-    r->lch = r->rch = NULL;
-    return r;
-}
-
-struct Edge {
-    int v, w;
-};
-
-struct State {
-    State(int _u, int _s) : u(_u), s(_s) {}
-
-    int u, s;
-
-    bool operator<(const State &z) const {
-        return s > z.s;
-    }
-};
-
-static int n, m, W, H;
-static int pos[NMAX + 10];
-static Node **tr;
-static vector<Edge> G[NODEMAX];
-
-inline void link(int u, int v, int w = 0) {
-    G[u].push_back({v, w});
-}
-
-static void insert(Node *x, int p, int xl, int xr) {
-    if (xl == xr) return;
-    int m = (xl + xr) >> 1;
-    if (p <= m) {
-        if (!x->lch) {
-            x->lch = alloc();
-            link(x->id, x->lch->id);
-        }
-        insert(x->lch, p, xl, m);
+static int rev[NMAX + 10];
+int insert(int x, int p, int i, int xl, int xr) {
+    if (!x) x = ++cnt;
+    if (xl == xr) {
+        rev[i] = x;
+        e[x].id = i;
     } else {
-        if (!x->rch) {
-            x->rch = alloc();
-            link(x->id, x->rch->id);
-        }
-        insert(x->rch, p, m + 1, xr);
+        int m = (xl + xr) >> 1;
+        if (p <= m) e[x].lch = insert(e[x].lch, p, i, xl, m);
+        else e[x].rch = insert(e[x].rch, p, i, m + 1, xr);
     }
+    return x;
 }
 
-static void insert(int i, int x, int y) {
-    int rt = 1, l = 1, r = W;
-    while (l < r) {
-        int m = (l + r) >> 1;
-        if (x <= m) r = m, rt = L(rt);
-        else l = m + 1, rt = R(rt);
-    }
-    if (!tr[rt]) tr[rt] = alloc();
-    insert(tr[rt], y, 1, H);
-    pos[i] = cnt;
-}
-
-static Node *meld(Node *x, Node *y) {
+int meld(int x, int y, int l, int r) {
     if (!x) return y;
     if (!y) return x;
-    Node *z = alloc();
-    z->lch = meld(x->lch, y->lch);
-    z->rch = meld(x->rch, y->rch);
-    if (z->lch) link(z->id, z->lch->id);
-    if (z->rch) link(z->id, z->rch->id);
-    if (!z->lch && !z->rch) {
-        link(z->id, x->id);
-        link(z->id, y->id);
+    int z = ++cnt;
+    e[z].x = x;
+    e[z].y = y;
+    if (l < r) {
+        int m = (l + r) >> 1;
+        e[z].lch = meld(e[x].lch, e[y].lch, l, m);
+        e[z].rch = meld(e[x].rch, e[y].rch, m + 1, r);
     }
     return z;
 }
 
-static void setup(int x, int xl, int xr) {
-    assert(x <= 300000);
-    if (xl == xr) return;
-    int m = (xl + xr) >> 1;
-    setup(L(x), xl, m);
-    setup(R(x), m + 1, xr);
-    tr[x] = meld(tr[L(x)], tr[R(x)]);
-}
+#define L(x) (x << 1)
+#define R(x) (L(x) | 1)
 
-static int t, Li, Ri, Di, Ui;
-static bool mark[NODEMAX];
-static int stk[1024], tail;
-static void cover(Node *x, int p, int xl, int xr) {
-    if (!x) return;
-    if (Di <= xl && xr <= Ui && !mark[x->id]) {
-        link(p, x->id, t);
-        mark[x->id] = true;
-        stk[tail++] = x->id;
-    } else {
-        int m = (xl + xr) >> 1;
-        if (Di <= m) cover(x->lch, p, xl, m);
-        if (Ui > m) cover(x->rch, p, m + 1, xr);
-    }
-}
+static int n, m, W, H;
+static int rt[4 * NMAX + 10];
 
-static void _cover(int x, int p, int xl, int xr) {
-    if (Li <= xl && xr <= Ri) cover(tr[x], p, 1, H);
+void set(int x, int i, int j, int k, int xl, int xr) {
+    if (xl == xr) rt[x] = insert(rt[x], k, i, 1, n);
     else {
         int m = (xl + xr) >> 1;
-        if (Li <= m) _cover(L(x), p, xl, m);
-        if (Ri > m) _cover(R(x), p, m + 1, xr);
+        if (j <= m) set(L(x), i, j, k, xl, m);
+        else set(R(x), i, j, k, m + 1, xr);
     }
 }
 
-static void cover(int x, int p, int xl, int xr) {
-    _cover(x, p, xl, xr);
-    while (tail) mark[stk[--tail]] = false;
+void build(int x, int xl, int xr) {
+    if (xl < xr) {
+        int m = (xl + xr) >> 1;
+        build(L(x), xl, m);
+        build(R(x), m + 1, xr);
+        rt[x] = meld(rt[L(x)], rt[R(x)], 1, n);
+    }
 }
 
-inline void initialize() {
-    mem = new Node[NODEMAX];
-    tr = new Node*[SEGMAX];
-    //scanf("%d%d%d%d", &n, &m, &W, &H);
-    read(n); read(m); read(W); read(H);
-    for (int i = 1; i <= n; i++) {
-        int x, y;
-        //scanf("%d%d", &x, &y);
-        read(x); read(y);
-        insert(i, x, y);
+static int tail, seq[NMAX + 10];
+void scan(int x, int L, int R, int xl, int xr) {
+    if (L <= xl && xr <= R) seq[tail++] = x;
+    else {
+        int m = (xl + xr) >> 1;
+        if (L <= m) scan(e[x].lch, L, R, xl, m);
+        if (R > m) scan(e[x].rch, L, R, m + 1, xr);
     }
-    setup(1, 1, W);
-    for (int i = 0; i < m; i++) {
-        int p;
-        //scanf("%d%d%d%d%d%d", &p, &t, &Li, &Ri, &Di, &Ui);
-        read(p); read(t); read(Li); read(Ri); read(Di); read(Ui);
-        cover(1, pos[p], 1, W);
-    }
-    delete[] mem;
-    delete[] tr;
 }
 
-static int dist[NODEMAX];
+void scan(int x, int L, int R, int D, int U, int xl, int xr) {
+    if (L <= xl && xr <= R) scan(rt[x], D, U, 1, n);
+    else {
+        int m = (xl + xr) >> 1;
+        if (L <= m) scan(L(x), L, R, D, U, xl, m);
+        if (R > m) scan(R(x), L, R, D, U, m + 1, xr);
+    }
+}
 
-int main() {
-#ifdef NDEBUG
-    freopen("jump.in", "r", stdin);
-    freopen("jump.out", "w", stdout);
-#endif
-    initialize();
+struct State {
+    int u, t;
 
+    bool operator<(const State &z) const {
+        return t > z.t;
+    }
+};
+
+struct Rect {
+    int t, L, R, D, U;
+};
+
+static vector<Rect> G[NMAX + 10];
+static int dist[EMAX + 10];
+
+void shortest() {
     memset(dist, 0x3f, sizeof(dist));
-    dist[pos[1]] = 0;
+    dist[rev[1]] = 0;
     priority_queue<State> q;
-    q.push(State(pos[1], 0));
+    q.push({rev[1], 0});
     while (!q.empty()) {
         State s = q.top();
         q.pop();
-        if (s.s != dist[s.u]) continue;
+        if (dist[s.u] < s.t) continue;
         int u = s.u;
-        for (auto &e : G[u]) {
-            int v = e.v;
-            if (dist[v] > dist[u] + e.w) {
-                dist[v] = dist[u] + e.w;
-                q.push(State(v, dist[v]));
+        if (e[u].id) {
+            for (auto &[t, L, R, D, U] : G[e[u].id]) {
+                tail = 0;
+                scan(1, L, R, D, U, 1, n);
+                for (int i = 0; i < tail; i++) {
+                    int v = seq[i];
+                    if (dist[v] > dist[u] + t) {
+                        dist[v] = dist[u] + t;
+                        q.push({v, dist[v]});
+                    }
+                }
+            }
+        } else {
+            auto push = [&q](int v, int t) {
+                if (!v) return;
+                if (dist[v] > t) {
+                    dist[v] = t;
+                    q.push({v, t});
+                }
+            };
+            if (e[u].x) {
+                push(e[u].x, s.t);
+                push(e[u].y, s.t);
+            } else {
+                push(e[u].lch, s.t);
+                push(e[u].rch, s.t);
             }
         }
     }
+}
 
-    for (int i = 2; i <= n; i++) printf("%d\n", dist[pos[i]]);
-    //fprintf(stderr, "cnt = %d\n", cnt);
+int main() {
+#ifdef ONLINE_JUDGE
+    freopen("jump.in", "r", stdin);
+    freopen("jump.out", "w", stdout);
+#endif
+    scanf("%d%d%d%d", &n, &m, &W, &H);
+    for (int i = 1; i <= n; i++) {
+        int x, y;
+        scanf("%d%d", &x, &y);
+        set(1, i, x, y, 1, n);
+    }
+    build(1, 1, n);
+    for (int i = 0; i < m; i++) {
+        int u, t, L, R, D, U;
+        scanf("%d%d%d%d%d%d", &u, &t, &L, &R, &D, &U);
+        G[u].push_back({t, L, R, D, U});
+    }
+    shortest();
+    for (int i = 2; i <= n; i++) printf("%d\n", dist[rev[i]]);
     return 0;
 }

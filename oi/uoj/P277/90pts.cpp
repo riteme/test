@@ -33,52 +33,124 @@ inline double tick() {
 #define INF 1e99
 
 typedef double ld;
+
 #define EPS 1e-8
-inline bool eq(ld x, ld y) { return x - EPS < y && y < x + EPS; }
-inline ld sqrt_s(ld x) { return sqrt(max(0.0, x)); }
+inline bool eq(ld x, ld y) {
+    return x - EPS < y && y < x + EPS;
+}
+
+inline ld sqrt_s(ld x) {
+    return sqrt(max(0.0, x));
+}
+
 struct vec {
     vec() : x(0), y(0) {}
     vec(ld _x, ld _y) : x(_x), y(_y) {}
+
     ld x, y;
-    ld len() const { return hypot(x, y); }
-    ld len2() const { return x * x + y * y; }
-    vec norm() const { ld l = len(); return vec(x / l, y / l); }
-    vec cw() const { return vec(y, -x); }
-    vec cw(ld t) const { ld c = cos(t), s = sin(t); return vec(-c * x + s * y, -s * x - c * y); }
-    vec ccw() const { return vec(-y, x); }
-    vec ccw(ld t) const { ld c = cos(t), s = sin(t); return vec(c * x - s * y, s * x + c * y); }
-    vec operator+(const vec &z) const { return vec(x + z.x, y + z.y); }
-    vec operator-(const vec &z) const { return vec(x - z.x, y - z.y); }
-    vec operator-() const { return vec(-x, -y); }
+
+    ld len() const {
+        return hypot(x, y);
+    }
+
+    ld len2() const {
+        return x * x + y * y;
+    }
+
+    vec norm() const {
+        ld l = len();
+        return vec(x / l, y / l);
+    }
+
+    vec cw() const {
+        return vec(y, -x);
+    }
+
+    vec cw(ld t) const {
+        ld c = cos(t), s = sin(t);
+        return vec(-c * x + s * y, -s * x - c * y);
+    }
+
+    vec ccw() const {
+        return vec(-y, x);
+    }
+
+    vec ccw(ld t) const {
+        ld c = cos(t), s = sin(t);
+        return vec(c * x - s * y, s * x + c * y);
+    }
+
+    vec operator+(const vec &z) const {
+        return vec(x + z.x, y + z.y);
+    }
+
+    vec operator-(const vec &z) const {
+        return vec(x - z.x, y - z.y);
+    }
+
+    vec operator-() const {
+        return vec(-x, -y);
+    }
+
     friend vec operator*(ld k, const vec &z);
-    vec operator*(ld k) const { return vec(x * k, y * k); }
-    vec operator/(ld k) const { return vec(x / k, y / k); }
-    vec &operator+=(const vec &z) { x += z.x; y += z.y; return *this; }
-    vec &operator-=(const vec &z) { x -= z.x; y -= z.y; return *this; }
-    vec &operator*=(ld k) { x *= k; y *= k; return *this; }
-    vec &operator/=(ld k) { x /= k; x /= k; return *this; }
+    vec operator*(ld k) const {
+        return vec(x * k, y * k);
+    }
+
+    vec operator/(ld k) const {
+        return vec(x / k, y / k);
+    }
+
+    vec &operator+=(const vec &z) {
+        x += z.x;
+        y += z.y;
+        return *this;
+    }
+
+    vec &operator-=(const vec &z) {
+        x -= z.x;
+        y -= z.y;
+        return *this;
+    }
+
+    vec &operator*=(ld k) {
+        x *= k;
+        y *= k;
+        return *this;
+    }
+
     bool operator==(const vec &z) const {
         return x - EPS < z.x && z.x < x + EPS &&
                y - EPS < z.y && z.y < y + EPS;
     }
+
     bool operator!=(const vec &z) const {
         return x - EPS >= z.x || z.x >= x + EPS ||
                y - EPS >= z.y || z.y >= y + EPS;
-}};
-inline vec operator*(ld k, const vec &z) { return vec(z.x * k, z.y * k); }
-inline ld dot(const vec &u, const vec &v) { return u.x * v.x + u.y * v.y; }
-inline ld cross(const vec &u, const vec &v) { return u.x * v.y - u.y * v.x; }
+    }
+};
 
-#define ACM_BEGIN
+inline vec operator*(ld k, const vec &z) {
+    return vec(z.x * k, z.y * k);
+}
+
+inline ld dot(const vec &u, const vec &v) {
+    return u.x * v.x + u.y * v.y;
+}
+
+inline ld cross(const vec &u, const vec &v) {
+    return u.x * v.y - u.y * v.x;
+}
+
 struct seg {
-#define ACM_END
     seg() {}
     seg(const vec &_u, const vec &_v) : u(_u), v(_v) {}
 
-#define ACM_BEGIN
     vec u, v;
-    ld len() const { return (u - v).len(); }
-#define ACM_END
+
+    ld len() const {
+        return (u - v).len();
+    }
 
     ld len2() const {
         return (u - v).len2();
@@ -93,9 +165,7 @@ struct seg {
         return (u != z.u || v != z.v) &&
                (u != z.v || v != z.u);
     }
-#define ACM_BEGIN
 };
-#define ACM_END
 
 inline ld dist(const vec &u, const seg &s) {
     vec dv = s.v - s.u;
@@ -106,15 +176,12 @@ inline ld dist(const vec &u, const seg &s) {
     } else return min((u - s.u).len(), (u - s.v).len());
 }
 
-#define ACM_BEGIN
 struct cir {
-#define ACM_END
     cir() {}
     cir(const vec &_p, ld _r) : p(_p), r(_r) {}
 
-#define ACM_BEGIN
-    vec p; ld r;
-#define ACM_END
+    vec p;
+    ld r;
 
     ld arcl(vec u, vec v) {
         u -= p; v -= p;
@@ -135,49 +202,45 @@ struct cir {
     bool operator!=(const cir &z) const {
         return p != z.p || r - EPS >= z.r || z.r >= r + EPS;
     }
-#define ACM_BEGIN
 };
-#define ACM_END
 
 inline bool pass(const seg &s, const cir &c) {
     return dist(c.p, s) <= c.r - EPS;
 }
 
-#define ACM_BEGIN
 // 点与圆的切点
 inline void pctan(const vec &p, const cir &c, vec &t1, vec &t2) {
-    vec v = p - c.p;
-    ld d = v.len(), l = sqrt_s(d * d - c.r * c.r);
+    ld d = (p - c.p).len();
+    ld l = sqrt_s(d * d - c.r * c.r);
     ld h = c.r * l / d, s = c.r * c.r / d;
-    v /= d; vec u = c.p + v * s; v = v.cw() * h;
+    vec u = c.p + (p - c.p).norm() * s, v = (p - c.p).cw().norm() * h;
     t1 = u + v; t2 = u - v;
 }
+
 // 外公切线
 inline void c2tan1(const cir &c1, const cir &c2, seg &t1, seg &t2) {
-    vec v = c1.p - c2.p;
-    ld dr = abs(c1.r - c2.r), d = v.len();
+    ld dr = abs(c1.r - c2.r), d = (c1.p - c2.p).len();
     ld l = sqrt_s(d * d - dr * dr);
     ld h1 = l * c1.r / d, s1 = dr * c1.r / d;
     ld h2 = l * c2.r / d, s2 = dr * c2.r / d;
-    v = (c1.r > c2.r ? -v : v) / d;
+    vec v = (c1.r > c2.r ? c2.p - c1.p : c1.p - c2.p).norm();
     vec u = v.cw(), p1 = c1.p + v * s1, p2 = c2.p + v * s2;
     t1 = seg(p1 + u * h1, p2 + u * h2);
     t2 = seg(p1 - u * h1, p2 - u * h2);
 }
+
 // 内公切线
 inline void c2tan2(const cir &c1, const cir &c2, seg &t1, seg &t2) {
-    vec v = c1.p - c2.p;
-    ld d = v.len();
+    ld d = (c1.p - c2.p).len();
     ld d1 = d * c1.r / (c1.r + c2.r), d2 = d * c2.r / (c1.r + c2.r);
     ld l1 = sqrt_s(d1 * d1 - c1.r * c1.r), l2 = sqrt_s(d2 * d2 - c2.r * c2.r);
     ld h1 = c1.r * l1 / d1, h2 = c2.r * l2 / d2;
     ld s1 = c1.r * c1.r / d1, s2 = c2.r * c2.r / d2;
-    v /= d; vec u = v.cw();
+    vec v = (c1.p - c2.p).norm(), u = v.cw();
     vec p1 = c1.p - v * s1, p2 = c2.p + v * s2;
     t1 = seg(p1 + u * h1, p2 - u * h2);
     t2 = seg(p1 - u * h1, p2 + u * h2);
 }
-#define ACM_END
 
 struct Edge {
     int v;
