@@ -1,53 +1,57 @@
-	.file	"a.c"
+	.file	"a.cpp"
 	.text
-	.globl	add
-	.type	add, @function
-add:
-.LFB0:
+	.p2align 4,,15
+	.globl	_Z1fii
+	.type	_Z1fii, @function
+_Z1fii:
+.LFB57:
 	.cfi_startproc
-	pushq	%rbp
-	.cfi_def_cfa_offset 16
-	.cfi_offset 6, -16
-	movq	%rsp, %rbp
-	.cfi_def_cfa_register 6
-	movl	%edi, -4(%rbp)
-	movl	%esi, -8(%rbp)
-	movl	-4(%rbp), %edx
-	movl	-8(%rbp), %eax
-	addl	%edx, %eax
-	popq	%rbp
-	.cfi_def_cfa 7, 8
+	leal	(%rdi,%rsi), %eax
 	ret
 	.cfi_endproc
-.LFE0:
-	.size	add, .-add
-	.section	.rodata
+.LFE57:
+	.size	_Z1fii, .-_Z1fii
+	.section	.rodata.str1.1,"aMS",@progbits,1
 .LC0:
-	.string	"%d\n"
-	.text
+	.string	"%d%d"
+.LC1:
+	.string	"%d + %d = %d\n"
+	.section	.text.startup,"ax",@progbits
+	.p2align 4,,15
 	.globl	main
 	.type	main, @function
 main:
-.LFB1:
+.LFB58:
 	.cfi_startproc
-	pushq	%rbp
-	.cfi_def_cfa_offset 16
-	.cfi_offset 6, -16
-	movq	%rsp, %rbp
-	.cfi_def_cfa_register 6
-	movl	$1, %esi
+	subq	$24, %rsp
+	.cfi_def_cfa_offset 32
+	leaq	.LC0(%rip), %rdi
+	movq	%fs:40, %rax
+	movq	%rax, 8(%rsp)
+	xorl	%eax, %eax
+	leaq	4(%rsp), %rdx
+	movq	%rsp, %rsi
+	call	scanf@PLT
+	movl	4(%rsp), %ecx
+	movl	(%rsp), %edx
+	leaq	.LC1(%rip), %rsi
 	movl	$1, %edi
-	call	add
-	movl	%eax, %esi
-	movl	$.LC0, %edi
-	movl	$0, %eax
-	call	printf
-	movl	$0, %eax
-	popq	%rbp
-	.cfi_def_cfa 7, 8
+	xorl	%eax, %eax
+	leal	(%rcx,%rdx), %r8d
+	call	__printf_chk@PLT
+	movq	8(%rsp), %rdi
+	xorq	%fs:40, %rdi
+	jne	.L6
+	xorl	%eax, %eax
+	addq	$24, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
 	ret
+.L6:
+	.cfi_restore_state
+	call	__stack_chk_fail@PLT
 	.cfi_endproc
-.LFE1:
+.LFE58:
 	.size	main, .-main
-	.ident	"GCC: (Ubuntu 5.4.0-6ubuntu1~16.04.4) 5.4.0 20160609"
+	.ident	"GCC: (Ubuntu 7.4.0-1ubuntu1~18.04.1) 7.4.0"
 	.section	.note.GNU-stack,"",@progbits

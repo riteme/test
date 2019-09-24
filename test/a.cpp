@@ -1,11 +1,13 @@
-#include <chrono>
-#include <iostream>
+#include <cstdio>
+#include <cstring>
 
-using namespace std;
-using namespace std::chrono;
+template <typename T>
+T show(T x) {
+    return x;
+}
 
 int main() {
-    cout << (double) std::chrono::high_resolution_clock::period::num
-             / std::chrono::high_resolution_clock::period::den << endl;
+    auto a = 1*1u;
+    show(static_cast<const int>(a));
     return 0;
 }
