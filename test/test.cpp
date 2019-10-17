@@ -1,17 +1,12 @@
-#include <iostream>
-#include <algorithm>
+#include <cstdio>
 
-using namespace std;
-
-static int n;
-static int a[1000000];
-static struct {
-    int v;
-} b[1000000];
-int c[1000000];
-static struct {
-    int v;
-} d[1000000];
 int main() {
+    int a = 1;
+    int b = 2;
+    int c, d;
+    scanf("%d%d", &c, &d);
+    a *= c;
+    b *= d;
+    printf("Hello, world!\n");
     return 0;
 }

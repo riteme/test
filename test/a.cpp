@@ -1,13 +1,11 @@
-#include <cstdio>
-#include <cstring>
+#include <string>
+#include <iostream>
+#include <algorithm>
 
-template <typename T>
-T show(T x) {
-    return x;
-}
+using namespace std;
 
 int main() {
-    auto a = 1*1u;
-    show(static_cast<const int>(a));
+    string a = "0123456789abc";
+    cout << a << endl;
     return 0;
 }
