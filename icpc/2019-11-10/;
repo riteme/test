@@ -1,0 +1,41 @@
+#include <cstdio>
+#include <cstring>
+
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+#define NMAX 100000
+
+typedef unsigned long long u64;
+
+struct Edge {
+    int v;
+    u64 w;
+};
+
+static int n;
+static vector<Edge> G[NMAX + 10];
+static u64 f[NMAX + 10][2], g[NMAX + 10][2]
+
+void dfs(int x, int k, int fa) {
+}
+
+int main() {
+    scanf("%d", &n);
+    for (int i = 1; i < n; i++) {
+        int u, v;
+        u64 w;
+        scanf("%d%d%llu", &u, &v, &w);
+        G[u].push_back({v, w});
+        G[v].push_back({u, w});
+    }
+
+    u64 ans = 0;
+    for (int k = 0; k < 32; k++) {
+        dfs(1, k, 0);
+    }
+    printf("%llu\n", ans);
+    return 0;
+}
