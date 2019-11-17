@@ -1,24 +1,16 @@
-import java.io.*;
-import java.util.*;
+import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
-        try {
-            BufferedReader bi = new BufferedReader(new InputStreamReader(System.in));
-            HashSet hs = new HashSet();
-            int n = Integer.parseInt(bi.readLine());
-            String line = bi.readLine();
-            for (String numStr: line.split("\\s")) {
-                int v = Integer.parseInt(numStr);
-                hs.add(v);
-            }
-            boolean ok = true;
-            for (int i = 1; i <= n && ok; i++) {
-                if (!hs.contains(i)) ok = false;
-            }
-            if (ok) System.out.println("Yes");
-            else System.out.println("No");
-        } catch(Exception e) {
+	public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+        String string = input.nextLine();
+        String[] strings = string.split(" ");
+        for (String s : strings) {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(Character.toUpperCase(s.charAt(0)));
+            for (int i = 1; i < s.length(); i++)
+                stringBuilder.append(Character.toLowerCase(s.charAt(i)));
+            System.out.print(stringBuilder.toString() + " ");
         }
     }
 }

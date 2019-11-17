@@ -1,0 +1,8 @@
+*.exe
+solver-qsort.cpp
+log.txt
+judger
+solver
+maker
+data/*
+!data/0.in
