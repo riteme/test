@@ -1,7 +1,9 @@
-long *take(long x, long y, long a, long b, long c, long d, long e) {
-    //long *p = &x;
-    //*p += y;
-    x += y;
-    long v;
-    return &v;
+#include <stdio.h>
+
+int main() {
+    long a, b;
+    scanf("%ld%ld", &a, &b);
+    if ((a + b) > 2147483647 || (a + b) < -2147483648) puts("YES");
+    else puts("NO");
+    return 0;
 }
