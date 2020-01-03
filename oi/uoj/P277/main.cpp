@@ -1,10 +1,3 @@
-//#define NDEBUG
-
-#ifdef ONLINE_JUDGE
-#define NDEBUG
-#endif
-
-#include <cassert>
 #include <cmath>
 #include <cstdio>
 #include <cstring>
@@ -12,330 +5,329 @@
 #include <queue>
 #include <vector>
 #include <algorithm>
+#include <unordered_map>
 
 using namespace std;
 
-#include <chrono>
-inline double tick() {
-    using namespace std::chrono;
-    typedef high_resolution_clock clock;
-    static clock::time_point tm;
-    static bool cur;
-    if (cur) {
-        cur = 0;
-        return duration<double>(clock::now() - tm).count();
-    } else tm = clock::now(), cur = 1;
-    return 0;
+#define EPS 1e-8
+#define INF 1e99
+
+template <typename T>
+inline bool eq(T x, decltype(x) y) {
+    return abs(x - y) < EPS;
 }
 
 #define NMAX 500
-#define MMAX 1000000
-#define INF 1e99
+#define MMAX 5000000
 
-typedef double ld;
-#define EPS 1e-8
-inline bool eq(ld x, ld y) { return x - EPS < y && y < x + EPS; }
-inline ld sqrt_s(ld x) { return sqrt(max(0.0, x)); }
 struct vec {
     vec() : x(0), y(0) {}
-    vec(ld _x, ld _y) : x(_x), y(_y) {}
-    ld x, y;
-    ld len() const { return hypot(x, y); }
-    ld len2() const { return x * x + y * y; }
-    vec norm() const { ld l = len(); return vec(x / l, y / l); }
-    vec cw() const { return vec(y, -x); }
-    vec cw(ld t) const { ld c = cos(t), s = sin(t); return vec(-c * x + s * y, -s * x - c * y); }
-    vec ccw() const { return vec(-y, x); }
-    vec ccw(ld t) const { ld c = cos(t), s = sin(t); return vec(c * x - s * y, s * x + c * y); }
-    vec operator+(const vec &z) const { return vec(x + z.x, y + z.y); }
-    vec operator-(const vec &z) const { return vec(x - z.x, y - z.y); }
-    vec operator-() const { return vec(-x, -y); }
-    friend vec operator*(ld k, const vec &z);
-    vec operator*(ld k) const { return vec(x * k, y * k); }
-    vec operator/(ld k) const { return vec(x / k, y / k); }
-    vec &operator+=(const vec &z) { x += z.x; y += z.y; return *this; }
-    vec &operator-=(const vec &z) { x -= z.x; y -= z.y; return *this; }
-    vec &operator*=(ld k) { x *= k; y *= k; return *this; }
-    vec &operator/=(ld k) { x /= k; x /= k; return *this; }
+    vec(double _x, double _y) : x(_x), y(_y) {}
+
+    double x, y;
+
+    double len() const {
+        return hypot(x, y);
+    }
+
+    double len2() const {
+        return x * x + y * y;
+    }
+
+    int region() const {
+        if (x >= 0 && y >= 0) return 1;
+        if (x <= 0 && y >= 0) return 2;
+        if (x <= 0 && y <= 0) return 3;
+        return 4;
+    }
+
+    vec operator+(const vec &z) const {
+        return {x + z.x, y + z.y};
+    }
+
+    vec operator-(const vec &z) const {
+        return {x - z.x, y - z.y};
+    }
+
+    vec operator-() const {
+        return {-x, -y};
+    }
+
+    vec operator*(double k) const {
+        return {x * k, y * k};
+    }
+
+    vec &operator/=(double k) {
+        x /= k;
+        y /= k;
+        return *this;
+    }
+
+    // unreliable: intended for unordered_map
     bool operator==(const vec &z) const {
-        return x - EPS < z.x && z.x < x + EPS &&
-               y - EPS < z.y && z.y < y + EPS;
+        return x == z.x && y == z.y;
     }
-    bool operator!=(const vec &z) const {
-        return x - EPS >= z.x || z.x >= x + EPS ||
-               y - EPS >= z.y || z.y >= y + EPS;
-}};
-inline vec operator*(ld k, const vec &z) { return vec(z.x * k, z.y * k); }
-inline ld dot(const vec &u, const vec &v) { return u.x * v.x + u.y * v.y; }
-inline ld cross(const vec &u, const vec &v) { return u.x * v.y - u.y * v.x; }
-
-#define ACM_BEGIN
-struct seg {
-#define ACM_END
-    seg() {}
-    seg(const vec &_u, const vec &_v) : u(_u), v(_v) {}
-
-#define ACM_BEGIN
-    vec u, v;
-    ld len() const { return (u - v).len(); }
-#define ACM_END
-
-    ld len2() const {
-        return (u - v).len2();
-    }
-
-    bool operator==(const seg &z) const {
-        return (u == z.u && v == z.v) ||
-               (u == z.v && v == z.u);
-    }
-
-    bool operator!=(const seg &z) const {
-        return (u != z.u || v != z.v) &&
-               (u != z.v || v != z.u);
-    }
-#define ACM_BEGIN
 };
-#define ACM_END
 
-inline ld dist(const vec &u, const seg &s) {
-    vec dv = s.v - s.u;
-    ld c = dot(u - s.u, dv);
-    if (c > -EPS && dot(u - s.v, dv) < EPS) {
-        ld d = c / dv.len();
-        return sqrt_s((u - s.u).len2() - d * d);
-    } else return min((u - s.u).len(), (u - s.v).len());
+double dot(const vec &u, const vec &v) {
+    return u.x * v.x + u.y * v.y;
 }
 
-#define ACM_BEGIN
+double cross(const vec &u, const vec &v) {
+    return u.x * v.y - u.y * v.x;
+}
+
 struct cir {
-#define ACM_END
-    cir() {}
-    cir(const vec &_p, ld _r) : p(_p), r(_r) {}
-
-#define ACM_BEGIN
-    vec p; ld r;
-#define ACM_END
-
-    ld arcl(vec u, vec v) {
-        u -= p; v -= p;
-        assert(u.len() < r + EPS);
-        assert(v.len() < r + EPS);
-        ld c = dot(u, v) / u.len() / v.len();
-        if (c > 1) c = 1;
-        if (c < -1) c = -1;
-        ld t = acos(c);
-        if (cross(u, v) <= -EPS) t = 2 * M_PI - t;
-        return t * r;
-    }
-
-    bool operator==(const cir &z) const {
-        return p == z.p && r - EPS < z.r && z.r < r + EPS;
-    }
-
-    bool operator!=(const cir &z) const {
-        return p != z.p || r - EPS >= z.r || z.r >= r + EPS;
-    }
-#define ACM_BEGIN
+    vec c;
+    double r;
 };
-#define ACM_END
 
-inline bool pass(const seg &s, const cir &c) {
-    return dist(c.p, s) <= c.r - EPS;
+struct line {
+    vec p, u;
+};
+
+struct seg {
+    vec u, v;
+
+    double len() const {
+        return (u - v).len();
+    }
+};
+
+enum TangentStatus {
+    TPOINT = 1,
+    TNORMAL = 2,
+    TINNERT = 3,
+    TCROSS = 4,
+    TOUTERT = 5,
+    TCONTAIN = 6
+};
+
+struct TangentResult {
+    seg s[4];
+    TangentStatus stat;
+    bool swapped;
+};
+
+TangentResult tangent(cir a, cir b) {
+    // assert: a.c != b.c
+    bool swapped = false;
+    if (a.r < b.r) {
+        swap(a, b);
+        swapped = true;
+    }
+
+    vec p = b.c - a.c;
+    double R = a.r, r = b.r, d = p.len();
+    TangentStatus stat;
+    if (eq(r, 0))            stat = TPOINT;
+    else if (R + r <= d - EPS) stat = TNORMAL;
+    else if (eq(R + r, d))     stat = TINNERT;
+    else if (d - EPS >= R - r) stat = TCROSS;
+    else if (eq(R - r, d))     stat = TOUTERT;
+    else                       stat = TCONTAIN;
+
+    // branch out if optimization is needed.
+    double
+    k = r / R,
+    t1 = (R - r) / d, t2 = (R + r) / d,
+    L1 = R * t1, H1 = R * sqrt(max(0.0, 1 - t1 * t1)),  // max: prevent nan
+    L2 = R * t2, H2 = R * sqrt(max(0.0, 1 - t2 * t2)),
+    l1 = L1 * k, h1 = H1 * k,
+    l2 = L2 * k, h2 = H2 * k;
+
+    p /= d;
+    vec o = {p.y, -p.x};
+    vec P1 = a.c + p * L1, P2 = a.c + p * L2;
+    vec O1 = o * H1, O2 = o * H2;
+    vec p1 = b.c + p * l1, p2 = b.c - p * l2;
+    vec o1 = o * h1, o2 = o * h2;
+    return {{
+        {P1 + O1, p1 + o1},
+        {P1 - O1, p1 - o1},
+        {P2 + O2, p2 - o2},
+        {P2 - O2, p2 + o2}
+    }, stat, swapped};
 }
 
-#define ACM_BEGIN
-// 点与圆的切点
-inline void pctan(const vec &p, const cir &c, vec &t1, vec &t2) {
-    vec v = p - c.p;
-    ld d = v.len(), l = sqrt_s(d * d - c.r * c.r);
-    ld h = c.r * l / d, s = c.r * c.r / d;
-    v /= d; vec u = c.p + v * s; v = v.cw() * h;
-    t1 = u + v; t2 = u - v;
+double pldist(const vec &v, const line &l) {
+    return abs(cross(v - l.p, l.u) / l.u.len());
 }
-// 外公切线
-inline void c2tan1(const cir &c1, const cir &c2, seg &t1, seg &t2) {
-    vec v = c1.p - c2.p;
-    ld dr = abs(c1.r - c2.r), d = v.len();
-    ld l = sqrt_s(d * d - dr * dr);
-    ld h1 = l * c1.r / d, s1 = dr * c1.r / d;
-    ld h2 = l * c2.r / d, s2 = dr * c2.r / d;
-    v = (c1.r > c2.r ? -v : v) / d;
-    vec u = v.cw(), p1 = c1.p + v * s1, p2 = c2.p + v * s2;
-    t1 = seg(p1 + u * h1, p2 + u * h2);
-    t2 = seg(p1 - u * h1, p2 - u * h2);
+
+double psdist(const vec &v, const seg &s) {
+    vec p = s.v - s.u;
+    if (dot(v - s.u, p) > -EPS &&
+        dot(v - s.v, -p) > -EPS)
+        return pldist(v, {s.u, p});
+    return INF;  // optimization for this problem
+    //return min((v - s.u).len(), (v - s.v).len());
 }
-// 内公切线
-inline void c2tan2(const cir &c1, const cir &c2, seg &t1, seg &t2) {
-    vec v = c1.p - c2.p;
-    ld d = v.len();
-    ld d1 = d * c1.r / (c1.r + c2.r), d2 = d * c2.r / (c1.r + c2.r);
-    ld l1 = sqrt_s(d1 * d1 - c1.r * c1.r), l2 = sqrt_s(d2 * d2 - c2.r * c2.r);
-    ld h1 = c1.r * l1 / d1, h2 = c2.r * l2 / d2;
-    ld s1 = c1.r * c1.r / d1, s2 = c2.r * c2.r / d2;
-    v /= d; vec u = v.cw();
-    vec p1 = c1.p - v * s1, p2 = c2.p + v * s2;
-    t1 = seg(p1 + u * h1, p2 - u * h2);
-    t2 = seg(p1 - u * h1, p2 + u * h2);
+
+double p2arc(const cir &c, const vec &u, const vec &v) {
+    // avoid float inaccuracy
+    if (eq(u.x, v.x) && eq(u.y, v.y))
+        return 0;
+    double d = dot(u, v);
+    double cr = cross(u, v);
+    double t = acos(d / c.r / c.r);
+    return c.r * (cr > 0 ? t : 2 * M_PI - t);
 }
-#define ACM_END
+
+bool no_intersect(const seg &s, const cir &c) {
+    vec p = s.v - s.u;
+    return
+        dot(c.c - s.u, p) <= EPS ||
+        dot(c.c - s.v, -p) <= EPS ||
+        abs(cross(c.c - s.u, p)) > (c.r - EPS) * p.len();
+}
 
 struct Edge {
     int v;
-    ld w;
+    double w;
 };
 
+static vec sp, tp;
 static int n, m;
 static cir C[NMAX + 10];
-static vector<int> cyc[NMAX + 10];
-static vec P[MMAX + 10];
+static vector<pair<vec, int>> P[NMAX + 10];
 static vector<Edge> G[MMAX + 10];
 
-inline bool valid(const seg &s, int j = 0, int k = 0) {
-    if (s.u == s.v) return false;
-    for (int i = 1; i <= n; i++)
-        if (i != j && i != k && pass(s, C[i])) return false;
-    return true;
-}
-
-inline void link(int u, const vec &v) {
-    ld w = (P[u] - v).len();
-    G[u].push_back({m + 1, w});
-    G[m + 1].push_back({u, w});
-    P[++m] = v;
-#ifndef NDEBUG
-    fprintf(stderr, "a[%d](%.3lf, %.3lf) ⇔ [%d](%.3lf, %.3lf) [%.2lf]\n",
-            u, P[u].x, P[u].y, m, v.x, v.y, w);
-#endif
-}
-
-inline void link(const seg &s, int i, int j) {
-    if (!valid(s, i, j)) return;
-    ld w = s.len();
-    cyc[i].push_back(m + 1);
-    cyc[j].push_back(m + 2);
-    G[m + 1].push_back({m + 2, w});
-    G[m + 2].push_back({m + 1, w});
-    P[++m] = s.u;
-    P[++m] = s.v;
-#ifndef NDEBUG
-    fprintf(stderr, "b[%d](%.3lf, %.3lf) ⇔ [%d](%.3lf, %.3lf) [%.2lf]\n",
-            m - 1, s.u.x, s.u.y, m, s.v.x, s.v.y, w);
-#endif
-}
-
-inline void link(int u, int v, ld w) {
+void link(int u, int v, double w) {
     G[u].push_back({v, w});
     G[v].push_back({u, w});
-#ifndef NDEBUG
-    fprintf(stderr, "c[%d](%.3lf, %.3lf) ⇔ [%d](%.3lf, %.3lf) [%.2lf]\n",
-            u, P[u].x, P[u].y, v, P[v].x, P[v].y, w);
-#endif
 }
 
-inline int idx(const vec &A) {
-    if (A.x >= 0 && A.y >= 0)
-        return 1;
-    if (A.x >= 0 && A.y <= 0)
-        return 2;
-    if (A.x <= 0 && A.y <= 0)
-        return 3;
-    return 4;
-}
+void connect(const cir &c1, const cir &c2, int i, int j) {
+    auto r = tangent(c1, c2);
+    if (r.swapped)
+        swap(i, j);
 
-inline void setup() {
-    m = 2;
-    if (valid({P[1], P[2]})) link(1, 2, (P[1] - P[2]).len());
-    for (int i = 1; i <= 2; i++) for (int j = 1; j <= n; j++) if (C[j].r > EPS) {
-        if (eq((P[i] - C[j].p).len(), C[j].r)) cyc[j].push_back(i);
-        else {
-            vec p1, p2;
-            pctan(P[i], C[j], p1, p2);
-            if (valid({P[i], p1}, j)) {
-                link(i, p1);
-                cyc[j].push_back(m);
-            }
-            if (valid({P[i], p2}, j)) {
-                link(i, p2);
-                cyc[j].push_back(m);
-            }
-        }
+    int c;
+    switch (r.stat) {
+        case TPOINT: c = 2; break;
+        case TNORMAL: c = 4; break;
+        case TINNERT: c = 3; break;
+        default: c = 0;
     }
 
-    for (int i = 1; i <= n; i++) if (C[i].r > EPS)
-    for (int j = i + 1; j <= n; j++) if (C[j].r > EPS) {
-        seg s1, s2;
-        c2tan1(C[i], C[j], s1, s2);
-        link(s1, i, j);
-        link(s2, i, j);
-        if (eq((C[i].p - C[j].p).len(), C[i].r + C[j].r)) {
-            vec p = C[j].p + (C[i].p - C[j].p) * C[j].r / (C[i].r + C[j].r);
-            P[++m] = p;
-            cyc[i].push_back(m);
-            cyc[j].push_back(m);
-        } else if ((C[i].p - C[j].p).len() > C[i].r + C[j].r) {
-            c2tan2(C[i], C[j], s1, s2);
-            link(s1, i, j);
-            link(s2, i, j);
-        }
-    }
+    for (int k = 0; k < c; k++) {
+        seg &s = r.s[k];
+        bool ok = true;
+        for (int p = 1; ok && p <= n; p++) if (p != i && p != j)
+            ok &= no_intersect(s, C[p]);
+        if (!ok) continue;
 
-    for (int i = 1; i <= n; i++) {
-        //fprintf(stderr, "i = %d\n", i);
-        sort(cyc[i].begin(), cyc[i].end(),
-             [i](int x, int y) {
-                 vec A = P[x] - C[i].p, B = P[y] - C[i].p;
-                 if (idx(A) == idx(B))
-                     return cross(A, B) >= EPS;
-                 return idx(A) > idx(B);
-             });
-        for (int j = 0; j < cyc[i].size(); j++) {
-            int u = cyc[i][j], v = cyc[i][(j + 1) % cyc[i].size()];
-            link(u, v, C[i].arcl(P[u], P[v]));
-        }
+        int u = i > 0 ? ++m : -i;
+        int v = j > 0 ? ++m : -j;
+        if (i > 0) P[i].push_back({s.u - C[i].c, u});
+        if (j > 0) P[j].push_back({s.v - C[j].c, v});
+
+        //fprintf(stderr, "[%d](%.4lf, %.4lf) - [%d](%.4lf, %.4lf): %.4lf\n",
+        //    u, s.u.x, s.u.y,
+        //    v, s.v.x, s.v.y, s.len());
+        link(u, v, s.len());
     }
 }
 
-static ld D[MMAX + 10];
+double shortest(int s, int t) {
+    static double dist[MMAX + 10];
+    for (int i = 1; i <= m; i++)
+        dist[i] = INF;
+    dist[s] = 0;
 
-inline void shortest() {
     struct State {
         int u;
-        ld s;
+        double t;
+
         bool operator<(const State &z) const {
-            return s > z.s;
+            return t > z.t;
         }
     };
-    queue<State> q;
-    for (int i = 2; i <= m; i++) D[i] = INF;
-    q.push({1, 0});
+
+    priority_queue<State> q;
+    q.push({s, 0});
     while (!q.empty()) {
-        auto s = q.front();
+        auto _ = q.top();
         q.pop();
-        if (s.s > D[s.u]) continue;
-        for (auto &e : G[s.u]) {
-            if (D[e.v] > s.s + e.w) {
-                D[e.v] = s.s + e.w;
-                q.push({e.v, D[e.v]});
+        int u = _.u;
+        if (_.t > dist[u])
+            continue;
+
+        for (auto &e : G[u]) {
+            int v = e.v;
+            if (dist[v] > dist[u] + e.w) {
+                dist[v] = dist[u] + e.w;
+                q.push({v, dist[v]});
             }
         }
     }
+
+    return dist[t];
 }
 
 int main() {
-    scanf("%lf%lf%lf%lf%d", &P[1].x, &P[1].y, &P[2].x, &P[2].y, &n);
+    scanf("%lf%lf%lf%lf%d", &sp.x, &sp.y, &tp.x, &tp.y, &n);
+    int s = ++m, t = ++m;
     for (int i = 1; i <= n; i++)
-        scanf("%lf%lf%lf", &C[i].p.x, &C[i].p.y, &C[i].r);
+        scanf("%lf%lf%lf", &C[i].c.x, &C[i].c.y, &C[i].r);
 
-    tick();
-    setup();
-    auto t = tick();
-    fprintf(stderr, "time = %.2lf\n", t);
-    shortest();
-    printf("%.1lf\n", D[2]);
+    bool ok = true;
+    for (int i = 1; ok && i <= n; i++)
+        ok &= no_intersect({sp, tp}, C[i]);
+    if (ok)
+        link(s, t, (sp - tp).len());
+    for (int i = 1; i <= n; i++) {
+        connect({sp, 0}, C[i], -s, i);
+        connect({tp, 0}, C[i], -t, i);
+    }
+    for (int i = 1; i <= n; i++)
+    for (int j = i + 1; j <= n; j++)
+        connect(C[i], C[j], i, j);
 
-#ifndef NDEBUG
-    for (int i = 3; i <= m; i++)
-        fprintf(stderr, "P_{%d}=(%.6lf,%.6lf)\n", i, P[i].x, P[i].y);
-#endif
+    for (int i = 1; i <= n; i++) {
+        sort(P[i].begin(), P[i].end(),
+        [](const pair<vec, int> &_u, const pair<vec, int> &_v) {
+            const vec &u = _u.first;
+            const vec &v = _v.first;
+            int ui = u.region();
+            int vi = v.region();
+            return ui < vi ||
+                (ui == vi && cross(u, v) > 0);
+        });
+
+        double sum = 0;
+        for (int j = 0; j < P[i].size(); j++) {
+            int k = j + 1 < P[i].size() ? j + 1 : 0;
+            pair<vec, int> &u = P[i][j], &v = P[i][k];
+            double w = p2arc(C[i], u.first, v.first);
+            sum += w;
+
+            //fprintf(stderr, "[%d](%.4lf, %.4lf) - [%d](%.4lf, %.4lf): %.4lf\n",
+            //    u.second, u.first.x, u.first.y,
+            //    v.second, v.first.x, v.first.y, w);
+            link(u.second, v.second, w);
+        }
+        //fprintf(stderr, "sum = %.4lf\n", sum);
+    }
+
+    printf("%.1lf\n", shortest(s, t));
     return 0;
 }
+
+/*
+int main() {
+    cir a, b;
+    while (
+        scanf("%lf%lf%lf%lf%lf%lf",
+        &a.c.x, &a.c.y, &a.r, &b.c.x, &b.c.y, &b.r) != EOF
+    ) {
+        auto ret = tangent(a, b);
+        for (int i = 0; i < 4; i++) {
+            auto &u = ret.s[i].u, &v = ret.s[i].v;
+            printf("(%.4lf, %.4lf) - (%.4lf, %.4lf) [%d]\n",
+                    u.x, u.y, v.x, v.y, ret.stat);
+        }
+    }
+    return 0;
+}
+*/
