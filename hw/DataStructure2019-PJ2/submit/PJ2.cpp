@@ -360,7 +360,7 @@ struct Solver {
                 G1.link(u, e.v, e.w, e.id);
             // else DEBUG("%d - %d (%d) removed.", u, e.v, e.w);
         };
-        TarjanLCA travesal(n, check);
+        TarjanLCA<decltype(check)> travesal(n, check);
 
         for (int i = 1; i <= n; i++)
             len[i] = new i64[TMAX];

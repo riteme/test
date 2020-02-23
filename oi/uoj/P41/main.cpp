@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <cstring>
-#include <climits>
 
+#include <queue>
 #include <algorithm>
 
 using namespace std;
@@ -9,77 +9,48 @@ using namespace std;
 #define NMAX 200
 #define MMAX 400
 
-struct Point {
-    int x, y;
-};
-
-static int n, m, T;
-static int mat[NMAX + 10][MMAX + 10];
-static int tail[NMAX + 10];
-static Point seq[NMAX + 10][NMAX + 10];
-static int ans[NMAX + 10], right[NMAX + 10];
-
-Point last(int x) {
-    while (true) {
-        Point &p = seq[x][tail[x]];
-
-        if (ans[p.x] != x && p.y >= right[p.x])
-            tail[x]--;
-        else
-            break;
-    }
-
-    return seq[x][tail[x]];
-}
-
-void dfs(int x) {
-    Point p = last(x);
-    int y = ans[p.x];
-    ans[p.x] = x;
-    right[p.x] = p.y;
-    if (y)
-        dfs(y);
-}
-
-void initialize() {
-    scanf("%d%d", &n, &m);
-
-    for (int i = 1; i <= n; i++) {
-        right[i] = m + 1;
-        for (int j = 1; j <= m; j++) {
-            scanf("%d", &mat[i][j]);
-        }
-    }
-
-    memset(tail, 0, sizeof(tail));
-    for (int j = 1; j <= m; j++) {
-        for (int i = 1; i <= n; i++) {
-            if (!mat[i][j])
-                continue;
-
-            int x = mat[i][j];
-            seq[x][++tail[x]] = {i, j};
-        }
-    }
-}
+static int n, m;
+static int c[NMAX + 10];
+static int a[NMAX + 10][MMAX + 10];
+static int t[NMAX + 10][NMAX + 10];
+static int mc[2 * NMAX + 10];
 
 int main() {
+    int T;
     scanf("%d", &T);
-
     while (T--) {
-        initialize();
-
-        memset(ans, 0, sizeof(ans));
-        for (int i = 1; i <= n; i++) {
-            dfs(i);
+        scanf("%d%d", &n, &m);
+        for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++) {
+            scanf("%d", a[i] + j);
+            t[i][a[i][j]] = j;
         }
 
+        queue<int> q;
+        memset(mc, 0, sizeof(mc));
         for (int i = 1; i <= n; i++) {
-            printf("%d ", ans[i]);
+            c[i] = 1;
+            q.push(i);
         }
-        printf("\n");
+        while (!q.empty()) {
+            int u = q.front();
+            q.pop();
+            for (int &i = c[u]; i <= m; i++) if (a[u][i]) {
+                int v = n + a[u][i];
+                if (!mc[v] || t[mc[v]][a[u][i]] < t[u][a[u][i]]) {
+                    q.push(mc[v]);
+                    mc[mc[v]] = 0;
+                    mc[v] = u;
+                    mc[u] = v;
+                    break;
+                }
+            }
+        }
+
+        for (int i = 1; i <= n; i++)
+            printf("%d ", mc[i] - n);
+        puts("");
     }
 
     return 0;
 }
-

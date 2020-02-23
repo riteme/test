@@ -1,8 +1,8 @@
 # Fdb version 3
-["pdflatex"] 1553309569 "/home/riteme/Code/test/test/test.tex" "/home/riteme/Code/test/test/test.pdf" "test" 1553309570
+["pdflatex"] 1578922610 "/home/riteme/Code/test/test/test.tex" "/home/riteme/Code/test/test/test.pdf" "test" 1578922610
   "/etc/texmf/web2c/texmf.cnf" 1539161864 475 c0e671620eb5563b2130f56340a5fde8 ""
-  "/home/riteme/Code/test/test/test.aux" 1553309570 8 a94a2480d3289e625eea47cd1b285758 ""
-  "/home/riteme/Code/test/test/test.tex" 1553309569 275 a25b6eac8859134426e1a088ab346977 ""
+  "/home/riteme/Code/test/test/test.aux" 1578922610 8 a94a2480d3289e625eea47cd1b285758 ""
+  "/home/riteme/Code/test/test/test.tex" 1578922610 278 34754675795d23689d067b574330159f ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1511824771 3332 103109f5612ad95229751940c61aada0 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmmi12.tfm" 1480098701 1524 4414a8315f39513458b80dfc63bff03a ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmmi6.tfm" 1480098701 1512 f21f83efb36853c0b70002322c1ab3ad ""
@@ -29,11 +29,11 @@
   "/usr/share/texmf/web2c/texmf.cnf" 1520210507 32485 c64754543d8ac501bea6e75e209ea521 ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1553307028 2700761 ac0584cc9514ab21918550a6948c4ee2 ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1553307035 4127037 452b051812b35eb09391fffcf0e1a8fa ""
-  "test.aux" 1553309570 8 a94a2480d3289e625eea47cd1b285758 ""
-  "test.tex" 1553309569 275 a25b6eac8859134426e1a088ab346977 ""
+  "test.aux" 1578922610 8 a94a2480d3289e625eea47cd1b285758 ""
+  "test.tex" 1578922610 278 34754675795d23689d067b574330159f ""
   (generated)
   "/home/riteme/Code/test/test/test.pdf"
-  "test.pdf"
-  "test.aux"
   "/home/riteme/Code/test/test/test.log"
+  "test.aux"
+  "test.pdf"
   "test.log"
