@@ -1,0 +1,44 @@
+
+ Performance counter stats for './vec.out 10000000' (100 runs):
+
+     4,389,092,027      cycles:u                                                      ( +-  0.18% )  (31.40%)
+     6,643,209,941      l1d_pend_miss.pending:u                                       ( +-  0.28% )  (26.33%)
+     1,993,611,545      l1d_pend_miss.pending_cycles:u                                     ( +-  0.27% )  (26.47%)
+        45,100,760      l2_rqsts.all_pf:u                                             ( +-  0.51% )  (26.59%)
+        20,208,200      l2_lines_out.useless_hwpf:u                                     ( +-  0.41% )  (26.68%)
+        40,418,674      l2_rqsts.pf_miss:u                                            ( +-  0.73% )  (21.30%)
+       121,188,909      l2_rqsts.references:u                                         ( +-  0.60% )  (21.22%)
+       676,587,751      mem_inst_retired.all_loads:u                                     ( +-  0.08% )  (21.16%)
+       644,877,897      mem_load_retired.l1_hit:u                                     ( +-  0.09% )  (21.09%)
+        22,495,164      mem_load_retired.l1_miss:u                                     ( +-  0.35% )  (21.03%)
+         1,709,954      mem_load_retired.l2_hit:u                                     ( +-  1.50% )  (20.98%)
+        19,811,813      mem_load_retired.l2_miss:u                                     ( +-  0.48% )  (20.93%)
+         3,199,759      mem_load_retired.l3_hit:u                                     ( +-  1.59% )  (20.90%)
+        15,979,404      mem_load_retired.l3_miss:u                                     ( +-  0.56% )  (20.89%)
+     3,604,783,545      inst_retired.any:u                                            ( +-  0.07% )  (26.11%)
+        74,877,698      l1d.replacement:u                                             ( +-  0.55% )  (26.11%)
+     1,959,947,488 ns   duration_time:u                                               ( +-  0.09% )
+        91,693,568      l2_lines_in.all:u                                             ( +-  0.52% )  (26.10%)
+     1,959,947,488 ns   duration_time:u                                               ( +-  0.09% )
+       150,346,209      offcore_requests.all_requests:u                                     ( +-  0.88% )  (26.10%)
+     1,959,947,488 ns   duration_time:u                                               ( +-  0.09% )
+        86,056,445      longest_lat_cache.miss:u                                      ( +-  0.48% )  (26.10%)
+     1,959,947,488 ns   duration_time:u                                               ( +-  0.09% )
+
+           1.95995 +- 0.00170 seconds time elapsed  ( +-  0.09% )
+
+ Performance counter stats for './vec.out 10000000' (10 runs):
+
+     2,120,847,511      cycle_activity.cycles_l1d_miss:u                                     ( +-  0.47% )  (18.11%)
+     2,025,548,061      cycle_activity.cycles_l2_miss:u                                     ( +-  0.34% )  (27.27%)
+     3,525,958,313      cycle_activity.cycles_mem_any:u                                     ( +-  0.13% )  (36.42%)
+     1,705,670,129      cycle_activity.stalls_l1d_miss:u                                     ( +-  0.31% )  (36.56%)
+     1,630,432,413      cycle_activity.stalls_l2_miss:u                                     ( +-  0.44% )  (36.61%)
+     1,775,133,817      cycle_activity.stalls_mem_any:u                                     ( +-  0.68% )  (36.59%)
+     2,359,621,712      cycle_activity.stalls_total:u                                     ( +-  0.77% )  (36.52%)
+                 0      mem_trans_retired.load_latency_gt_4:u                                     ( +-100.00% )  (36.40%)
+                 0      mem_trans_retired.load_latency_gt_8:u                                     (9.02%)
+                 0      mem_trans_retired.load_latency_gt_16:u                                     (9.01%)
+                 0      mem_trans_retired.load_latency_gt_32:u                                     (9.01%)
+
+           1.93802 +- 0.00361 seconds time elapsed  ( +-  0.19% )

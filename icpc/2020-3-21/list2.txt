@@ -1,0 +1,68 @@
+
+ Performance counter stats for './list2.out 10000000' (10 runs):
+
+     5,881,960,356      cycles:u                                                      ( +-  0.41% )  (31.42%)
+     6,804,171,509      l1d_pend_miss.pending:u                                       ( +-  0.60% )  (26.28%)
+     3,422,564,070      l1d_pend_miss.pending_cycles:u                                     ( +-  0.57% )  (26.37%)
+        68,525,561      l2_rqsts.all_pf:u                                             ( +-  1.13% )  (26.46%)
+        32,597,953      l2_lines_out.useless_hwpf:u                                     ( +-  0.72% )  (26.53%)
+        61,395,229      l2_rqsts.pf_miss:u                                            ( +-  1.16% )  (21.18%)
+       146,965,734      l2_rqsts.references:u                                         ( +-  1.51% )  (21.12%)
+       698,897,902      mem_inst_retired.all_loads:u                                     ( +-  0.29% )  (21.07%)
+       665,739,169      mem_load_retired.l1_hit:u                                     ( +-  0.34% )  (21.03%)
+        22,648,851      mem_load_retired.l1_miss:u                                     ( +-  0.48% )  (21.03%)
+         1,926,837      mem_load_retired.l2_hit:u                                     ( +-  4.75% )  (21.03%)
+        20,781,010      mem_load_retired.l2_miss:u                                     ( +-  0.58% )  (21.04%)
+         2,507,098      mem_load_retired.l3_hit:u                                     ( +-  4.01% )  (21.04%)
+        18,473,331      mem_load_retired.l3_miss:u                                     ( +-  1.26% )  (21.04%)
+     3,675,422,679      inst_retired.any:u                                            ( +-  0.33% )  (26.28%)
+        78,331,564      l1d.replacement:u                                             ( +-  1.48% )  (26.26%)
+     2,294,607,671 ns   duration_time:u                                               ( +-  0.21% )
+       110,295,459      l2_lines_in.all:u                                             ( +-  1.65% )  (26.22%)
+     2,294,607,671 ns   duration_time:u                                               ( +-  0.21% )
+       193,114,318      offcore_requests.all_requests:u                                     ( +-  3.82% )  (26.18%)
+     2,294,607,671 ns   duration_time:u                                               ( +-  0.21% )
+       118,183,676      longest_lat_cache.miss:u                                      ( +-  1.66% )  (26.15%)
+     2,294,607,671 ns   duration_time:u                                               ( +-  0.21% )
+
+           2.29461 +- 0.00491 seconds time elapsed  ( +-  0.21% )
+
+
+ Performance counter stats for './list2.out 10000000' (10 runs):
+
+     3,508,477,851      cycle_activity.cycles_l1d_miss:u                                     ( +-  0.59% )  (18.12%)
+     3,374,426,560      cycle_activity.cycles_l2_miss:u                                     ( +-  0.54% )  (27.26%)
+     4,806,178,075      cycle_activity.cycles_mem_any:u                                     ( +-  0.32% )  (36.40%)
+     3,085,735,268      cycle_activity.stalls_l1d_miss:u                                     ( +-  0.50% )  (36.50%)
+     2,986,415,824      cycle_activity.stalls_l2_miss:u                                     ( +-  0.38% )  (36.53%)
+     3,068,248,508      cycle_activity.stalls_mem_any:u                                     ( +-  0.30% )  (36.51%)
+     3,782,611,680      cycle_activity.stalls_total:u                                     ( +-  0.12% )  (36.43%)
+                 0      mem_trans_retired.load_latency_gt_4:u                                     ( +-100.00% )  (36.36%)
+                 0      mem_trans_retired.load_latency_gt_8:u                                     (9.06%)
+                 0      mem_trans_retired.load_latency_gt_16:u                                     (9.06%)
+                 0      mem_trans_retired.load_latency_gt_32:u                                     (9.04%)
+
+           2.28603 +- 0.00287 seconds time elapsed  ( +-  0.13% )
+
+./list.out: Interrupt
+
+ Performance counter stats for './list.out 10000000':
+
+        60,419,572      cycle_activity.cycles_l1d_miss:u                                     (18.15%)
+        38,527,543      cycle_activity.cycles_l2_miss:u                                     (27.39%)
+     1,060,246,795      cycle_activity.cycles_mem_any:u                                     (36.64%)
+        34,096,636      cycle_activity.stalls_l1d_miss:u                                     (36.92%)
+        14,685,179      cycle_activity.stalls_l2_miss:u                                     (36.98%)
+        83,159,948      cycle_activity.stalls_mem_any:u                                     (36.75%)
+       429,375,815      cycle_activity.stalls_total:u                                     (36.47%)
+                 0      mem_trans_retired.load_latency_gt_4:u                                     (36.19%)
+                 0      mem_trans_retired.load_latency_gt_8:u                                     (8.96%)
+                 0      mem_trans_retired.load_latency_gt_16:u                                     (8.96%)
+                 0      mem_trans_retired.load_latency_gt_32:u                                     (8.96%)
+
+       1.071724892 seconds time elapsed
+
+       0.519283000 seconds user
+       0.549326000 seconds sys
+
+

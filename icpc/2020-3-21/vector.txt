@@ -1,0 +1,26 @@
+
+ Performance counter stats for './vector.out 5000000' (20 runs):
+
+            685.88 msec task-clock:u              #    1.000 CPUs utilized            ( +-  0.11% )
+                 0      context-switches:u        #    0.000 K/sec                  
+                 0      cpu-migrations:u          #    0.000 K/sec                  
+           368,046      page-faults:u             #    0.537 M/sec                    ( +-  0.00% )
+     1,009,105,621      cycles:u                  #    1.471 GHz                      ( +-  0.23% )  (37.46%)
+     1,377,178,916      instructions:u            #    1.36  insn per cycle           ( +-  0.16% )  (45.33%)
+       237,024,703      branches:u                #  345.578 M/sec                    ( +-  0.14% )  (45.74%)
+         2,598,715      branch-misses:u           #    1.10% of all branches          ( +-  0.33% )  (46.16%)
+       256,389,594      L1-dcache-loads:u         #  373.812 M/sec                    ( +-  0.25% )  (46.57%)
+        12,277,975      L1-dcache-load-misses:u   #    4.79% of all L1-dcache hits    ( +-  1.65% )  (46.99%)
+         7,801,905      LLC-loads:u               #   11.375 M/sec                    ( +-  0.58% )  (31.49%)
+         6,486,134      LLC-load-misses:u         #   83.14% of all LL-cache hits     ( +-  1.71% )  (31.38%)
+   <not supported>      L1-icache-loads:u                                           
+           190,829      L1-icache-load-misses:u                                       ( +-  1.55% )  (31.05%)
+       255,921,456      dTLB-loads:u              #  373.129 M/sec                    ( +-  0.13% )  (30.64%)
+           189,016      dTLB-load-misses:u        #    0.07% of all dTLB cache hits   ( +- 11.55% )  (30.22%)
+               272      iTLB-loads:u              #    0.396 K/sec                    ( +-  9.76% )  (29.92%)
+             1,112      iTLB-load-misses:u        #  409.42% of all iTLB cache hits   ( +- 42.97% )  (29.82%)
+   <not supported>      L1-dcache-prefetches:u                                      
+   <not supported>      L1-dcache-prefetch-misses:u                                   
+
+          0.686117 +- 0.000761 seconds time elapsed  ( +-  0.11% )
+

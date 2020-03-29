@@ -1,43 +1,45 @@
+#include <cmath>
 #include <cstdio>
-#include <cstring>
 
 #include <random>
-#include <vector>
-#include <algorithm>
 
 using namespace std;
 
-int n = 1000000;
-int cnt = 0;
-vector<bool> a;
+typedef long double d8;
 
-void solve(const vector<int> &li) {
-    if (li.empty())
-        return;
-    cnt += li.size() % 3;
-    vector<int> nxt;
-    for (int i = 0; 3 * i + 2 < li.size(); i++) {
-        cnt++;
-        int k = a[3*i] + a[3*i + 1] + a[3*i + 2];
-        if (k == 1 || k == 2) cnt++;
-        if ((k == 1 && a[3*i] == 1) || (k == 2 && a[3*i] == 0)) {
-            nxt.push_back(3*i + 1);
-        }
-    }
-    solve(nxt);
+d8 randf() {
+    static random_device rd;
+    static mt19937_64 gen(rd());
+    static uniform_real_distribution<d8> dis(0.0L, 2.0L * M_PI);
+    return dis(gen);
+}
+
+d8 det(d8 x1, d8 y1, d8 x2, d8 y2) {
+    return x1 * y2 - x2 * y1;
 }
 
 int main() {
-    random_device rd;
-    mt19937_64 randi(rd());
-    a.resize(n);
-    vector<int> seq;
-    seq.reserve(n);
-    for (int i = 0; i < n; i++) {
-        seq.push_back(i);
-        a[i] = 0;
+    d8 r1, r2, r3;
+    int T;
+    scanf("%Lf%Lf%Lf%d", &r1, &r2, &r3, &T);
+
+    d8 sum = 0;
+    for (int i = 0; i < T; i++) {
+        d8 t1 = randf();
+        d8 t2 = randf();
+        d8 t3 = randf();
+        d8 x1 = r1 * cosl(t1), y1 = r1 * sinl(t1);
+        d8 x2 = r2 * cosl(t2), y2 = r2 * sinl(t2);
+        d8 x3 = r3 * cosl(t3), y3 = r3 * sinl(t3);
+        sum += 0.5 * fabs(
+            det(x1, y1, x2, y2) +
+            det(x2, y2, x3, y3) +
+            det(x3, y3, x1, y1)
+        );
     }
-    solve(seq);
-    printf("%d\n", cnt);
+
+    d8 aver = sum / T;
+    printf("%.12Lf\n", aver);
+
     return 0;
 }
