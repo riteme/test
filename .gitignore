@@ -143,5 +143,6 @@ target/
 *.profile
 *.pdf
 
-.vscode
+.vscode/
 *.class
+.mypy_cache/
