@@ -1,0 +1,238 @@
+#include <cmath>
+#include <cstdio>
+#include <cstring>
+
+#include <algorithm>
+
+using namespace std;
+
+#define TMAX 70
+#define NMAX 100
+#define EPS 1e-10
+
+bool eq(double x, double y) {
+    return fabs(x - y) < EPS;
+}
+
+struct vec {
+    vec() : x(0), y(0) {}
+    vec(double _x, double _y) : x(_x), y(_y) {}
+
+    double x, y;
+
+    double len() const {
+        return hypot(x, y);
+    }
+
+    vec norm() const {
+        double l = len();
+        return {x / l, y / l};
+    }
+
+    vec cw() const {
+        return vec(y, -x);
+    }
+
+    vec ccw() const {
+        return vec(-y, x);
+    }
+
+    vec operator+(const vec &z) const {
+        return {x + z.x, y + z.y};
+    }
+
+    vec operator-(const vec &z) const {
+        return {x - z.x, y - z.y};
+    }
+
+    vec operator*(double k) const {
+        return {x * k, y * k};
+    }
+
+    double operator*(const vec &z) const {
+        return x * z.x + y * z.y;
+    }
+
+    double operator%(const vec &z) const {
+        return x * z.y - y * z.x;
+    }
+
+    vec &operator+=(const vec &z) {
+        x += z.x;
+        y += z.y;
+        return *this;
+    }
+};
+
+struct line {
+    line() : u(0, 0), v(0, 0) {}
+    line(vec _u, vec _v) : u(_u), v(_v) {}
+
+    vec u, v;
+};
+
+vec isect(const line &a, const line &b) {
+    vec z = b.u - a.u;
+    double t = (b.v % z) / (b.v % a.v);
+    return a.u + a.v * t;
+}
+
+int n, m;
+vec A[NMAX + 10], B[NMAX + 10];
+
+void initialize() {
+    scanf("%d", &n);
+    for (int i = 0; i < n; i++) {
+        scanf("%lf%lf", &A[i].x, &A[i].y);
+    }
+
+    scanf("%d", &m);
+    for (int i = 0; i < m; i++) {
+        scanf("%lf%lf", &B[i].x, &B[i].y);
+    }
+}
+
+line t[NMAX + 10];
+vec C[NMAX + 10];
+
+int prep(int i) {
+    return i > 0 ? i - 1 : n - 1;
+}
+
+int nxtp(int i) {
+    return i + 1 < n ? i + 1 : 0;
+}
+
+bool inside(const vec &p) {
+    bool rax = true;
+    for (int k = 0; k < n; k++) {
+        rax &= (A[nxtp(k)] - A[k]) % (p - A[k]) > -EPS;
+    }
+    return rax;
+}
+
+int sgn(double x) {
+    if (eq(x, 0.0))
+        return 0;
+    return x > 0 ? 1 : -1;
+}
+
+bool in_range(const line &l, const vec &p) {
+    int s1 = sgn((p - l.u) * (l.v - l.u));
+    int s2 = sgn((p - l.v) * (l.u - l.v));
+    if (s1 == 0)
+        return true;
+    if (s2 == 0)
+        return false;
+    return s1 * s2 > 0;
+}
+
+line cut(const line &l) {
+    int cnt = 0;
+    line rax;
+    for (int i = 0; i < n; i++) {
+        vec u = A[i], v = A[nxtp(i)] - A[i];
+        if (eq(v % l.v, 0.0))
+            continue;
+        vec p = isect({u, v}, l);
+        if (in_range({A[i], A[nxtp(i)]}, p)) {
+            if (cnt == 0)
+                rax.u = p;
+            else
+                rax.v = p;
+            cnt++;
+        }
+    }
+    if (cnt != 2) {
+        rax.u = rax.v;
+    }
+    return rax;
+}
+
+bool test(double d) {
+    for (int i = 0; i < n; i++) {
+        vec v = A[nxtp(i)] - A[i];
+
+        int j;
+        for (j = 0; j < m; j++) {
+            bool ok = true;
+            for (int k = 0; k < m; k++) {
+                ok &= v % (B[k] - B[j]) > -EPS;
+            }
+            if (ok)
+                break;
+        }
+
+        vec w = v.cw().norm();
+        t[i] = {B[j] + w * d, v};
+    }
+
+    for (int i = 0; i < n; i++) {
+        C[nxtp(i)] = isect(t[i], t[nxtp(i)]);
+    }
+
+    for (int i = 0; i < n; i++) {
+        vec p;
+
+        vec v = A[nxtp(i)] - A[i];
+        double ecl = (C[nxtp(i)] - C[i]).len();
+        if (v.len() + EPS > ecl)
+            p = A[i];
+        else {
+            vec w = v.ccw().norm();
+            double l = 0, r = 1e99;
+            for (int j = 0; j < n; j++) {
+                line ln = cut({A[j], v});
+                if ((ln.u - ln.v).len() + EPS > ecl) {
+                    r = min(r, (A[j] - A[i]) * w);
+                }
+            }
+
+            if (r < 1e99) {
+                line ln;
+                for (int _ = 0; _ < TMAX; _++) {
+                    double mi = (l + r) / 2;
+                    vec u = A[i] + w * mi;
+                    ln = cut({u, v});
+                    double len = (ln.u - ln.v).len();
+                    if (len <= ecl)
+                        l = mi;
+                    else
+                        r = mi;
+                }
+
+                if ((ln.v - ln.u) * v <= -EPS)
+                    swap(ln.u, ln.v);
+
+                p = ln.u;
+            }
+        }
+
+        bool ok = inside(p);
+        for (int j = i; nxtp(j) != i; j = nxtp(j)) {
+            p += C[nxtp(j)] - C[j];
+            ok &= inside(p);
+        }
+
+        if (ok)
+            return true;
+    }
+
+    return false;
+}
+
+int main() {
+    initialize();
+
+    double l = 0, r = 1e4;
+    for (int _ = 0; _ < TMAX; _++) {
+        double mi = (l + r) / 2;
+        if (test(mi))
+            l = mi;
+        else
+            r = mi;
+    }
+    printf("%.12lf\n", l / 2);
+
+    return 0;
+}
