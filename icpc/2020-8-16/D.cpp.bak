@@ -1,0 +1,227 @@
+#include <cstdio>
+#include <cstring>
+
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+#define NMAX 100000
+
+struct Node {
+    Node(int _l, int _r)
+        : l(_l), r(_r),
+          sum(0), sum0(0),
+          lch(NULL), rch(NULL) {
+        if (l < r) {
+            int m = (l + r) / 2;
+            lch = new Node(l, m);
+            rch = new Node(m + 1, r);
+        }
+    }
+
+    int l, r, sum, sum0;
+    Node *lch, *rch;
+
+    int rsum() {
+        return sum + (r - l + 1) * sum0;
+    }
+
+    void commit() {
+        if (!lch)
+            return;
+
+        if (sum0) {
+            sum = rsum();
+            lch->sum0 += sum0;
+            rch->sum0 += sum0;
+            sum0 = 0;
+        }
+    }
+
+    void fetch() {
+        if (!lch)
+            return;
+
+        sum = lch->rsum() + rch->rsum();
+    }
+
+    void modify(int L, int R, int v) {
+        if (L <= l && r <= R)
+            sum0 += v;
+        else {
+            int m = (l + r) / 2;
+
+            commit();
+            if (L <= m)
+                lch->modify(L, R, v);
+            if (R > m)
+                rch->modify(L, R, v);
+            fetch();
+        }
+    }
+
+    int query(int L, int R) {
+        if (L <= l && r <= R)
+            return rsum();
+
+        int m = (l + r) / 2;
+        int ret = 0;
+
+        commit();
+        if (L <= m)
+            ret += lch->query(L, R);
+        if (R > m)
+            ret += rch->query(L, R);
+        fetch();
+
+        return ret;
+    }
+};
+
+struct ran {
+    int l, r;
+
+    bool contain(const ran &z) const {
+        return l <= z.l && z.r <= r;
+    }
+
+    bool contain(int x) const {
+        return l <= x && x <= r;
+    }
+
+    bool intersect(const ran &z) const {
+        return contain(z.l) || contain(z.r) || z.contain(l) || z.contain(r);
+    }
+
+    bool operator<(const ran &z) const {
+        return r < z.r || (r == z.r && l > z.l);
+    }
+};
+
+Node *tr = new Node(1, NMAX + 1);
+int n, q, idcnt;
+int pa[NMAX + 10];
+vector<int> G[NMAX + 10];
+ran A[NMAX + 10];
+int top[NMAX + 10], idx[NMAX + 10];
+
+void dfs(int x) {
+    top[x] = 1;
+    for (int i = 0; i < G[x].size(); i++) {
+        int v = G[x][i];
+        dfs(v);
+        top[x] += top[v];
+    }
+}
+
+void decompose(int x) {
+    idx[x] = idcnt++;
+    int u = 0;
+    for (int i = 0; i < G[x].size(); i++) {
+        int v = G[x][i];
+        if (top[v] >= top[u])
+            u = v;
+    }
+    if (u) {
+        top[u] = top[x];
+        decompose(u);
+    }
+    for (int i = 0; i < G[x].size(); i++) {
+        int v = G[x][i];
+        if (u == v)
+            continue;
+        top[v] = v;
+        decompose(v);
+    }
+}
+
+int query(int x) {
+    int rax = 0;
+    while (x) {
+        int u = top[x];
+        rax += tr->query(idx[u], idx[x]);
+        x = pa[u];
+    }
+    return rax;
+}
+
+void _main() {
+    for (int i = 1; i <= n + 1; i++) {
+        G[i].clear();
+    }
+
+    A[0].l = A[0].r = -1;
+    for (int i = 1; i <= n; i++) {
+        scanf("%d%d", &A[i].l, &A[i].r);
+        A[i].r--;
+    }
+
+    sort(A + 1, A + n + 1);
+    int j = 1;
+    for (int i = 2; i <= n; i++) {
+        if (A[i].contain(A[j]))
+            continue;
+        A[++j] = A[i];
+    }
+    n = j;
+
+    j = 1;
+    pa[n + 1] = 0;
+    for (int i = 1; i <= n; i++) {
+        while (j <= n && A[i].intersect(A[j])) {
+            j++;
+        }
+        pa[i] = j;
+        G[pa[i]].push_back(i);
+    }
+
+    idcnt = 1;
+    dfs(n + 1);
+    top[n + 1] = n + 1;
+    decompose(n + 1);
+
+    while (q--) {
+        int L, R;
+        scanf("%d%d", &L, &R);
+        R--;
+
+        int l = 0, r = n;
+        while (l < r) {
+            int m = (l + r) / 2 + 1;
+            if (A[m].l < L)
+                l = m;
+            else
+                r = m - 1;
+        }
+
+        int xl = l + 1;
+        l = 0, r = n;
+        while (l < r) {
+            int m = (l + r) / 2 + 1;
+            if (A[m].r <= R)
+                l = m;
+            else
+                r = m - 1;
+        }
+        int xr = l;
+
+        int ans;
+        if (xr < xl)
+            ans = 0;
+        else {
+            tr->modify(xl, xr, +1);
+            ans = query(xl);
+            tr->modify(xl, xr, -1);
+        }
+
+        printf("%d\n", ans);
+    }
+}
+
+int main() {
+    while (scanf("%d%d", &n, &q) != EOF) {
+        _main();
+    }
+    return 0;
+}
