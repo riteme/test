@@ -1,0 +1,126 @@
+#include <cstdio>
+#include <cstring>
+
+#include <algorithm>
+
+using namespace std;
+
+typedef long long i64;
+typedef long double ld;
+
+#define PMAX 10100
+#define NMAX 60
+
+i64 qmul(i64 a, i64 b, i64 m) {
+    a %= m;
+    b %= m;
+    i64 r = a * b;
+    i64 s = ld(a) * b / m;
+    return ((r - m * s) % m + m) % m;
+}
+
+i64 qpow(i64 a, i64 k, i64 m) {
+    i64 r = 1;
+    for ( ; k; k >>= 1) {
+        if (k & 1)
+            r = qmul(r, a, m);
+        a = qmul(a, a, m);
+    }
+    return r;
+}
+
+bool miller_rabin(i64 n, i64 base) {
+    i64 n2 = n - 1, s = 0;
+    while (n2 % 2 == 0) n2 /= 2, s++;
+    i64 t = qpow(base, n2, n);
+    if (t == 1 || t == n - 1)
+        return true;
+    for (s--; s >= 0; s--)
+        if ((t = qmul(t, t, n)) == n - 1)
+            return true;
+    return false;
+}
+
+bool is_prime(i64 n) {
+    static i64 base[] = {
+        2,3,5,7,11,13,17,19,23,29,31,37
+    };
+    if (n < 2)
+        return false;
+    for (int i = 0; i < 12 && base[i] < n; i++) {
+        if (!miller_rabin(n, base[i]))
+            return false;
+    }
+    return true;
+}
+
+int cnt;
+bool mark[PMAX + 10];
+i64 pr[PMAX + 10];
+i64 C[NMAX][NMAX];
+double f[NMAX];
+
+void _main() {
+    i64 n;
+    scanf("%lld", &n);
+
+    int c = 0;
+    for (int i = 0; i < cnt && pr[i] <= n; i++) {
+        while (n % pr[i] == 0) {
+            n /= pr[i];
+            c++;
+        }
+    }
+
+    if (n > 1) {
+        if (is_prime(n))
+            c++;
+        else
+            c += 2;
+    }
+
+    //printf("%d, %.6lf\n", c, f[c]);
+    printf("%.6f\n", f[c]);
+}
+
+int main() {
+    for (int i = 0; i < NMAX; i++) {
+        C[i][0] = 1;
+    }
+    for (int i = 1; i < NMAX; i++)
+    for (int j = 1; j <= i; j++) {
+        C[i][j] = C[i - 1][j] + C[i - 1][j - 1];
+    }
+
+    f[1] = 1;
+    for (int n = 2; n < NMAX; n++) {
+        i64 dem = (1LL << n) - 2;
+        //double inv = 1.0 / dem;
+        for (int k = 1; k < n; k++) {
+            f[n] += double(C[n][k]) / dem * (1 + f[max(k, n - k)]);
+        }
+        //f[n] *= inv;
+        //f[n] /= dem;
+    }
+
+    for (i64 i = 2; i <= PMAX; i++) {
+        if (!mark[i]) {
+            pr[cnt++] = i;
+        }
+        for (int j = 0; j < cnt && pr[j] * i <= PMAX; j++) {
+            mark[pr[j] * i] = true;
+            if (i % pr[j] == 0)
+                break;
+        }
+    }
+    //printf("%.16lf\n", f[40]);
+
+    int T;
+    scanf("%d", &T);
+    for (int i = 1; i <= T; i++) {
+        printf("Case #%d: ", i);
+        _main();
+    }
+
+    return 0;
+}

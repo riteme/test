@@ -1,0 +1,75 @@
+#include<bits/stdc++.h>
+using namespace std;
+#define N 100010
+#define LL long long
+#define MOD 998244353
+#define EPS 1e-8
+#define rep(i,j,n) for(int i=j;i<=n;i++)
+int n,m,T;
+double ans;
+double a[4], b[4];
+
+double check(double x)
+{
+    double p = a[0] + a[1] + x;
+    p /= 2;
+    double temp = sqrt(p*(p-a[0])*(p-a[1])*(p-x));
+    p = a[2] + a[3] + x;
+    p /= 2;
+    temp += sqrt(p*(p-a[2])*(p-a[3])*(p-x));
+    return temp;
+}
+
+bool accept;
+void solve()
+{
+    double l = max(fabs(a[0]-a[1]),fabs(a[2]-a[3]));
+    double r = min(fabs(a[0]+a[1]),fabs(a[2]+a[3]));
+    if(l>=r+EPS) return;
+    accept = true;
+    double mid1, mid2,temp1, temp2;
+    rep(i,1,100)
+    {
+        mid1 = (l+l+r)/3;
+        mid2 = (l+r+r)/3;
+        temp1 = check(mid1);
+        temp2 = check(mid2);
+        if(temp1>temp2)
+            r = mid2;
+        else
+            l = mid1;
+    }
+    temp1 = check((l+r)/2);
+    if(temp1>ans) ans = temp1;
+}
+
+
+int main()
+{
+    ios::sync_with_stdio(0);
+    cin>>n;
+    rep(tt,1,n)
+    {
+        rep(i,0,3)
+            cin>>b[i];
+        ans = 0;
+        accept = false;
+
+        a[0]=b[0];a[1]=b[1];a[2]=b[2];a[3]=b[3];
+        solve();
+        a[0]=b[0];a[1]=b[1];a[2]=b[3];a[3]=b[2];
+        solve();
+        a[0]=b[0];a[1]=b[3];a[2]=b[1];a[3]=b[2];
+        solve();
+        a[0]=b[0];a[1]=b[3];a[2]=b[2];a[3]=b[1];
+        solve();
+        a[0]=b[0];a[1]=b[2];a[2]=b[3];a[3]=b[1];
+        solve();
+        a[0]=b[0];a[1]=b[2];a[2]=b[1];a[3]=b[3];
+        solve();
+
+        printf("Case %d: ",tt);
+        accept ? printf("%.6f\n",ans) : puts("-1");
+    }
+
+}
