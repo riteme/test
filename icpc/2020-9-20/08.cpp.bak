@@ -1,0 +1,155 @@
+#include <cmath>
+#include <cstdio>
+#include <cstring>
+
+#include <algorithm>
+
+using namespace std;
+
+#define NMAX 50
+#define INF 1e99
+
+int n;
+int K[NMAX + 10];
+double x0, s2 = sqrt(2);
+double f[NMAX + 10][NMAX + 10];
+
+double sqr(double x) {
+    return x * x;
+}
+
+void chkmin(double &a, double b) {
+    if (a > b)
+        a = b;
+}
+
+int s[NMAX + 10];
+double update(int y, int k, double p0) {
+    int p = s[0], cnt = 0;
+    double rax = 0;
+    for (int i = 0; i < y && k <= y - cnt; i++, cnt++) {
+        double x = (double) k / (y - cnt);
+        //printf("%.3lf\n", x);
+        f[y][s[i]] += p0 * x;
+
+        if (i > 0)
+            rax += 2.0 * abs(s[i] - p) * p0;
+
+        p = s[i];
+        p0 *= 1 - x;
+    }
+
+    return rax;
+}
+
+int maxlen(int y, int i) {
+    return max(i - 1, y - i);
+}
+
+bool to_left(int y, int i) {
+    return i - 1 > y - i;
+}
+
+void solve() {
+    scanf("%d%lf", &n, &x0);
+    for (int i = 1; i <= n; i++) {
+        scanf("%d", K + i);
+    }
+
+    memset(f, 0, sizeof(f));
+
+    int mi = 1000000000;
+    int mp;
+    for (int i = 1; i <= n; i++) {
+        double x1 = (n % 2 == 0 ? 1 : 0) - (n / 2 * 2) + (i - 1) * 2;
+        int d = sqr(x0 - x1) + 1;
+
+        if (d < mi || (d == mi && maxlen(n, i) > maxlen(n, mp))) {
+            mi = d;
+            mp = i;
+        }
+    }
+
+    int p = 0;
+    double d = sqrt(mi);
+    double ans = d + 1 + (n - 1) * s2;
+    if (to_left(n, mp)) {
+        p = 0;
+        int i = mp;
+        s[p++] = i;
+        for (int j = i - 1; j >= 1; j--) {
+            s[p++] = j;
+        }
+        for (int j = i + 1; j <= n; j++) {
+            s[p++] = j;
+        }
+        ans += update(n, K[n], 1);
+    } else {
+        p = 0;
+        int i = mp;
+        s[p++] = i;
+        for (int j = i + 1; j <= n; j++) {
+            s[p++] = j;
+        }
+        for (int j = i - 1; j >= 1; j--) {
+            s[p++] = j;
+        }
+        ans += update(n, K[n], 1);
+    }
+
+    /*
+    printf("mp = %d\n", mp);
+    for (int i = 0; i < p; i++) {
+        printf("%d ", s[i]);
+    }
+    puts("");
+    */
+
+    for (int i = n - 1; i >= 1; i--)
+    for (int j = 1; j <= i + 1; j++) {
+        double p0 = f[i + 1][j];
+
+        int p = 0;
+        int c = j > 1 ? j - 1 : j;
+        if (j <= i && maxlen(i, j) > maxlen(i, c))
+            c = j;
+
+        s[p++] = c;
+        if (to_left(i, c)) {
+            for (int k = s[0] - 1; k >= 1; k--) {
+                s[p++] = k;
+            }
+            for (int k = s[0] + 1; k <= i; k++) {
+                s[p++] = k;
+            }
+        } else {
+            for (int k = s[0] + 1; k <= i; k++) {
+                s[p++] = k;
+            }
+            for (int k = s[0] - 1; k >= 1; k--) {
+                s[p++] = k;
+            }
+        }
+
+        /*
+        printf("i = %d, j = %d\n", i + 1, j);
+        for (int k = 0; k < p; k++) {
+            printf("%d ", s[k]);
+        }
+        puts("");
+        */
+
+        ans += update(i, K[i], p0);
+    }
+
+    printf("%.10lf\n", ans);
+}
+
+int main() {
+    int T;
+    scanf("%d", &T);
+    while (T--) {
+        solve();
+    }
+    return 0;
+}

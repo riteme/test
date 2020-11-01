@@ -1,0 +1,316 @@
+#include <cstdio>
+#include <cstring>
+
+#include <queue>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+constexpr int NMAX = 300;
+constexpr int AX_X = 0;
+constexpr int AX_Y = 1;
+
+const char *NO_WIN = "no window at given position";
+const char *NO_FIT = "window does not fit";
+const char *MOVING = "moved %d instead of %d";
+
+struct win_t {
+    win_t() : x(0), y(0) {}
+    win_t(int _x, int _y, int _w, int _h)
+        : x(_x), y(_y), w(_w), h(_h) {}
+
+    int x, y, w, h;
+
+    int left() {
+        return x;
+    }
+    int right() {
+        return x + w - 1;
+    }
+    int top() {
+        return y;
+    }
+    int bottom() {
+        return y + h - 1;
+    }
+
+    bool contain(int x0, int y0) {
+        return x <= x0 && x0 < x + w &&
+            y <= y0 && y0 < y + h;
+    }
+    bool contain(win_t &w0) {
+        return contain(w0.left(), w0.top()) &&
+            contain(w0.left(), w0.bottom()) &&
+            contain(w0.right(), w0.top()) &&
+            contain(w0.right(), w0.bottom());
+    }
+
+    bool overlap(win_t &w0) {
+        int l = max(left(), w0.left());
+        int r = min(right(), w0.right());
+        if (r < l)
+            return false;
+
+        l = max(top(), w0.top());
+        r = min(bottom(), w0.bottom());
+        return l <= r;
+    }
+
+    win_t join(win_t &w0) {
+        int l = min(left(), w0.left());
+        int r = max(right(), w0.right());
+        int t = min(top(), w0.top());
+        int b = max(bottom(), w0.bottom());
+        return {l, t, r - l + 1, b - t + 1};
+    }
+
+    int dist(win_t &w0, int ax) {
+        if (ax == AX_X)
+            return min(abs(left() - w0.right()), abs(right() - w0.left())) - 1;
+        return min(abs(top() - w0.bottom()), abs(bottom() - w0.top())) - 1;
+    }
+
+    int len(int ax) {
+        return ax == AX_X ? w : h;
+    }
+};
+
+int _cur;
+char op[64];
+win_t desktop;
+vector<win_t> win;
+
+template <typename ... TArgs>
+void report(const char *fmt, const TArgs& ... args) {
+    printf("Command %d: %s - ", _cur, op);
+    printf(fmt, args...);
+    puts("");
+}
+
+int click(int x, int y) {
+    for (int i = 0; i < win.size(); i++) {
+        if (win[i].contain(x, y))
+            return i;
+    }
+
+    report(NO_WIN);
+    return -1;
+}
+
+bool fit(win_t &w, int ex = -1) {
+    if (!desktop.contain(w))
+        goto fuck;
+
+    for (int i = 0; i < win.size(); i++) {
+        if (i != ex && win[i].overlap(w))
+            goto fuck;
+    }
+
+    return true;
+
+fuck:
+    report(NO_FIT);
+    return false;
+}
+
+void wopen(int x, int y, int w, int h) {
+    win_t w0 = {x, y, w, h};
+    if (!fit(w0))
+        return;
+    win.push_back(w0);
+}
+
+void wclose(int x, int y) {
+    int z = click(x, y);
+    if (z < 0)
+        return;
+    win.erase(win.begin() + z);
+}
+
+void wresize(int x, int y, int w, int h) {
+    int z = click(x, y);
+    if (z < 0)
+        return;
+
+    win_t tmp = win[z];
+    win[z].w = w;
+    win[z].h = h;
+    if (!fit(win[z], z)) {
+        win[z] = tmp;
+        return;
+    }
+}
+
+struct edge_t {
+    int v, w;
+};
+
+int mark[NMAX + 10];
+vector<edge_t> G[NMAX + 10];
+int in[NMAX + 10], dp[NMAX + 10], maxdx[NMAX + 10], maxdy[NMAX + 10];
+
+int reduce(int d, int s) {
+    if (d > 0)
+        return max(0, d - s);
+    if (d < 0)
+        return min(0, d + s);
+    return 0;
+}
+
+void reset() {
+    memset(mark, 0, sizeof(mark));
+    memset(in, 0, sizeof(in));
+    memset(dp, 0, sizeof(dp));
+    memset(maxdx, 0, sizeof(maxdx));
+    memset(maxdy, 0, sizeof(maxdy));
+    for (int i = 0; i < win.size(); i++) {
+        G[i].clear();
+    }
+}
+
+struct state_t {
+    int i, t;
+};
+
+int _ax;
+win_t _c;
+struct cmp {
+    bool operator()(const state_t &a, const state_t &b) const {
+        return _c.dist(win[a.i], _ax) < _c.dist(win[b.i], _ax);
+    }
+};
+
+void mimic_push(int s, int dx, int dy, int ax) {
+    _ax = ax;
+    _c = win[s];
+    priority_queue<state_t, vector<state_t>, cmp> q;
+    q.push({s, 1});
+    mark[s] = 1;
+
+    int cur = 2;
+    do {
+        auto s = q.top();
+        q.pop();
+        int u = s.i;
+        if (s.t != mark[u])
+            continue;
+
+        auto m = win[u];
+        m.x += dx;
+        m.y += dy;
+        m = m.join(win[u]);
+
+        for (int v = 0; v < win.size(); v++)
+        if (u != v && m.overlap(win[v])) {
+            int w = win[u].dist(win[v], ax);
+            //mimic_push(v, reduce(dx, w), reduce(dy, w), ax);
+            mark[v] = cur++;
+            q.push({v, mark[v]});
+
+            in[v]++;
+            G[u].push_back({v, w});
+        }
+    } while (q.size());
+}
+
+int maxlen(int u, int ax) {
+    if (dp[u] > 0)
+        return dp[u];
+    for (auto &e : G[u]) {
+        dp[u] = max(dp[u], maxlen(e.v, ax));
+    }
+    dp[u] += win[u].len(ax);
+    return dp[u];
+}
+
+void apply_push(int s, int dx, int dy, int ax) {
+    queue<int> q;
+    q.push(s);
+
+    maxdx[s] = dx;
+    maxdy[s] = dy;
+    do {
+        int u = q.front();
+        q.pop();
+
+        win[u].x += maxdx[u];
+        win[u].y += maxdy[u];
+
+        for (auto &e : G[u]) {
+            int v = e.v;
+            int tx = reduce(maxdx[u], e.w);
+            int ty = reduce(maxdy[u], e.w);
+            if (abs(tx) > abs(maxdx[v]))
+                maxdx[v] = tx;
+            if (abs(ty) > abs(maxdy[v]))
+                maxdy[v] = ty;
+
+            in[v]--;
+            if (!in[v])
+                q.push(v);
+        }
+    } while (q.size());
+}
+
+void wmove(int x, int y, int dx, int dy) {
+    int z = click(x, y);
+    if (z < 0)
+        return;
+
+    int ax = dx ? AX_X : AX_Y;
+
+    reset();
+    mimic_push(z, dx, dy, ax);
+
+    int len = maxlen(z, ax);
+    int tx = 0, ty = 0;
+    if (dx > 0)
+        tx = min(dx, desktop.w - len - win[z].x);
+    else if (dx < 0)
+        tx = -min(-dx, win[z].x + win[z].w - len);
+    else if (dy > 0)
+        ty = min(dy, desktop.h - len - win[z].y);
+    else /*if (dy < 0)*/
+        ty = -min(-dy, win[z].y + win[z].h - len);
+
+    if (abs(tx) != abs(dx))
+        report(MOVING, abs(tx), abs(dx));
+    else if (abs(ty) != abs(dy))
+        report(MOVING, abs(ty), abs(dy));
+
+    reset();
+    mimic_push(z, tx, ty, ax);
+    apply_push(z, tx, ty, ax);
+}
+
+int main() {
+    scanf("%d%d", &desktop.w, &desktop.h);
+
+    for (_cur = 1; scanf("%s", op) != EOF; _cur++) {
+        if (op[0] == 'O') {
+            int x, y, w, h;
+            scanf("%d%d%d%d", &x, &y, &w, &h);
+            wopen(x, y, w, h);
+        } else if (op[0] == 'C') {
+            int x, y;
+            scanf("%d%d", &x, &y);
+            wclose(x, y);
+        } else if (op[0] == 'R') {
+            int x, y, w, h;
+            scanf("%d%d%d%d", &x, &y, &w, &h);
+            wresize(x, y, w, h);
+        } else if (op[0] == 'M') {
+            int x, y, dx, dy;
+            scanf("%d%d%d%d", &x, &y, &dx, &dy);
+            wmove(x, y, dx, dy);
+        }
+    }
+
+    printf("%zu window(s):\n", win.size());
+    for (auto &w : win) {
+        printf("%d %d %d %d\n", w.x, w.y, w.w, w.h);
+    }
+
+    return 0;
+}
