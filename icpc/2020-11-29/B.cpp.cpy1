@@ -1,0 +1,93 @@
+#include <cstdio>
+#include <cstring>
+#include <cassert>
+
+#include <algorithm>
+
+using namespace std;
+
+constexpr int NMAX = 10000;
+
+int n;
+int a[NMAX + 10];
+
+int cnt;
+struct {
+    int i, j, x;
+} r[4 * NMAX + 10];
+
+void mov(int i, int j, int x, bool mod = true) {
+    if (x == 0)
+        return;
+
+    r[cnt++] = {i, j, x};
+    if (mod) {
+        a[i] -= i * x;
+        a[j] += i * x;
+        assert(a[i] >= 0);
+        assert(a[j] >= 0);
+    }
+}
+
+void _main() {
+    cnt = 0;
+    scanf("%d", &n);
+    int sum = 0;
+    for (int i = 1; i <= n; i++) {
+        scanf("%d", a + i);
+        sum += a[i];
+    }
+
+    if (sum % n) {
+        puts("-1");
+        return;
+    }
+
+    for (int i = 2; i <= n; i++)
+    if (a[i] >= i) {
+        mov(i, 1, a[i] / i);
+        assert(a[i] < i);
+    }
+
+    int aver = sum / n;
+    for (int i = 2; i <= n; i++)
+    if (a[i] > aver) {
+        if (a[1] < i - a[i]) {
+            puts("-1");
+            return;
+        }
+
+        mov(1, i, i - a[i]);
+        mov(i, 1, 1);
+        assert(a[i] == 0);
+    }
+
+    for (int i = 2; i <= n; i++)
+    if (a[i] < aver) {
+        if (a[1] < aver - a[i]) {
+            puts("-1");
+            return;
+        }
+
+        mov(1, i, aver - a[i]);
+    }
+
+    assert(cnt <= 3 * n);
+    for (int i = 1; i <= n; i++) {
+        assert(a[i] == aver);
+    }
+
+    printf("%d\n", cnt);
+    for (int i = 0; i < cnt; i++) {
+        printf("%d %d %d\n", r[i].i, r[i].j, r[i].x);
+    }
+}
+
+int main() {
+    int T;
+    scanf("%d", &T);
+    while (T--) {
+        _main();
+    }
+    return 0;
+}
