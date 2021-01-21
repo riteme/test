@@ -1,0 +1,24 @@
+#include <cstdio>
+#include <cstring>
+
+#include <algorithm>
+
+using namespace std;
+
+constexpr int NMAX = 20;
+constexpr int SMAX = 1 << NMAX;
+
+int n, G, sum;
+int p[NMAX + 10];
+int w[SMAX]
+
+int main() {
+	scanf("%d%d", &n, &G);
+	for (int i = 0; i < n; i++) {
+		scanf("%d", p + i);
+		sum += p[i];
+	}
+
+
+	return 0;
+}
