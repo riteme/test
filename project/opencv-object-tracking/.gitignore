@@ -1,0 +1,15 @@
+main
+server
+client
+test_decoder
+
+*.pb.h
+*.pb.cc
+*.o
+*.ts
+*.onnx
+*.mp4
+*.mkv
+*.bundle
+*.weights
+*.m3u8

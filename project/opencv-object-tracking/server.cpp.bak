@@ -1,0 +1,54 @@
+#include "decoder.hpp"
+#include "tracker.hpp"
+
+#include <grpcpp/grpcpp.h>
+#include "object_tracking.grpc.pb.h"
+
+class ObjectTrackingImpl final : public ObjectTracking::Service {
+public:
+    grpc::Status process(
+        grpc::ServerContext *ctx,
+        grpc::ServerReaderWriter<VideoFrame, VideoChunk> *stream
+    ) override {
+        puts("Hello!");
+        VideoChunk chunk;
+        cv::Mat frame;
+        ObjectTracker tracker(OBJECT_CAR, 1);
+        while (stream->Read(&chunk)) {
+            auto decoder = Decoder(chunk.data());
+            auto fps = decoder.fps();
+            printf("duration=%lu us, fps=%d/%d\n", chunk.duration_us(), fps.num, fps.den);
+            auto step = 1000000000 * fps.den / fps.num;
+            auto t0 = chunk.timestamp_ns() - chunk.duration_us() * 1000;
+            while (decoder.read(frame)) {
+                tracker.update(frame);
+
+                VideoFrame result;
+                result.set_timestamp_ns(t0);
+                t0 += step;
+                result.set_frame_index(tracker.frame_count);
+
+                auto bbox = tracker.trackers[0].bbox;
+                auto dest = result.mutable_bbox();
+                dest->set_x(bbox.x);
+                dest->set_y(bbox.y);
+                dest->set_width(bbox.width);
+                dest->set_height(bbox.height);
+                stream->Write(result);
+            }
+        }
+        puts("Finished");
+        return grpc::Status::OK;
+    }
+};
+
+int main() {
+    ObjectTrackingImpl service;
+    grpc::ServerBuilder builder;
+    builder.SetMaxMessageSize(128 * 1024 * 1024);  // 128 MiB
+    builder.AddListeningPort("0.0.0.0:23324", grpc::InsecureServerCredentials());
+    builder.RegisterService(&service);
+    auto server = builder.BuildAndStart();
+    server->Wait();
+    return 0;
+}

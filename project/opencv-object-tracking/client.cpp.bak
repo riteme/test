@@ -1,0 +1,128 @@
+#include <chrono>
+#include <thread>
+#include <fstream>
+#include <iostream>
+
+#include "decoder.hpp"
+#include "bundle.hpp"
+
+#include <grpcpp/grpcpp.h>
+#include "object_tracking.grpc.pb.h"
+
+using Clock = std::chrono::high_resolution_clock;
+using StreamPtr = std::shared_ptr<grpc::ClientReaderWriter<VideoChunk, VideoFrame>>;
+
+static uint64_t get_timestamp_ns() {
+    auto t = Clock::now().time_since_epoch();
+    return std::chrono::duration_cast<std::chrono::nanoseconds>(t).count();
+}
+
+const char *bundle_path;
+bool show_visualization = false;
+
+void sender_routine(StreamPtr stream) {
+    Bundle bundle(bundle_path);
+    while (true) {
+        uint64_t duration_us;
+        VideoChunk chunk;
+
+        auto begin_ts = Clock::now();
+        if (!bundle.read_blob(duration_us, *chunk.mutable_data()))
+            break;
+
+        printf("size=%lu\n", chunk.data().size());
+        chunk.set_timestamp_ns(get_timestamp_ns());
+        chunk.set_duration_us(duration_us);
+        stream->Write(chunk);
+
+        auto end_ts = Clock::now();
+        auto t = std::chrono::duration_cast<std::chrono::microseconds>(end_ts - begin_ts).count();
+        printf("t=%ld, duration=%ld\n", t, duration_us);
+        if (t < duration_us)
+            usleep(duration_us - t);
+    }
+
+    stream->WritesDone();
+}
+
+void receiver_routine(StreamPtr stream) {
+    Bundle bundle(bundle_path);
+    Decoder *decoder = NULL;
+
+    std::string blob;
+    VideoFrame frame;
+    while (stream->Read(&frame)) {
+        auto latency = get_timestamp_ns() - frame.timestamp_ns();
+        printf(
+            "lat=%lu ns, index=%lu, {x=%u, y=%u, w=%u, h=%u}\n",
+            latency,
+            frame.frame_index(),
+            frame.bbox().x(),
+            frame.bbox().y(),
+            frame.bbox().width(),
+            frame.bbox().height()
+        );
+
+        if (show_visualization) {
+            bool okay = false;
+            cv::Mat cv_frame;
+            while (!okay) {
+                if (!decoder) {
+                    uint64_t _;
+                    assert(bundle.read_blob(_, blob));
+                    decoder = new Decoder(blob);
+                }
+
+                if (decoder->read(cv_frame))
+                    okay = true;
+                else {
+                    delete decoder;
+                    decoder = NULL;
+                }
+            }
+
+            cv::rectangle(
+                cv_frame,
+                cv::Rect(
+                    frame.bbox().x(),
+                    frame.bbox().y(),
+                    frame.bbox().width(),
+                    frame.bbox().height()
+                ),
+                cv::Scalar(255, 0, 0),
+                2
+            );
+            cv::imshow("Show", cv_frame);
+            cv::waitKey(1);
+        }
+    }
+
+    auto status = stream->Finish();
+    if (!status.ok()) {
+        printf("Error %d: %s\n", status.error_code(), status.error_message().c_str());
+        puts(status.error_details().c_str());
+    }
+}
+
+int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        fprintf(stderr, "%s [*.bundle] [visualize?]\n", argv[0]);
+        return -1;
+    }
+
+    bundle_path = argv[1];
+    if (argc > 2 && atoi(argv[2]) != 0)
+        show_visualization = true;
+
+    auto channel = grpc::CreateChannel("0.0.0.0:23324", grpc::InsecureChannelCredentials());
+    auto stub = ObjectTracking::NewStub(channel);
+
+    grpc::ClientContext ctx;
+    StreamPtr stream = stub->process(&ctx);
+    std::thread sender(sender_routine, stream);
+    std::thread receiver(receiver_routine, stream);
+    sender.join();
+    receiver.join();
+
+    return 0;
+}

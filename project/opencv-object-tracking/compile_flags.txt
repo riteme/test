@@ -1,0 +1,4 @@
+-xc++
+-std=c++17
+-Wno-c99-designator
+-I/usr/include/opencv4

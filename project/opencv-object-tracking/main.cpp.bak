@@ -1,0 +1,243 @@
+#include <cassert>
+#include <cstdio>
+
+#include <map>
+#include <vector>
+
+#include <opencv2/core/ocl.hpp>
+#include <opencv2/dnn.hpp>
+#include <opencv2/face.hpp>
+#include <opencv2/opencv.hpp>
+#include <opencv2/tracking.hpp>
+
+enum ObjectType : int {
+    OBJECT_CAR = 7,
+    OBJECT_HORSE = 13,
+    OBJECT_PERSON = 15,
+};
+
+constexpr const char *label_map[] = {
+    [0] = "background",   [1] = "aeroplane", [2] = "bicycle",    [3] = "bird",
+    [4] = "boat",         [5] = "bottle",    [6] = "bus",        [7] = "car",
+    [8] = "cat",          [9] = "chair",     [10] = "cow",       [11] = "diningtable",
+    [12] = "dog",         [13] = "horse",    [14] = "motorbike", [15] = "person",
+    [16] = "pottedplant", [17] = "sheep",    [18] = "sofa",      [19] = "train",
+    [20] = "tvmonitor",
+};
+
+constexpr struct {
+    int interval = 30;
+    int width = 300;
+    int height = 300;
+    float mean = 127.5f;
+    float threshold = 0.20f;
+} detector_config;
+
+constexpr struct {
+    int max_fail_count = 30;
+} tracker_config;
+
+struct ObjectTracker {
+    struct Tracker {
+        cv::Ptr<cv::Tracker> tracker;
+        cv::Rect bbox;
+        int fail_count;
+
+        bool valid() const {
+            return !tracker.empty();
+        }
+
+        void init(const cv::Mat &frame, cv::Rect _bbox) {
+            tracker = cv::tracking::TrackerKCF::create();
+            bbox = _bbox;
+            fail_count = 0;
+        }
+
+        void update(const cv::Mat &frame) {
+            if (!valid())
+                return;
+            if (!tracker->update(frame, bbox))
+                fail_count++;
+            if (fail_count > tracker_config.max_fail_count)
+                reset();
+        }
+
+        void reset() {
+            tracker.reset();
+        }
+    };
+
+    int target_idx;
+    int num_trackers;
+
+    int frame_count;
+    std::vector<Tracker> trackers;
+    cv::dnn::Net detector;
+
+    ObjectTracker(int _target_idx, int _num_trackers) :
+        target_idx(_target_idx),
+        num_trackers(_num_trackers)
+    {
+        trackers.resize(num_trackers);
+        detector = cv::dnn::readNetFromCaffe("mobilenet.prototxt", "mobilenet.caffemodel");
+        assert(!detector.empty());
+    }
+
+    int num_used_trackers()  {
+        int count = 0;
+        for (auto &t : trackers) {
+            if (!t.tracker.empty())
+                count++;
+        }
+        return count;
+    }
+
+    void detect(const cv::Mat &frame) {
+        if (num_used_trackers() >= num_trackers)
+            return;
+
+        auto size = cv::Size(detector_config.width, detector_config.height);
+        cv::Mat scaled_frame;
+        cv::resize(frame, scaled_frame, size, cv::INTER_AREA);
+        auto input = cv::dnn::blobFromImage(
+            scaled_frame,
+            1.0f / detector_config.mean,
+            size,
+            cv::Scalar(detector_config.mean, detector_config.mean, detector_config.mean)
+        );
+        detector.setInput(input);
+        auto detection = detector.forward();
+        auto result = cv::Mat(
+            detection.size[2],
+            detection.size[3],
+            CV_32F,
+            detection.ptr<float>()
+        );
+
+        struct Item {
+            float confidence;
+            cv::Rect bbox;
+
+            bool operator<(const Item &rhs) const {
+                return confidence < rhs.confidence;
+            }
+        };
+
+        std::vector<Item> items;
+        for (int i = 0; i < result.rows; i++) {
+            float confidence = result.at<float>(i, 2);
+            if (confidence < detector_config.threshold)
+                continue;
+
+            int idx = (int)result.at<float>(i, 1);
+            if (idx != target_idx)
+                continue;
+
+            float x = result.at<float>(i, 3) * frame.cols;
+            float y = result.at<float>(i, 4) * frame.rows;
+            float w = result.at<float>(i, 5) * frame.cols - x;
+            float h = result.at<float>(i, 6) * frame.rows - y;
+            items.push_back({confidence, {(int)x, (int)y, (int)w, (int)h}});
+        }
+
+        std::sort(items.begin(), items.end());
+        for (int i = 0; i < num_trackers && !items.empty(); i++) {
+            auto &t = trackers[i];
+            if (!t.valid())
+                continue;
+
+            t.init(frame, items.back().bbox);
+            items.pop_back();
+        }
+    }
+
+    void update(const cv::Mat &frame) {
+        for (auto &t : trackers) {
+            t.update(frame);
+        }
+        if (frame_count % detector_config.interval == 0)
+            detect(frame);
+    }
+
+    void render(cv::Mat &frame) {
+        for (auto &t : trackers) {
+            if (!t.valid())
+                continue;
+            cv::rectangle(frame, t.bbox, cv::Scalar(255, 0, 0));
+        }
+    }
+};
+
+int main() {
+    auto video = cv::VideoCapture("car-500k.mp4");
+    assert(video.isOpened());
+
+
+
+    // auto net = cv::dnn::readNetFromCaffe("mobilenet.prototxt", "mobilenet.caffemodel");
+    // assert(!net.empty());
+
+    // cv::Mat frame;
+    // // assert(video.read(frame));
+
+    // // auto bbox = cv::selectROI("Select bbox", frame);
+    // // auto tracker = cv::TrackerCSRT::create();
+    // // tracker->init(frame, bbox);
+    // // printf("bbox={x=%d, y=%d, w=%d, h=%d}\n", bbox.x, bbox.y, bbox.width, bbox.height);
+
+
+    // while (video.read(frame)) {
+    //     auto size = cv::Size(300, 300);
+    //     cv::Mat image;
+    //     cv::resize(frame, image, size, cv::INTER_AREA);
+    //     auto input = cv::dnn::blobFromImage(
+    //         image, 1 / 127.5, size, cv::Scalar(127.5, 127.5, 127.5));
+    //     net.setInput(input);
+    //     auto detection = net.forward();
+    //     auto result = cv::Mat(detection.size[2], detection.size[3], CV_32F, detection.ptr<float>());
+
+    //     float threshold = 0.20;
+    //     // printf("result.rows=%d\n", result.rows);
+    //     for (int i = 0; i < 100; i++) {
+    //         float confidence = result.at<float>(i, 2);
+    //         if (confidence < threshold)
+    //             continue;
+
+    //         int idx = (int)result.at<float>(i, 1);
+
+    //         if (idx == 7) {
+    //             int x = (int)(result.at<float>(i, 3) * frame.cols);
+    //             int y = (int)(result.at<float>(i, 4) * frame.rows);
+    //             int w = (int)(result.at<float>(i, 5) * frame.cols) - x;
+    //             int h = (int)(result.at<float>(i, 6) * frame.rows) - y;
+    //             cv::rectangle(frame, cv::Rect(x, y, w, h), cv::Scalar(255, 0, 0));
+
+    //             cv::String label = label_map[idx];
+    //             label += ": ";
+    //             label += std::to_string(confidence);
+    //             // int baseline = 0;
+    //             // auto size = cv::getTextSize(label, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseline);
+    //             cv::putText(frame, label, cv::Point(x, y), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 255, 255));
+    //         }
+    //     }
+
+    //     // if (tracker->update(frame, bbox)) {
+    //     //     cv::rectangle(frame, bbox, cv::Scalar(255, 0, 0), 2);
+    //     // } else {
+    //     //     putText(frame,
+    //     //         "Tracking failure detected",
+    //     //         cv::Point(100, 80),
+    //     //         cv::FONT_HERSHEY_SIMPLEX,
+    //     //         0.75,
+    //     //         cv::Scalar(0, 0, 255),
+    //     //         2
+    //     //     );
+    //     // }
+
+    //     cv::imshow("Show", frame);
+    //     if (cv::waitKey(0) == 27)
+    //         break;
+    // }
+
+    return 0;
+}

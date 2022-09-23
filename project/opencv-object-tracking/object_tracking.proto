@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+message BoundingBox {
+    uint32 x = 1;
+    uint32 y = 2;
+    uint32 width = 3;
+    uint32 height = 4;
+}
+
+message VideoChunk {
+    uint64 duration_us = 2;
+    bytes data = 3;
+}
+
+message VideoFrame {
+    bool chunk_finished = 1;
+    uint64 index_in_stream = 2;
+    uint64 index_in_chunk = 3;
+    bool found = 4;
+    float score = 5;
+    BoundingBox bbox = 6;
+}
+
+service ObjectTracking {
+    rpc process(stream VideoChunk) returns (stream VideoFrame);
+}
