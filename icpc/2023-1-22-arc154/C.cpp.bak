@@ -1,0 +1,106 @@
+#include <cstdio>
+#include <cstring>
+
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+constexpr int NMAX = 5000;
+
+int n;
+int A[NMAX], B[NMAX];
+int m[NMAX];
+bool visited[NMAX], onstack[NMAX];
+vector<int> G[NMAX];
+
+bool dfs(int u) {
+    onstack[u] = true;
+    visited[u] = true;
+    for (int v : G[u]) {
+        if (onstack[v])
+            return true;
+        if (visited[v])
+            continue;
+        if (dfs(v))
+            return true;
+    }
+    onstack[u] = false;
+    return false;
+}
+
+bool check(int s) {
+    // printf("s=%d\n", s);
+    int i = 0, j = 0;
+    int imax = n;
+    while (i < imax) {
+        if (i > j)
+            j = i;
+        while (j <= n && B[i] != A[(s + j) % n]) {
+            j++;
+        }
+        if (j > n)
+            return false;
+        // printf("%d %d\n", i, (s + j) % n);
+        if (i == 0) {
+            while (imax > 0 && B[imax - 1] == B[0]) {
+                imax--;
+            }
+        }
+        // m[i] = (s + j) % n;
+        i++;
+    }
+    // for (int i = imax; i < n; i++) {
+    //     m[i] = m[0];
+    // }
+    // for (int i = 0; i < n; i++) {
+    //     G[i].clear();
+    // }
+    // for (int i = 0; i < n; i++) {
+    //     printf("%d %d\n", i, m[i]);
+    //     int j = (i + 1) % n;
+    //     if (i == m[i])
+    //         continue;
+    //     if (B[i] == B[j])
+    //         G[j].push_back(i);
+    //     else
+    //         G[i].push_back(j);
+    // }
+    // memset(visited, 0, n);
+    // memset(onstack, 0, n);
+    // for (int i = 0; i < n; i++) {
+    //     if (dfs(i))
+    //         return false;
+    // }
+    return true;
+}
+
+int main() {
+    int T;
+    scanf("%d", &T);
+    while (T--) {
+        scanf("%d", &n);
+        for (int i = 0; i < n; i++) {
+            scanf("%d", A + i);
+        }
+        for (int i = 0; i < n; i++) {
+            scanf("%d", B + i);
+        }
+        bool okay = false;
+        for (int i = 0; i < n; i++) {
+            if (check(i)) {
+                okay = true;
+                break;
+            }
+        }
+        // puts(okay ? ".Yes" : ".No");
+        if (okay && memcmp(A, B, sizeof(int) * n) != 0) {
+            sort(B, B + n);
+            int m = unique(B, B + n) - B;
+            if (m == n)
+                okay = false;
+        }
+        puts(okay ? "Yes" : "No");
+    }
+    return 0;
+}
