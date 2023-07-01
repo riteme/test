@@ -1,0 +1,91 @@
+class Solution {
+public:
+    int n;
+    int per[12];
+    int mod, tar;
+    long long g[12], length[12];
+    long long pw[1200];
+    int vis[12][12];
+    vector<long long> val[11][11];
+    int len[11][11];
+    int ans;
+    int getlen(int x) {
+        int ret = 0;
+        if (x == 0)
+            return 1;
+        while (x) {
+            ret++;
+            x = x / 10;
+        }
+        return ret;
+    }
+    void solve(int l, int r) {
+        int i;
+        long long tmp;
+        if (vis[l][r] == 1)
+            return;
+        vis[l][r] = 1;
+        if (l == r) {
+            tmp = (pw[length[l] + 1] + g[l] * pw[1] + 9) % mod;
+            len[l][r] = 1 + length[l] + 1;
+            val[l][r].push_back(tmp);
+        }
+        //printf ( "dfs %d %d\n" , l , r );
+        long long pwl, pwr;
+        for (i = l; i <= r - 1; i++) {
+            solve(l, i);
+            solve(i + 1, r);
+            pwl = pw[len[l][i] + len[i + 1][r] + 1];
+            pwr = pw[len[i + 1][r] + 1];
+            for (auto t1 : val[l][i]) {
+                for (auto t2 : val[i + 1][r]) {
+                    tmp = (pwl + t1 * pwr + t2 * pw[1] + 9) % mod;
+                    val[l][r].push_back(tmp);
+                }
+            }
+            len[l][r] = 1 + len[l][i] + len[i + 1][r] + 1;
+        }
+    }
+    int treeOfInfiniteSouls(vector<int> &gem, int p, int target) {
+        int i, j;
+        n = gem.size();
+        mod = p;
+        tar = target;
+        sort(gem.begin(), gem.end());
+        pw[0] = 1;
+        for (i = 1; i <= 1000; i++) {
+            pw[i] = (pw[i - 1] * 10) % p;
+        }
+        for (i = 1; i <= n; i++) {
+            per[i] = i;
+        }
+        ans = 0;
+        do {
+            /*for ( i = 1 ; i <= n ; i++ ) {
+                printf ( "%d " , g[i] );
+            }
+            printf ( "\n" );*/
+            for (i = 1; i <= n; i++) {
+                g[i] = gem[per[i] - 1];
+            }
+            for (i = 1; i <= n; i++) {
+                length[i] = getlen(g[i]);
+            }
+            for (i = 1; i <= n; i++) {
+                for (j = i; j <= n; j++) {
+                    val[i][j].clear();
+                    vis[i][j] = 0;
+                }
+            }
+            //tim = 0;
+            solve(1, n);
+            //printf ( "%d\n" , tim );
+            for (auto t : val[1][n]) {
+                if (t % mod == target)
+                    ans++;
+            }
+            //printf ( "%d\n" , clock () );
+        } while (next_permutation(per + 1, per + 1 + n));
+        return ans;
+    }
+};

@@ -1,0 +1,101 @@
+#include <cstdio>
+#include <cstring>
+
+#include <algorithm>
+#include <unordered_map>
+#include <vector>
+
+using namespace std;
+
+using i64 = long long;
+
+constexpr int NMAX = 100000;
+
+int n, q;
+vector<int> G[NMAX + 10];
+i64 a[NMAX + 10];
+i64 a2sum[NMAX + 10];
+int p[NMAX + 10], dep[NMAX + 10];
+int top[NMAX + 10];
+
+void dfs1(int u) {
+    top[u] = 1;
+    a2sum[u] += a[u] * a[u];
+    for (int v : G[u]) {
+        dep[v] = dep[u] + 1;
+        a2sum[v] = a2sum[u];
+        dfs1(v);
+        top[u] += top[v];
+    }
+}
+
+void dfs2(int u) {
+    if (G[u].empty())
+        return;
+
+    int maxv = 0;
+    for (int v : G[u]) {
+        if (top[v] > top[maxv])
+            maxv = v;
+    }
+
+    top[maxv] = top[u];
+    dfs2(maxv);
+
+    for (int v : G[u]) {
+        if (v == maxv)
+            continue;
+
+        top[v] = v;
+        dfs2(v);
+    }
+}
+
+int lca(int u, int v) {
+    while (top[u] != top[v]) {
+        if (dep[top[u]] < dep[top[v]])
+            swap(u, v);
+        u = p[top[u]];
+    }
+    return dep[u] < dep[v] ? u : v;
+}
+
+unordered_map<int, i64> ans[NMAX + 10];
+
+i64 get(int u, int v) {
+    if (u == v)
+        return a2sum[u];
+    if (u > v)
+        swap(u, v);
+    auto it = ans[u].find(v);
+    if (it == ans[u].end()) {
+        i64 r = get(p[u], p[v]) + a[u] * a[v];
+        ans[u][v] = r;
+        return r;
+    } else {
+        return it->second;
+    }
+}
+
+int main() {
+    scanf("%d%d", &n, &q);
+    for (int i = 1; i <= n; i++) {
+        scanf("%lld", a + i);
+    }
+    for (int v = 2; v <= n; v++) {
+        scanf("%d", p + v);
+        G[p[v]].push_back(v);
+    }
+
+    dfs1(1);
+    top[1] = 1;
+    dfs2(1);
+
+    while (q--) {
+        int u, v;
+        scanf("%d%d", &u, &v);
+        printf("%lld\n", get(u, v));
+    }
+
+    return 0;
+}
