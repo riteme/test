@@ -1,0 +1,28 @@
+#include <cstdio>
+#include <cstring>
+
+char S[100];
+
+int main() {
+    scanf("%s", S + 1);
+    int n = strlen(S + 1);
+    for (int i = 1; i <= n; i++) {
+        int F = 0;
+        for (int j = 1; j < i; j++) {
+            if (S[j] == '+')
+                F++;
+            else
+                F--;
+        }
+        for (int j = i + 1; j <= n; j++) {
+            if (S[j] == '+')
+                F--;
+            else
+                F++;
+        }
+        if (S[i] == '-')
+            F = -F;
+        putchar(F < 0 ? '<' : '>');
+    }
+    puts("");
+}
