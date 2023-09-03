@@ -1,0 +1,165 @@
+#include <cstdio>
+#include <cstring>
+
+#include <vector>
+#include <bitset>
+#include <string>
+#include <algorithm>
+
+using namespace std;
+
+constexpr int NMAX = 150;
+constexpr int CMAX = 26;
+
+struct node {
+    bool mark;
+    int len;
+    int ch[CMAX];
+} no[NMAX * NMAX + 10];
+string str[NMAX * NMAX + 10];
+
+int n, L, K;
+int cnt;
+char s[NMAX + 10];
+vector<int> G[NMAX * NMAX + 10];
+
+void insert(char *beg, char *end) {
+    string t(beg, end);
+    int x = 1;
+    for ( ; beg != end; beg++) {
+        int c = *beg - 'a';
+        if (!no[x].ch[c]) {
+            int y = ++cnt;
+            memset(no + y, 0, sizeof(no[y]));
+            no[y].len = no[x].len + 1;
+            no[x].ch[c] = y;
+        }
+        x = no[x].ch[c];
+    }
+    no[x].mark = true;
+    if (str[x].empty() || t < str[x])
+        str[x] = std::move(t);
+}
+
+void scan(int u, int x) {
+    if (!x)
+        return;
+    if (no[x].mark) {
+        G[u].push_back(x);
+        // printf("%s -> %s\n", str[u].c_str(), str[x].c_str());
+    }
+    for (int c = 0; c < CMAX; c++) {
+        if (no[x].ch[c])
+            scan(u, no[x].ch[c]);
+    }
+}
+
+char f[NMAX + 10][NMAX + 10][NMAX * NMAX + 10];
+
+bool dp(int x, int l, int k) {
+    if (l > L || k > K)
+        return false;
+    if (f[l][k][x])
+        return f[l][k][x] == 1;
+    if (l == L && k == K)
+        return true;
+
+    f[l][k][x] = 2;
+    for (int v : G[x]) {
+        if (dp(v, l + no[v].len, k + 1)) {
+            f[l][k][x] = 1;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+struct pos {
+    int x, k, i;
+
+    char getc() {
+        return str[x][i];
+    }
+};
+
+void solve() {
+    cnt = 1;
+    memset(no + 1, 0, sizeof(no[1]));
+    scanf("%d%d%d%s", &n, &L, &K, s);
+    for (int l = 0; l < n; l++) {
+        for (int r = l; r < n; r++) {
+            insert(s + l, s + r + 1);
+        }
+    }
+
+    for (int u = 2; u <= cnt; u++) {
+        if (!no[u].mark)
+            continue;
+        for (int c = 0; c < CMAX; c++) {
+            if (no[u].ch[c])
+                continue;
+            scan(u, no[1].ch[c]);
+        }
+    }
+
+    for (int l = 0; l <= L; l++) {
+        for (int k = 0; k <= K; k++) {
+            for (int x = 1; x <= cnt; x++) {
+                f[l][k][x] = 0;
+            }
+        }
+    }
+
+    vector<pos> q;
+    for (int x = 1; x <= cnt; x++) {
+        if (no[x].mark && dp(x, no[x].len, 1))
+            q.push_back({x, 1, 0});
+    }
+
+    if (q.empty()) {
+        puts("-1");
+    } else {
+        for (int i = 1; i <= L; i++) {
+            char minc = 'z' + 1;
+            for (auto &e : q) {
+                minc = min(minc, e.getc());
+            }
+
+            vector<pos> tmp;
+            for (auto e : q) {
+                if (e.getc() != minc)
+                    continue;
+
+                e.i++;
+                if (e.i < no[e.x].len) {
+                    tmp.push_back(e);
+                } else {
+                    for (int v : G[e.x]) {
+                        if (dp(v, i + no[v].len, e.k + 1))
+                            tmp.push_back({v, e.k + 1, 0});
+                    }
+                }
+            }
+
+            printf("tmp.size()=%zu\n", tmp.size());
+            swap(q, tmp);
+            putchar(minc);
+        }
+        puts("");
+    }
+
+    for (int u = 1; u <= cnt; u++) {
+        G[u].clear();
+        str[u].clear();
+    }
+}
+
+int main() {
+    int T;
+    scanf("%d", &T);
+    while (T--) {
+        solve();
+    }
+    return 0;
+}
